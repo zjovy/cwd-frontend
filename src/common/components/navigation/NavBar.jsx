@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import styled from 'styled-components';
-
-import { Button } from '@/common/components/atoms/Button';
+import { Button } from '@/common/components/atoms/CommonButton';
 import { useUser } from '@/common/contexts/UserContext';
+import styled from 'styled-components';
 
 import LogoutModal from './LogoutModal';
 

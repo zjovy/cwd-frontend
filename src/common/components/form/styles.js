@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { Button } from '@/common/components/atoms/Button';
+import { Button } from '@/common/components/atoms/CommonButton';
 
 export const InputContainer = styled.div``;
 
