@@ -4,6 +4,7 @@ import Badge from '@/common/components/atoms/Badge';
 import Card from '@/common/components/atoms/Card';
 import SectionTitle from '@/common/components/atoms/SectionTitle';
 import useDonations from '@/hooks/useDonations';
+import { formatAmount, formatDate } from '@/utils/format';
 import { Plus } from 'lucide-react';
 
 import DeleteConfirmModal from './DeleteConfirmModal';
@@ -106,25 +107,6 @@ const statusMsg = {
 
 const HEADERS = ['Name', 'Amount', 'Date', 'Receipt Status', 'Actions'];
 
-/* ── helpers ──────────────────────────────────────── */
-
-function formatCurrency(value) {
-  return Number(value).toLocaleString('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  });
-}
-
-function formatDate(iso) {
-  return new Date(iso).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-}
-
-/* ── ActionsMenu (per-row) ────────────────────────── */
-
 function ActionsMenu({ onEdit, onDelete }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
@@ -169,8 +151,6 @@ function ActionsMenu({ onEdit, onDelete }) {
   );
 }
 
-/* ── main component ───────────────────────────────── */
-
 export default function RecentDonations() {
   const { donations, loading, error, createDonation, updateDonation, deleteDonation } =
     useDonations();
@@ -179,7 +159,6 @@ export default function RecentDonations() {
   const [editing, setEditing] = useState(null);
   const [deleting, setDeleting] = useState(null);
 
-  /* create / edit handlers */
   const openCreate = () => {
     setEditing(null);
     setModalOpen(true);
@@ -191,7 +170,6 @@ export default function RecentDonations() {
   const handleSubmit = (data) =>
     editing ? updateDonation(editing.id, data) : createDonation(data);
 
-  /* delete handlers */
   const openDelete = (d) => setDeleting(d);
   const handleDelete = () => deleteDonation(deleting.id);
 
@@ -232,7 +210,7 @@ export default function RecentDonations() {
                     <td style={{ ...tdStyle, fontWeight: '500', color: '#1a1a1a' }}>
                       {d.donor_name}
                     </td>
-                    <td style={tdStyle}>{formatCurrency(d.amount)}</td>
+                    <td style={tdStyle}>{formatAmount(d.amount)}</td>
                     <td style={tdStyle}>{formatDate(d.donation_date)}</td>
                     <td style={tdStyle}>
                       <Badge status={d.receipt_status} />
@@ -251,7 +229,6 @@ export default function RecentDonations() {
         )}
       </Card>
 
-      {/* Create / Edit modal */}
       <DonationModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -259,7 +236,6 @@ export default function RecentDonations() {
         donation={editing}
       />
 
-      {/* Delete confirmation modal */}
       <DeleteConfirmModal
         open={Boolean(deleting)}
         onClose={() => setDeleting(null)}

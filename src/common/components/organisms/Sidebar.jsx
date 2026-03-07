@@ -9,8 +9,10 @@
 
 import NavItem from '@/common/components/atoms/NavItem';
 import UserProfile from '@/common/components/molecules/UserProfile';
+import { useUser } from '@/common/contexts/UserContext';
 import { DollarSign, LayoutDashboard, Users } from 'lucide-react';
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 
 const NAV_ITEMS = [
   { label: 'Dashboard', icon: LayoutDashboard, id: 'dashboard' },
@@ -47,7 +49,30 @@ const styles = {
   },
 };
 
+function getInitials(user) {
+  if (user?.firstname && user?.lastname) {
+    return `${user.firstname[0]}${user.lastname[0]}`.toUpperCase();
+  }
+  if (user?.username) return user.username.slice(0, 2).toUpperCase();
+  if (user?.email) return user.email.slice(0, 2).toUpperCase();
+  return '?';
+}
+
+function getDisplayName(user) {
+  if (user?.firstname && user?.lastname) return `${user.firstname} ${user.lastname}`;
+  if (user?.username) return user.username;
+  return user?.email || '';
+}
+
 export default function Sidebar({ activePage, onNavigate }) {
+  const { user, logout } = useUser();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login', { replace: true });
+  };
+
   return (
     <aside style={styles.sidebar}>
       <div style={styles.logo}>
@@ -65,9 +90,10 @@ export default function Sidebar({ activePage, onNavigate }) {
         ))}
       </nav>
       <UserProfile
-        initials='AD'
-        name='Clarence Weaver'
-        email='cwfoundation1960@gmail.com'
+        initials={getInitials(user)}
+        name={getDisplayName(user)}
+        email={user?.email || ''}
+        onLogout={handleLogout}
       />
     </aside>
   );

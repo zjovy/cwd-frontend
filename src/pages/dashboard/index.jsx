@@ -1,4 +1,5 @@
 import Button from '@/common/components/atoms/CommonButton';
+import { useUser } from '@/common/contexts/UserContext';
 import ChartsRow from '@/pages/dashboard/ChartsRow';
 import RecentDonations from '@/pages/dashboard/RecentDonations';
 import StatsRow from '@/pages/dashboard/StatsRow';
@@ -31,15 +32,16 @@ const styles = {
 };
 
 export default function DashboardPage() {
+  const { user } = useUser();
+  const firstName = user?.firstname || user?.username || 'there';
+
   return (
     <main style={styles.main}>
       <div style={styles.topRow}>
         <div>
           <div style={styles.title}>Dashboard</div>
           <div style={styles.subtitle}>
-            {
-              "Welcome back Clarence! Here's an overview of your C&W Foundation donor activity."
-            }
+            {`Welcome back ${firstName}! Here's an overview of your C&W Foundation donor activity.`}
           </div>
         </div>
         <Button variant='outline'>
