@@ -1,11 +1,13 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import Card from '@/common/components/atoms/Card';
 import DeleteConfirmModal from '@/common/components/organisms/DeleteConfirmModal';
 import DonationModal from '@/common/components/organisms/DonationModal';
 import DonationTable from '@/common/components/organisms/DonationTable';
-import donationService from '@/services/donationService';
+import useDonations from '@/hooks/useDonations';
 import { Plus } from 'lucide-react';
+
+import DonationsFilterBar from './DonationsFilterBar';
 
 /* ── styles ─────────────────────────────────────────── */
 
@@ -46,84 +48,24 @@ const styles = {
     fontWeight: '500',
     cursor: 'pointer',
   },
-  filterBar: {
-    display: 'flex',
-    gap: '10px',
-    marginBottom: '14px',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-  },
-  searchInput: {
-    flex: '1 1 220px',
-    padding: '8px 12px',
-    border: '1px solid #e5e7eb',
-    borderRadius: '8px',
-    fontSize: '13px',
-    outline: 'none',
-    minWidth: '180px',
-  },
-  select: {
-    padding: '8px 12px',
-    border: '1px solid #e5e7eb',
-    borderRadius: '8px',
-    fontSize: '13px',
-    outline: 'none',
-    background: '#fff',
-    cursor: 'pointer',
-  },
-  amountInput: {
-    width: '110px',
-    padding: '8px 12px',
-    border: '1px solid #e5e7eb',
-    borderRadius: '8px',
-    fontSize: '13px',
-    outline: 'none',
-  },
-  count: {
-    fontSize: '13px',
-    color: '#6b7280',
-    marginBottom: '12px',
-  },
 };
+
+const INITIAL_FILTERS = { search: '', status: '', minAmount: '', maxAmount: '' };
 
 /* ── component ───────────────────────────────────────── */
 
 export default function DonationsPage() {
-  const [donations, setDonations] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [filters, setFilters] = useState(INITIAL_FILTERS);
   const [selected, setSelected] = useState(new Set());
-
-  const [search, setSearch] = useState('');
-  const [status, setStatus] = useState('');
-  const [minAmount, setMinAmount] = useState('');
-  const [maxAmount, setMaxAmount] = useState('');
-
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [deleting, setDeleting] = useState(null);
 
-  const fetchDonations = useCallback(async (filters) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await donationService.getAll(filters);
-      setDonations(data);
-      setSelected(new Set());
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const { donations, loading, error, createDonation, updateDonation, deleteDonation } =
+    useDonations(filters);
 
-  // Debounce filter changes so we don't fire on every keystroke
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchDonations({ search, status, minAmount, maxAmount });
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [search, status, minAmount, maxAmount, fetchDonations]);
+  const handleFilterChange = (field, value) =>
+    setFilters((prev) => ({ ...prev, [field]: value }));
 
   const handleSelectChange = (id) => {
     setSelected((prev) => {
@@ -134,26 +76,23 @@ export default function DonationsPage() {
     });
   };
 
-  const handleSelectAll = (selectAll) => {
+  const handleSelectAll = (selectAll) =>
     setSelected(selectAll ? new Set(donations.map((d) => d.id)) : new Set());
-  };
 
   const openCreate = () => { setEditing(null); setModalOpen(true); };
   const openEdit = (d) => { setEditing(d); setModalOpen(true); };
 
   const handleSubmit = async (data) => {
     if (editing) {
-      await donationService.update(editing.id, data);
+      await updateDonation(editing.id, data);
     } else {
-      await donationService.create(data);
+      await createDonation(data);
     }
-    fetchDonations({ search, status, minAmount, maxAmount });
   };
 
   const handleDelete = async () => {
-    await donationService.delete(deleting.id);
+    await deleteDonation(deleting.id);
     setDeleting(null);
-    fetchDonations({ search, status, minAmount, maxAmount });
   };
 
   return (
@@ -168,47 +107,13 @@ export default function DonationsPage() {
         </button>
       </div>
 
-      <Card style={{ padding: '24px' }}>
-        <div style={styles.filterBar}>
-          <input
-            style={styles.searchInput}
-            placeholder='Search by name or email…'
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <select
-            style={styles.select}
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-          >
-            <option value=''>All Status</option>
-            <option value='sent'>Sent</option>
-            <option value='pending'>Pending</option>
-          </select>
-          <input
-            style={styles.amountInput}
-            type='number'
-            placeholder='Min Amount'
-            min='0'
-            value={minAmount}
-            onChange={(e) => setMinAmount(e.target.value)}
-          />
-          <input
-            style={styles.amountInput}
-            type='number'
-            placeholder='Max Amount'
-            min='0'
-            value={maxAmount}
-            onChange={(e) => setMaxAmount(e.target.value)}
-          />
-        </div>
+      <DonationsFilterBar
+        filters={filters}
+        onChange={handleFilterChange}
+        count={loading ? null : donations.length}
+      />
 
-        {!loading && !error && (
-          <div style={styles.count}>
-            Showing {donations.length} donation{donations.length !== 1 ? 's' : ''}
-          </div>
-        )}
-
+      <Card style={{ padding: '24px', marginTop: '16px' }}>
         <DonationTable
           donations={donations}
           loading={loading}

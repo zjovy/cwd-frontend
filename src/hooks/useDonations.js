@@ -1,11 +1,16 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import donationService from '@/services/donationService';
 
-export default function useDonations() {
+export default function useDonations(filters = {}) {
   const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Keep a ref so mutations can always re-fetch with the latest filters
+  // without needing them as effect dependencies
+  const filtersRef = useRef(filters);
+  useEffect(() => { filtersRef.current = filters; });
 
   const fetchDonations = useCallback(async (params) => {
     setLoading(true);
@@ -20,30 +25,35 @@ export default function useDonations() {
     }
   }, []);
 
+  // Debounce filter-driven fetches; destructure to avoid firing on every
+  // render when the parent creates a new filters object each time
+  const { search, status, minAmount, maxAmount } = filters;
   useEffect(() => {
-    fetchDonations();
-  }, [fetchDonations]);
+    const timer = setTimeout(() => {
+      fetchDonations({ search, status, minAmount, maxAmount });
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search, status, minAmount, maxAmount, fetchDonations]);
 
   const createDonation = async (data) => {
     await donationService.create(data);
-    await fetchDonations();
+    await fetchDonations(filtersRef.current);
   };
 
   const updateDonation = async (id, data) => {
     await donationService.update(id, data);
-    await fetchDonations();
+    await fetchDonations(filtersRef.current);
   };
 
   const deleteDonation = async (id) => {
     await donationService.delete(id);
-    await fetchDonations();
+    await fetchDonations(filtersRef.current);
   };
 
   return {
     donations,
     loading,
     error,
-    refresh: fetchDonations,
     createDonation,
     updateDonation,
     deleteDonation,
