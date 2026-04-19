@@ -23,13 +23,29 @@ async function request(url, options = {}) {
   return res.json();
 }
 
+/** Normalize GET /donations payloads (array vs `{ donations, total }`, alternate keys). */
+function normalizeDonationsListPayload(raw) {
+  if (raw == null) return { donations: [], total: 0 };
+  if (Array.isArray(raw)) return { donations: raw, total: raw.length };
+  if (typeof raw !== 'object') return { donations: [], total: 0 };
+
+  const rows = raw.donations ?? raw.data ?? raw.results;
+  const donations = Array.isArray(rows) ? rows : [];
+  const totalRaw = raw.total ?? raw.count ?? raw.meta?.total;
+  const n = typeof totalRaw === 'number' ? totalRaw : Number(totalRaw);
+  const total = Number.isFinite(n) && n >= 0 ? n : donations.length;
+
+  return { donations, total };
+}
+
 const donationService = {
-  getAll(params = {}, signal) {
+  async getAll(params = {}, signal) {
     const { signal: _ignored, ...rest } = params;
     const query = new URLSearchParams(
       Object.fromEntries(Object.entries(rest).filter(([, v]) => v != null && v !== ''))
     ).toString();
-    return request(`${BASE_URL}${query ? `?${query}` : ''}`, { signal });
+    const raw = await request(`${BASE_URL}${query ? `?${query}` : ''}`, { signal });
+    return normalizeDonationsListPayload(raw);
   },
 
   getById(id) {
