@@ -74,9 +74,11 @@ function getPageNumbers(page, totalPages) {
 }
 
 export default function Pagination({ page, totalPages, onPageChange }) {
-  if (totalPages <= 1) return null;
+  const safeTotal =
+    typeof totalPages === 'number' && Number.isFinite(totalPages) ? totalPages : 0;
+  if (safeTotal <= 1) return null;
 
-  const pages = getPageNumbers(page, totalPages);
+  const pages = getPageNumbers(page, safeTotal);
 
   return (
     <div style={styles.container}>
@@ -115,11 +117,11 @@ export default function Pagination({ page, totalPages, onPageChange }) {
       <button
         style={{
           ...styles.btn,
-          ...(page === totalPages ? styles.btnDisabled : {}),
+          ...(page === safeTotal ? styles.btnDisabled : {}),
         }}
         type='button'
         onClick={() => onPageChange(page + 1)}
-        disabled={page === totalPages}
+        disabled={page === safeTotal}
       >
         →
       </button>

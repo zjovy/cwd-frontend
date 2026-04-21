@@ -1,9 +1,17 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import Card from '@/common/components/atoms/Card';
-import donorService from '@/services/donorService';
-import { formatAmount, formatDate } from '@/utils/format';
+import Pagination from '@/common/components/atoms/Pagination';
+import DeleteConfirmModal from '@/common/components/organisms/DeleteConfirmModal';
+import DonorModal from '@/common/components/organisms/DonorModal';
+import DonorTable from '@/common/components/organisms/DonorsTable';
+import useDonors from '@/hooks/useDonors';
+import { PAGE_SIZE } from '@/utils/pagination';
+import { Plus } from 'lucide-react';
+
+import DonorsFilterBar from './DonorsFilterBar';
+
+/* ── styles ─────────────────────────────────────────── */
 
 const styles = {
   main: {
@@ -12,7 +20,12 @@ const styles = {
     overflowY: 'auto',
     minHeight: '100vh',
   },
-  topRow: { marginBottom: '20px' },
+  topRow: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    marginBottom: '28px',
+  },
   title: {
     fontSize: '26px',
     fontWeight: '700',
@@ -20,116 +33,134 @@ const styles = {
     color: '#1a1a1a',
     marginBottom: '4px',
   },
-  subtitle: { fontSize: '14px', color: '#6b7280' },
-  card: { padding: '24px' },
-  table: { width: '100%', borderCollapse: 'collapse' },
-  th: {
-    textAlign: 'left',
-    fontSize: '12px',
-    fontWeight: '600',
-    color: '#9ca3af',
-    textTransform: 'uppercase',
-    letterSpacing: '0.05em',
-    paddingBottom: '12px',
-    borderBottom: '1px solid #f0f0ee',
-  },
-  td: {
-    padding: '14px 0',
-    fontSize: '14px',
-    color: '#374151',
-    borderBottom: '1px solid #f9f9f8',
-  },
-  row: { cursor: 'pointer' },
-  nameCell: { fontWeight: '500', color: '#1a1a1a' },
-  status: {
-    padding: '40px 0',
-    textAlign: 'center',
+  subtitle: {
     fontSize: '14px',
     color: '#6b7280',
   },
+  addBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '9px 16px',
+    border: 'none',
+    borderRadius: '8px',
+    background: '#2563eb',
+    color: '#fff',
+    fontSize: '13px',
+    fontWeight: '500',
+    cursor: 'pointer',
+  },
 };
 
-const COLUMNS = [
-  'Name',
-  'Email',
-  'Phone',
-  'Total Donated',
-  'Donations',
-  'Last Donation',
-];
+const INITIAL_FILTERS = { search: ''};
+
+/* ── component ───────────────────────────────────────── */
 
 export default function DonorsPage() {
-  const navigate = useNavigate();
-  const [donors, setDonors] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [filters, setFilters] = useState(INITIAL_FILTERS);
+  const [page, setPage] = useState(1);
+  const [selected, setSelected] = useState(new Set());
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [deleting, setDeleting] = useState(null);
+
+  const { donors, total, totalPages, loading, error, onPageResetRef, createDonor, updateDonor, deleteDonor } =
+    useDonors({ ...filters, page });
 
   useEffect(() => {
-    const controller = new AbortController();
-    (async () => {
-      try {
-        const res = await donorService.getAll(undefined, controller.signal);
-        const rows = Array.isArray(res) ? res : res.donors || [];
-        setDonors(rows);
-      } catch (err) {
-        if (err.name !== 'AbortError') setError(err.message);
-      } finally {
-        if (!controller.signal.aborted) setLoading(false);
-      }
-    })();
-    return () => controller.abort();
-  }, []);
+    onPageResetRef.current = () => { setPage(1); setSelected(new Set()); };
+  });
+
+  const handleFilterChange = (field, value) => {
+    setPage(1);
+    setFilters((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSelectChange = (id) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleSelectAll = (selectAll) =>
+    setSelected(selectAll ? new Set(donors.map((d) => d.id)) : new Set());
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+    setSelected(new Set());
+  };
+
+  const openCreate = () => { setEditing(null); setModalOpen(true); };
+  const openEdit = (d) => { setEditing(d); setModalOpen(true); };
+
+  const handleSubmit = async (data) => {
+    if (editing) {
+      await updateDonor(editing.id, data);
+    } else {
+      await createDonor(data);
+    }
+  };
+
+  const handleDelete = async () => {
+    await deleteDonor(deleting.id);
+    setDeleting(null);
+  };
 
   return (
     <main style={styles.main}>
       <div style={styles.topRow}>
-        <div style={styles.title}>Donors</div>
-        <div style={styles.subtitle}>
-          View and manage everyone who has contributed.
+        <div>
+          <div style={styles.title}>Donors</div>
+          <div style={styles.subtitle}>View donor details and contributions in one place.</div>
         </div>
+        <button style={styles.addBtn} onClick={openCreate}>
+          <Plus size={14} /> Add Donor
+        </button>
       </div>
 
-      <Card style={styles.card}>
-        {loading ? (
-          <div style={styles.status}>Loading donors…</div>
-        ) : error ? (
-          <div style={{ ...styles.status, color: '#dc2626' }}>
-            Error: {error}
-          </div>
-        ) : donors.length === 0 ? (
-          <div style={styles.status}>No donors yet.</div>
-        ) : (
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                {COLUMNS.map((h) => (
-                  <th key={h} style={styles.th}>
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {donors.map((d) => (
-                <tr
-                  key={d.id}
-                  style={styles.row}
-                  onClick={() => navigate(`/donors/${d.id}`)}
-                >
-                  <td style={{ ...styles.td, ...styles.nameCell }}>{d.name}</td>
-                  <td style={styles.td}>{d.email}</td>
-                  <td style={styles.td}>{d.phone || '—'}</td>
-                  <td style={styles.td}>{formatAmount(d.total_donations)}</td>
-                  <td style={styles.td}>{d.donation_count ?? 0}</td>
-                  <td style={styles.td}>
-                    {d.most_recent ? formatDate(d.most_recent) : '—'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+      <DonorsFilterBar
+        filters={filters}
+        onChange={handleFilterChange}
+        page={page}
+        pageSize={PAGE_SIZE}
+        total={loading ? null : total}
+      />
+
+      <Card style={{ padding: '24px', marginTop: '16px' }}>
+        <DonorTable
+          donors={donors}
+          loading={loading}
+          error={error}
+          selected={selected}
+          onSelectChange={handleSelectChange}
+          onSelectAll={handleSelectAll}
+          onEdit={openEdit}
+          onDelete={(d) => setDeleting(d)}
+        />
+
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       </Card>
+
+      <DonorModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSubmit={handleSubmit}
+        donor={editing}
+      />
+
+      <DeleteConfirmModal
+        open={Boolean(deleting)}
+        onClose={() => setDeleting(null)}
+        onConfirm={handleDelete}
+        donorName={deleting?.name}
+      />
     </main>
   );
 }
