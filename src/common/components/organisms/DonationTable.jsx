@@ -12,8 +12,8 @@
     onEdit        – (donation) => void
     onDelete      – (donation) => void
 */
-
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import Badge from '@/common/components/atoms/Badge';
 import { formatAmount, formatDate } from '@/utils/format';
@@ -103,6 +103,13 @@ const menuItemDanger = {
   color: '#dc2626',
 };
 
+const donorLinkStyle = {
+  color: '#1a1a1a',
+  textDecoration: 'none',
+  borderBottom: '1px solid transparent',
+  transition: 'border-color 0.15s',
+};
+
 /* ── ActionsMenu ─────────────────────────────────────── */
 
 function ActionsMenu({ onEdit, onDelete }) {
@@ -116,12 +123,27 @@ function ActionsMenu({ onEdit, onDelete }) {
       </button>
       {open && (
         <>
-          <div style={{ position: 'fixed', inset: 0, zIndex: 9 }} onClick={close} />
+          <div
+            style={{ position: 'fixed', inset: 0, zIndex: 9 }}
+            onClick={close}
+          />
           <div style={menuStyle}>
-            <button style={menuItem} onClick={() => { close(); onEdit(); }}>
+            <button
+              style={menuItem}
+              onClick={() => {
+                close();
+                onEdit();
+              }}
+            >
               Edit
             </button>
-            <button style={menuItemDanger} onClick={() => { close(); onDelete(); }}>
+            <button
+              style={menuItemDanger}
+              onClick={() => {
+                close();
+                onDelete();
+              }}
+            >
               Delete
             </button>
           </div>
@@ -138,7 +160,14 @@ ActionsMenu.propTypes = {
 
 /* ── DonationTable ───────────────────────────────────── */
 
-const COLUMNS = ['Donor Name', 'Email', 'Amount', 'Date', 'Receipt Status', 'Actions'];
+const COLUMNS = [
+  'Donor Name',
+  'Email',
+  'Amount',
+  'Date',
+  'Receipt Status',
+  'Actions',
+];
 
 export default function DonationTable({
   donations,
@@ -150,7 +179,8 @@ export default function DonationTable({
   onEdit,
   onDelete,
 }) {
-  const allChecked = donations.length > 0 && donations.every((d) => selected.has(d.id));
+  const allChecked =
+    donations.length > 0 && donations.every((d) => selected.has(d.id));
   const someChecked = donations.some((d) => selected.has(d.id));
 
   const selectAllRef = useRef(null);
@@ -161,7 +191,8 @@ export default function DonationTable({
   }, [someChecked, allChecked]);
 
   if (loading) return <div style={statusMsg}>Loading donations…</div>;
-  if (error) return <div style={{ ...statusMsg, color: '#dc2626' }}>Error: {error}</div>;
+  if (error)
+    return <div style={{ ...statusMsg, color: '#dc2626' }}>Error: {error}</div>;
 
   return (
     <table style={tableStyle}>
@@ -200,7 +231,13 @@ export default function DonationTable({
                 />
               </td>
               <td style={{ ...tdStyle, fontWeight: '500', color: '#1a1a1a' }}>
-                {d.donor_name}
+                {d.donor_id ? (
+                  <Link to={`/donors/${d.donor_id}`} style={donorLinkStyle}>
+                    {d.donor_name}
+                  </Link>
+                ) : (
+                  d.donor_name
+                )}
               </td>
               <td style={tdStyle}>{d.donor_email}</td>
               <td style={tdStyle}>{formatAmount(d.amount)}</td>
@@ -209,7 +246,10 @@ export default function DonationTable({
                 <Badge status={d.receipt_status} />
               </td>
               <td style={tdStyle}>
-                <ActionsMenu onEdit={() => onEdit(d)} onDelete={() => onDelete(d)} />
+                <ActionsMenu
+                  onEdit={() => onEdit(d)}
+                  onDelete={() => onDelete(d)}
+                />
               </td>
             </tr>
           ))
