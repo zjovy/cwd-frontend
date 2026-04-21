@@ -23,8 +23,10 @@ UserProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-const buildUrl = (endpoint) =>
-  `${import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '')}${endpoint}`;
+const buildUrl = (endpoint) => {
+  const base = import.meta.env.VITE_BACKEND_URL ?? '';
+  return `${String(base).replace(/\/$/, '')}${endpoint}`;
+};
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
