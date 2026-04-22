@@ -1,7 +1,6 @@
 /*
   DonationViewModal — view + edit a donation record.
-  Fetches phone/address from the detail endpoint on open;
-  pre-fills donation fields immediately from the passed `donation` prop.
+  Pre-fills donation fields immediately from the passed `donation` prop.
 
   Props:
     open       – bool
@@ -11,8 +10,6 @@
 */
 import { useEffect, useState } from 'react';
 
-import donationService from '@/services/donationService';
-import donorService from '@/services/donorService';
 import { Send } from 'lucide-react';
 import { PropTypes } from 'prop-types';
 
@@ -187,8 +184,6 @@ const EMPTY = {
   amount: '',
   donation_date: '',
   receipt_status: 'pending',
-  phone: '',
-  address: '',
 };
 
 function fromDonationRow(d) {
@@ -199,8 +194,6 @@ function fromDonationRow(d) {
     amount: d.amount ?? '',
     donation_date: d.donation_date?.slice(0, 10) ?? '',
     receipt_status: d.receipt_status ?? 'pending',
-    phone: '',
-    address: '',
   };
 }
 
@@ -229,16 +222,6 @@ export default function DonationViewModal({
     setConfirmDelete(false);
     setDeleting(false);
 
-    donationService
-      .getById(donation.id)
-      .then((detail) => {
-        setForm((prev) => ({
-          ...prev,
-          phone: detail.phone ?? '',
-          address: detail.address ?? '',
-        }));
-      })
-      .catch((err) => console.error('[DonationViewModal] detail fetch failed:', err));
   }, [open, donation?.id]);
 
   if (!open) return null;
@@ -258,15 +241,6 @@ export default function DonationViewModal({
         donation_date: form.donation_date,
         receipt_status: form.receipt_status,
       });
-      // Best-effort donor contact upsert — don't fail the save if this errors
-      await donorService
-        .upsertByEmail({
-          email: form.donor_email,
-          name: form.donor_name,
-          phone: form.phone || null,
-          address: form.address || null,
-        })
-        .catch((err) => console.error('[DonationViewModal] donor upsert failed:', err));
       onClose();
     } catch (err) {
       setError(err.message);
@@ -351,7 +325,7 @@ export default function DonationViewModal({
               />
             </div>
 
-            <div style={fieldGroup}>
+            <div style={fieldGroupLast}>
               <label style={labelStyle}>Email</label>
               <input
                 style={inputStyle}
@@ -359,26 +333,6 @@ export default function DonationViewModal({
                 value={form.donor_email}
                 onChange={set('donor_email')}
                 required
-              />
-            </div>
-
-            <div style={fieldGroup}>
-              <label style={labelStyle}>Phone</label>
-              <input
-                style={inputStyle}
-                value={form.phone}
-                onChange={set('phone')}
-                placeholder='—'
-              />
-            </div>
-
-            <div style={fieldGroupLast}>
-              <label style={labelStyle}>Address</label>
-              <input
-                style={inputStyle}
-                value={form.address}
-                onChange={set('address')}
-                placeholder='—'
               />
             </div>
           </div>
