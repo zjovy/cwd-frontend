@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react';
-
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import styled from 'styled-components';
 
 import { Subtitle, Title } from '@/common/components/atoms/Text';
+import styled from 'styled-components';
 
 const VerificationPage = styled.div`
   flex: 1 0 0;

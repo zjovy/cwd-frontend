@@ -6,7 +6,6 @@
   Props:
     - status (string): The status to display.
 */
-
 import PropTypes from 'prop-types';
 
 const colorMap = {

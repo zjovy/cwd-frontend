@@ -11,7 +11,9 @@ export default function useDonors(filters = {}) {
 
   // Lets mutations re-fetch with the latest filters without stale closures
   const filtersRef = useRef(filters);
-  useEffect(() => { filtersRef.current = filters; });
+  useEffect(() => {
+    filtersRef.current = filters;
+  });
 
   // Callback exposed to the page so it can reset page to 1 after a mutation
   const onPageResetRef = useRef(null);

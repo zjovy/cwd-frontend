@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react';
-
-import { getRedirectResult } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 
 import { auth } from '@/firebase-config';
+import { getRedirectResult } from 'firebase/auth';
+import styled from 'styled-components';
 
 const Container = styled.div`
   display: flex;

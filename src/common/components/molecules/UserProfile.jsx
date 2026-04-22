@@ -8,7 +8,6 @@
     - email (string): The email to display.
     - onLogout (function): The function to call when the logout button is clicked.
 */
-
 import Avatar from '@/common/components/atoms/Avatar';
 import { LogOut } from 'lucide-react';
 import PropTypes from 'prop-types';

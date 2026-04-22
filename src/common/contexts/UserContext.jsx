@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 
 import { auth, googleProvider } from '@/firebase-config';
 import {
@@ -9,6 +8,7 @@ import {
   signInWithPopup,
   signOut,
 } from 'firebase/auth';
+import PropTypes from 'prop-types';
 
 export const UserContext = React.createContext({
   user: null,

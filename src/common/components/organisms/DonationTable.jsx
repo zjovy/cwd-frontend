@@ -9,8 +9,7 @@
     selected      – Set<id>  (controlled by parent)
     onSelectChange – (id) => void   toggles one row
     onSelectAll    – (bool) => void  select / deselect all visible rows
-    onEdit        – (donation) => void
-    onDelete      – (donation) => void
+    onRowClick    – (donation) => void
 */
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -61,48 +60,6 @@ const statusMsg = {
   color: '#6b7280',
 };
 
-const actionsBtnStyle = {
-  background: 'none',
-  border: 'none',
-  cursor: 'pointer',
-  color: '#9ca3af',
-  fontSize: '18px',
-  letterSpacing: '2px',
-  padding: '0 4px',
-  lineHeight: 1,
-  position: 'relative',
-};
-
-const menuStyle = {
-  position: 'absolute',
-  right: 0,
-  top: '100%',
-  background: '#fff',
-  border: '1px solid #e5e7eb',
-  borderRadius: '8px',
-  boxShadow: '0 4px 12px rgba(0,0,0,.1)',
-  zIndex: 10,
-  minWidth: '120px',
-  overflow: 'hidden',
-};
-
-const menuItem = {
-  display: 'block',
-  width: '100%',
-  padding: '8px 14px',
-  fontSize: '13px',
-  color: '#374151',
-  background: 'none',
-  border: 'none',
-  textAlign: 'left',
-  cursor: 'pointer',
-};
-
-const menuItemDanger = {
-  ...menuItem,
-  color: '#dc2626',
-};
-
 const donorLinkStyle = {
   color: '#1a1a1a',
   textDecoration: 'none',
@@ -110,64 +67,61 @@ const donorLinkStyle = {
   transition: 'border-color 0.15s',
 };
 
-/* ── ActionsMenu ─────────────────────────────────────── */
+/* ── DonationRow ─────────────────────────────────────── */
 
-function ActionsMenu({ onEdit, onDelete }) {
-  const [open, setOpen] = useState(false);
-  const close = () => setOpen(false);
-
+function DonationRow({ d, selected, onSelectChange, onRowClick }) {
+  const [hovered, setHovered] = useState(false);
   return (
-    <span style={{ position: 'relative' }}>
-      <button style={actionsBtnStyle} onClick={() => setOpen((v) => !v)}>
-        ···
-      </button>
-      {open && (
-        <>
-          <div
-            style={{ position: 'fixed', inset: 0, zIndex: 9 }}
-            onClick={close}
-          />
-          <div style={menuStyle}>
-            <button
-              style={menuItem}
-              onClick={() => {
-                close();
-                onEdit();
-              }}
-            >
-              Edit
-            </button>
-            <button
-              style={menuItemDanger}
-              onClick={() => {
-                close();
-                onDelete();
-              }}
-            >
-              Delete
-            </button>
-          </div>
-        </>
-      )}
-    </span>
+    <tr
+      style={{
+        cursor: 'pointer',
+        background: hovered ? '#f5f5f3' : 'transparent',
+        transition: 'background 0.1s',
+      }}
+      onClick={() => onRowClick(d)}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <td style={checkboxTd} onClick={(e) => e.stopPropagation()}>
+        <input
+          type='checkbox'
+          checked={selected.has(d.id)}
+          onChange={() => onSelectChange(d.id)}
+        />
+      </td>
+      <td style={{ ...tdStyle, fontWeight: '500', color: '#1a1a1a' }}>
+        {d.donor_id ? (
+          <Link
+            to={`/donors/${d.donor_id}`}
+            style={donorLinkStyle}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {d.donor_name}
+          </Link>
+        ) : (
+          d.donor_name
+        )}
+      </td>
+      <td style={tdStyle}>{d.donor_email}</td>
+      <td style={tdStyle}>{formatAmount(d.amount)}</td>
+      <td style={tdStyle}>{formatDate(d.donation_date)}</td>
+      <td style={tdStyle}>
+        <Badge status={d.receipt_status} />
+      </td>
+    </tr>
   );
 }
 
-ActionsMenu.propTypes = {
-  onEdit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
+DonationRow.propTypes = {
+  d: PropTypes.object.isRequired,
+  selected: PropTypes.instanceOf(Set).isRequired,
+  onSelectChange: PropTypes.func.isRequired,
+  onRowClick: PropTypes.func.isRequired,
 };
 
 /* ── DonationTable ───────────────────────────────────── */
 
-const COLUMNS = [
-  'Donor Name',
-  'Email',
-  'Amount',
-  'Date',
-  'Receipt Status',
-  'Actions',
-];
+const COLUMNS = ['Donor Name', 'Email', 'Amount', 'Date', 'Receipt Status'];
 
 export default function DonationTable({
   donations,
@@ -176,8 +130,7 @@ export default function DonationTable({
   selected,
   onSelectChange,
   onSelectAll,
-  onEdit,
-  onDelete,
+  onRowClick,
 }) {
   const allChecked =
     donations.length > 0 && donations.every((d) => selected.has(d.id));
@@ -222,36 +175,13 @@ export default function DonationTable({
           </tr>
         ) : (
           donations.map((d) => (
-            <tr key={d.id}>
-              <td style={checkboxTd}>
-                <input
-                  type='checkbox'
-                  checked={selected.has(d.id)}
-                  onChange={() => onSelectChange(d.id)}
-                />
-              </td>
-              <td style={{ ...tdStyle, fontWeight: '500', color: '#1a1a1a' }}>
-                {d.donor_id ? (
-                  <Link to={`/donors/${d.donor_id}`} style={donorLinkStyle}>
-                    {d.donor_name}
-                  </Link>
-                ) : (
-                  d.donor_name
-                )}
-              </td>
-              <td style={tdStyle}>{d.donor_email}</td>
-              <td style={tdStyle}>{formatAmount(d.amount)}</td>
-              <td style={tdStyle}>{formatDate(d.donation_date)}</td>
-              <td style={tdStyle}>
-                <Badge status={d.receipt_status} />
-              </td>
-              <td style={tdStyle}>
-                <ActionsMenu
-                  onEdit={() => onEdit(d)}
-                  onDelete={() => onDelete(d)}
-                />
-              </td>
-            </tr>
+            <DonationRow
+              key={d.id}
+              d={d}
+              selected={selected}
+              onSelectChange={onSelectChange}
+              onRowClick={onRowClick}
+            />
           ))
         )}
       </tbody>
@@ -266,6 +196,5 @@ DonationTable.propTypes = {
   selected: PropTypes.instanceOf(Set).isRequired,
   onSelectChange: PropTypes.func.isRequired,
   onSelectAll: PropTypes.func.isRequired,
-  onEdit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
+  onRowClick: PropTypes.func.isRequired,
 };

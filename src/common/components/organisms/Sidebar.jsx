@@ -6,13 +6,13 @@
     - activePage (string): The active page.
     - onNavigate (function): The function to call when the navigation item is clicked.
 */
+import { useNavigate } from 'react-router-dom';
 
 import NavItem from '@/common/components/atoms/NavItem';
 import UserProfile from '@/common/components/molecules/UserProfile';
 import { useUser } from '@/common/contexts/UserContext';
 import { DollarSign, LayoutDashboard, Users } from 'lucide-react';
 import PropTypes from 'prop-types';
-import { useNavigate } from 'react-router-dom';
 
 const NAV_ITEMS = [
   { label: 'Dashboard', icon: LayoutDashboard, id: 'dashboard' },
@@ -59,7 +59,8 @@ function getInitials(user) {
 }
 
 function getDisplayName(user) {
-  if (user?.firstname && user?.lastname) return `${user.firstname} ${user.lastname}`;
+  if (user?.firstname && user?.lastname)
+    return `${user.firstname} ${user.lastname}`;
   if (user?.username) return user.username;
   return user?.email || '';
 }

@@ -1,7 +1,8 @@
+import { useEffect, useState } from 'react';
+
 import StatCard from '@/common/components/atoms/StatCard';
 import { formatAmount } from '@/utils/format';
 import { ArrowUpRight, DollarSign, TrendingUp, Users } from 'lucide-react';
-import { useEffect, useState } from 'react';
 
 const rowStyle = {
   display: 'flex',
@@ -21,12 +22,10 @@ export default function StatsRow() {
   }, []);
 
   const growthRate = summary?.growth_rate;
-  const growthValue = growthRate == null
-    ? 'N/A'
-    : `${growthRate > 0 ? '+' : ''}${growthRate}%`;
-  const growthColor = growthRate == null
-    ? '#9ca3af'
-    : growthRate >= 0 ? '#22c55e' : '#ef4444';
+  const growthValue =
+    growthRate == null ? 'N/A' : `${growthRate > 0 ? '+' : ''}${growthRate}%`;
+  const growthColor =
+    growthRate == null ? '#9ca3af' : growthRate >= 0 ? '#22c55e' : '#ef4444';
 
   const stats = [
     {

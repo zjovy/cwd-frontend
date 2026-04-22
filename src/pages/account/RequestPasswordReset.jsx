@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
-
 import { Link } from 'react-router-dom';
-import styled from 'styled-components';
 
-import { useUser } from '@/common/contexts/UserContext';
 import { Form, FormTitle } from '@/common/components/form/Form';
 import { Input } from '@/common/components/form/Input';
 import SubmitButton from '@/common/components/form/SubmitButton';
 import { RedSpan } from '@/common/components/form/styles';
+import { useUser } from '@/common/contexts/UserContext';
+import styled from 'styled-components';
 
 const SuccessMessage = styled.div`
   color: #2e7d32;

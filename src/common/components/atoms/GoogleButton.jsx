@@ -7,7 +7,6 @@
     - onClick (function): The function to call when the button is clicked.
     - text (string): The text to display on the button.
 */
-
 import React from 'react';
 
 import PropTypes from 'prop-types';

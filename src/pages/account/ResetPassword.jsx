@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
-
-import { confirmPasswordReset } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 
-import { auth } from '@/firebase-config';
 import { Form, FormTitle } from '@/common/components/form/Form';
 import { Input } from '@/common/components/form/Input';
 import SubmitButton from '@/common/components/form/SubmitButton';
 import { RedSpan } from '@/common/components/form/styles';
+import { auth } from '@/firebase-config';
+import { confirmPasswordReset } from 'firebase/auth';
+import styled from 'styled-components';
 
 const PasswordStrength = styled.div`
   height: 5px;
@@ -91,9 +90,7 @@ export default function ResetPassword() {
         'No reset token found. Please request a new password reset link.'
       );
     } else if (mode !== 'resetPassword') {
-      setError(
-        'Invalid reset link. Please request a new password reset link.'
-      );
+      setError('Invalid reset link. Please request a new password reset link.');
     } else {
       setOobCode(code);
     }
@@ -104,7 +101,9 @@ export default function ResetPassword() {
     setError('');
 
     if (!oobCode) {
-      setError('Reset token not found. Please request a new password reset link.');
+      setError(
+        'Reset token not found. Please request a new password reset link.'
+      );
       return;
     }
 
@@ -134,7 +133,9 @@ export default function ResetPassword() {
       if (err.code === 'auth/expired-action-code') {
         setError('Reset link has expired. Please request a new one.');
       } else if (err.code === 'auth/invalid-action-code') {
-        setError('Reset link is invalid or already used. Please request a new one.');
+        setError(
+          'Reset link is invalid or already used. Please request a new one.'
+        );
       } else {
         setError(err.message || 'Failed to reset password. Please try again.');
       }

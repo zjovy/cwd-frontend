@@ -5,7 +5,6 @@
   Props:
     - children (node): The content to display inside the section title.
 */
-
 import PropTypes from 'prop-types';
 
 const titleStyle = {

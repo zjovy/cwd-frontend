@@ -22,12 +22,19 @@ function yearsActive(date) {
   if (!date) return '';
   const start = new Date(date);
   const now = new Date();
-  const years = Math.max(0, Math.floor((now - start) / (365.25 * 24 * 3600 * 1000)));
+  const years = Math.max(
+    0,
+    Math.floor((now - start) / (365.25 * 24 * 3600 * 1000))
+  );
   if (years === 0) return 'less than a year active';
   return `${years} year${years === 1 ? '' : 's'} active`;
 }
 
-export default function DonorStatsRow({ totalDonated, memberSince, totalDonations }) {
+export default function DonorStatsRow({
+  totalDonated,
+  memberSince,
+  totalDonations,
+}) {
   return (
     <div style={rowStyle}>
       <StatCard

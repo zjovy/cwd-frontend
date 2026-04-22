@@ -5,7 +5,6 @@
     totalPages  – total number of pages
     onPageChange – (newPage) => void
 */
-
 import PropTypes from 'prop-types';
 
 const styles = {
@@ -75,7 +74,9 @@ function getPageNumbers(page, totalPages) {
 
 export default function Pagination({ page, totalPages, onPageChange }) {
   const safeTotal =
-    typeof totalPages === 'number' && Number.isFinite(totalPages) ? totalPages : 0;
+    typeof totalPages === 'number' && Number.isFinite(totalPages)
+      ? totalPages
+      : 0;
   if (safeTotal <= 1) return null;
 
   const pages = getPageNumbers(page, safeTotal);

@@ -91,13 +91,13 @@ const errorStyle = {
 };
 
 const EMPTY = {
-    name: '',
-    email: '',
-    address: '',
-    phone: '',
-    total_donations: '', 
-    donation_count: '', 
-    most_recent: '',
+  name: '',
+  email: '',
+  address: '',
+  phone: '',
+  total_donations: '',
+  donation_count: '',
+  most_recent: '',
 };
 
 /** Empty / whitespace-only → null so JSON has explicit null (SQL NULL), not omitted undefined. */
@@ -126,8 +126,8 @@ function toFormValues(donor) {
     email: donor.email ?? '',
     address: donor.address ?? '',
     phone: donor.phone ?? '',
-    total_donations: donor.total_donations ?? '', 
-    donation_count: donor.donation_count ?? '', 
+    total_donations: donor.total_donations ?? '',
+    donation_count: donor.donation_count ?? '',
     most_recent: donor.most_recent?.slice(0, 10) ?? '',
   };
 }
@@ -145,7 +145,8 @@ export default function DonorModal({ open, onClose, onSubmit, donor }) {
 
   if (!open) return null;
 
-  const set = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
+  const set = (field) => (e) =>
+    setForm((f) => ({ ...f, [field]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -214,7 +215,7 @@ export default function DonorModal({ open, onClose, onSubmit, donor }) {
           <label style={labelStyle}>Phone Number</label>
           <input
             style={inputStyle}
-            type = 'tel'
+            type='tel'
             value={form.phone}
             onChange={set('phone')}
           />

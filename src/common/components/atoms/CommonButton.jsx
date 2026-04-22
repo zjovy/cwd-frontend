@@ -8,7 +8,6 @@
     - onClick (function): The function to call when the button is clicked.
     - title (string): The title of the button.
 */
-
 import React from 'react';
 
 import PropTypes from 'prop-types';

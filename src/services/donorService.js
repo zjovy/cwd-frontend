@@ -13,16 +13,22 @@ async function authHeaders() {
 async function request(url, options = {}) {
   const { signal, ...rest } = options;
   const headers = await authHeaders();
-  const res = await fetch(url, { ...rest, headers, credentials: 'include', signal });
+  const res = await fetch(url, {
+    ...rest,
+    headers,
+    credentials: 'include',
+    signal,
+  });
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new Error(body.error || body.message || `Request failed (${res.status})`);
+    throw new Error(
+      body.error || body.message || `Request failed (${res.status})`
+    );
   }
 
   return res.json();
 }
-
 
 function normalizeDonorsListPayload(raw) {
   if (raw == null) return { donors: [], total: 0 };
@@ -55,12 +61,15 @@ function normalizeDonorBody(data) {
   }
   const td = out.total_donations;
   if (td === '' || td === undefined) out.total_donations = null;
-  else if (typeof td === 'number' && !Number.isFinite(td)) out.total_donations = null;
+  else if (typeof td === 'number' && !Number.isFinite(td))
+    out.total_donations = null;
 
   const dc = out.donation_count;
   if (dc === '' || dc === undefined) out.donation_count = null;
-  else if (typeof dc === 'number' && !Number.isFinite(dc)) out.donation_count = null;
-  else if (typeof dc === 'string' && dc.trim() === '') out.donation_count = null;
+  else if (typeof dc === 'number' && !Number.isFinite(dc))
+    out.donation_count = null;
+  else if (typeof dc === 'string' && dc.trim() === '')
+    out.donation_count = null;
 
   return out;
 }
@@ -69,9 +78,13 @@ const donorService = {
   async getAll(params = {}, signal) {
     const { signal: _ignored, ...rest } = params;
     const query = new URLSearchParams(
-      Object.fromEntries(Object.entries(rest).filter(([, v]) => v != null && v !== ''))
+      Object.fromEntries(
+        Object.entries(rest).filter(([, v]) => v != null && v !== '')
+      )
     ).toString();
-    const raw = await request(`${BASE_URL}${query ? `?${query}` : ''}`, { signal });
+    const raw = await request(`${BASE_URL}${query ? `?${query}` : ''}`, {
+      signal,
+    });
     return normalizeDonorsListPayload(raw);
   },
 
@@ -96,6 +109,13 @@ const donorService = {
   delete(id) {
     return request(`${BASE_URL}/${id}`, {
       method: 'DELETE',
+    });
+  },
+
+  upsertByEmail(data) {
+    return request(`${BASE_URL}/upsert-by-email`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
     });
   },
 };

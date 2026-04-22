@@ -122,7 +122,8 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
 
   if (!open) return null;
 
-  const set = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
+  const set = (field) => (e) =>
+    setForm((f) => ({ ...f, [field]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -148,7 +149,9 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
         onClick={(e) => e.stopPropagation()}
         onSubmit={handleSubmit}
       >
-        <div style={titleStyle}>{isEdit ? 'Edit Donation' : 'New Donation'}</div>
+        <div style={titleStyle}>
+          {isEdit ? 'Edit Donation' : 'New Donation'}
+        </div>
 
         {error && <div style={errorStyle}>{error}</div>}
 

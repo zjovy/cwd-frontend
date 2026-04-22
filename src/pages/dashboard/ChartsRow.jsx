@@ -1,7 +1,8 @@
+import { useEffect, useState } from 'react';
+
 import Card from '@/common/components/atoms/Card';
 import SectionTitle from '@/common/components/atoms/SectionTitle';
 import PropTypes from 'prop-types';
-import { useEffect, useState } from 'react';
 import {
   Bar,
   BarChart,
@@ -46,7 +47,9 @@ function CustomTooltip({ active, payload, label }) {
     return (
       <div style={tooltipStyle}>
         <div style={tooltipLabelStyle}>{label}</div>
-        <div style={tooltipValueStyle}>${Number(payload[0].value).toLocaleString()}</div>
+        <div style={tooltipValueStyle}>
+          ${Number(payload[0].value).toLocaleString()}
+        </div>
       </div>
     );
   }

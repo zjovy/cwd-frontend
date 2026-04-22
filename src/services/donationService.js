@@ -13,11 +13,18 @@ async function authHeaders() {
 async function request(url, options = {}) {
   const { signal, ...rest } = options;
   const headers = await authHeaders();
-  const res = await fetch(url, { ...rest, headers, credentials: 'include', signal });
+  const res = await fetch(url, {
+    ...rest,
+    headers,
+    credentials: 'include',
+    signal,
+  });
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new Error(body.error || body.message || `Request failed (${res.status})`);
+    throw new Error(
+      body.error || body.message || `Request failed (${res.status})`
+    );
   }
 
   return res.json();
@@ -42,9 +49,13 @@ const donationService = {
   async getAll(params = {}, signal) {
     const { signal: _ignored, ...rest } = params;
     const query = new URLSearchParams(
-      Object.fromEntries(Object.entries(rest).filter(([, v]) => v != null && v !== ''))
+      Object.fromEntries(
+        Object.entries(rest).filter(([, v]) => v != null && v !== '')
+      )
     ).toString();
-    const raw = await request(`${BASE_URL}${query ? `?${query}` : ''}`, { signal });
+    const raw = await request(`${BASE_URL}${query ? `?${query}` : ''}`, {
+      signal,
+    });
     return normalizeDonationsListPayload(raw);
   },
 
@@ -69,6 +80,13 @@ const donationService = {
   delete(id) {
     return request(`${BASE_URL}/${id}`, {
       method: 'DELETE',
+    });
+  },
+
+  sendReceipt(id, body) {
+    return request(`${BASE_URL}/${id}/send-receipt`, {
+      method: 'POST',
+      body: JSON.stringify({ body }),
     });
   },
 };
