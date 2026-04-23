@@ -37,7 +37,7 @@ export function UserProvider({ children }) {
       if (firebaseUser) {
         try {
           const idToken = await firebaseUser.getIdToken();
-          const response = await fetch(buildUrl('/auth/profile'), {
+          const response = await fetch(buildUrl('/auth/me'), {
             headers: { Authorization: `Bearer ${idToken}` },
           });
 

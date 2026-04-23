@@ -67,6 +67,7 @@ function getDisplayName(user) {
 
 export default function Sidebar({ activePage, onNavigate }) {
   const { user, logout } = useUser();
+  const navItems = NAV_ITEMS.filter(({ id }) => id !== 'admin' || user?.isAdmin);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -80,7 +81,7 @@ export default function Sidebar({ activePage, onNavigate }) {
         <span style={styles.logoText}>Donor Management</span>
       </div>
       <nav style={styles.nav}>
-        {NAV_ITEMS.map(({ label, icon, id }) => (
+        {navItems.map(({ label, icon, id }) => (
           <NavItem
             key={id}
             label={label}

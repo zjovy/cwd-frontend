@@ -1,11 +1,7 @@
-import { useState } from 'react';
-
 import Card from '@/common/components/atoms/Card';
-import { MOCK_ADMINS, MOCK_INVITES } from '@/utils/adminData';
+import useUsers from '@/hooks/useUsers';
 
-import AdminsTable from './AdminsTable';
-import InviteForm from './InviteForm';
-import InvitesTable from './InvitesTable';
+import UsersTable from './UsersTable';
 
 /* ── styles ─────────────────────────────────────────── */
 
@@ -39,81 +35,61 @@ const styles = {
     color: '#1a1a1a',
     marginBottom: '16px',
   },
-  sectionSubtitle: {
-    fontSize: '13px',
-    color: '#6b7280',
-    marginBottom: '16px',
-    marginTop: '-10px',
-  },
   divider: {
     borderTop: '1px solid #f0f0ee',
     margin: '28px 0',
+  },
+  errorMsg: {
+    padding: '40px 0',
+    textAlign: 'center',
+    fontSize: '14px',
+    color: '#dc2626',
   },
 };
 
 /* ── AdminPage ───────────────────────────────────────── */
 
 export default function AdminPage() {
-  const [admins, setAdmins] = useState(MOCK_ADMINS);
-  const [invites, setInvites] = useState(MOCK_INVITES);
+  const { users, loading, error, setApproved, setAdmin, approveAsAdmin } = useUsers();
 
-  const handleInvite = (email) => {
-    const newInvite = {
-      id: Date.now(),
-      email,
-      status: 'pending',
-      sentDate: new Date().toISOString().slice(0, 10),
-    };
-    setInvites((prev) => [newInvite, ...prev]);
-  };
-
-  const handleResend = (invite) => {
-    setInvites((prev) =>
-      prev.map((i) =>
-        i.id === invite.id
-          ? { ...i, status: 'pending', sentDate: new Date().toISOString().slice(0, 10) }
-          : i,
-      ),
-    );
-  };
-
-  const handleRevoke = (invite) => {
-    setInvites((prev) => prev.filter((i) => i.id !== invite.id));
-  };
-
-  const handleRemoveAdmin = (admin) => {
-    setAdmins((prev) => prev.filter((a) => a.id !== admin.id));
-  };
+  const pending = users.filter((u) => !u.isApproved);
+  const active = users.filter((u) => u.isApproved);
 
   return (
     <main style={styles.main}>
       <div style={styles.topRow}>
         <div>
-          <div style={styles.title}>Admin Management</div>
-          <div style={styles.subtitle}>Invite and manage platform administrators.</div>
+          <div style={styles.title}>User Management</div>
+          <div style={styles.subtitle}>Manage user access and permissions.</div>
         </div>
       </div>
 
-      <Card style={{ padding: '24px', marginBottom: '20px' }}>
-        <div style={styles.sectionHeader}>Invite a New Admin</div>
-        <div style={styles.sectionSubtitle}>
-          Send an email invite to grant someone administrator access.
-        </div>
-        <InviteForm onInvite={handleInvite} />
-      </Card>
-
       <Card style={{ padding: '24px' }}>
-        <div style={styles.sectionHeader}>Pending Invites</div>
-        <InvitesTable
-          invites={invites}
-          onResend={handleResend}
-          onRevoke={handleRevoke}
-        />
+        {error ? (
+          <div style={styles.errorMsg}>{error}</div>
+        ) : (
+          <>
+            <div style={styles.sectionHeader}>Pending Approval</div>
+            <UsersTable
+              users={pending}
+              loading={loading}
+              onSetApproved={setApproved}
+              onSetAdmin={setAdmin}
+              onApproveAsAdmin={approveAsAdmin}
+            />
 
-        <div style={styles.divider} />
+            <div style={styles.divider} />
 
-        <div style={styles.sectionHeader}>Current Admins</div>
-        <AdminsTable admins={admins} onRemove={handleRemoveAdmin} />
+            <div style={styles.sectionHeader}>Active Users</div>
+            <UsersTable
+              users={active}
+              loading={loading}
+              onSetApproved={setApproved}
+              onSetAdmin={setAdmin}
+              onApproveAsAdmin={approveAsAdmin}
+            />
+          </>
+        )}
       </Card>
     </main>
   );
