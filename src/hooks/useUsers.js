@@ -55,6 +55,7 @@ export default function useUsers() {
       );
     } catch (err) {
       setError(err.message);
+      await fetchUsers();
     }
   };
 

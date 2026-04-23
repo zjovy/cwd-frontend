@@ -21,7 +21,7 @@ export function AdminRoute() {
     return <div>Loading...</div>;
   }
 
-  return user?.isAdmin ? <Outlet /> : <Navigate to='/' replace />;
+  return user?.isAdmin && user?.isApproved ? <Outlet /> : <Navigate to='/' replace />;
 }
 
 export function PublicOnlyRoute() {

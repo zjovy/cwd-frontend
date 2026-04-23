@@ -1,4 +1,5 @@
 import Card from '@/common/components/atoms/Card';
+import SectionTitle from '@/common/components/atoms/SectionTitle';
 import useUsers from '@/hooks/useUsers';
 
 import UsersTable from './UsersTable';
@@ -28,12 +29,6 @@ const styles = {
   subtitle: {
     fontSize: '14px',
     color: '#6b7280',
-  },
-  sectionHeader: {
-    fontSize: '15px',
-    fontWeight: '600',
-    color: '#1a1a1a',
-    marginBottom: '16px',
   },
   divider: {
     borderTop: '1px solid #f0f0ee',
@@ -69,7 +64,7 @@ export default function AdminPage() {
           <div style={styles.errorMsg}>{error}</div>
         ) : (
           <>
-            <div style={styles.sectionHeader}>Pending Approval</div>
+            <SectionTitle>Pending Approval</SectionTitle>
             <UsersTable
               users={pending}
               loading={loading}
@@ -80,7 +75,7 @@ export default function AdminPage() {
 
             <div style={styles.divider} />
 
-            <div style={styles.sectionHeader}>Active Users</div>
+            <SectionTitle>Active Users</SectionTitle>
             <UsersTable
               users={active}
               loading={loading}
