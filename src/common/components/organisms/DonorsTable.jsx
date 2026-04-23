@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 import { tableStyle, tdStyle, thStyle, statusMsg } from '@/common/components/atoms/tableStyles';
-import Badge from '@/common/components/atoms/Badge';
 import ActionsMenu from '@/common/components/molecules/ActionsMenu';
 import { formatAmount, formatDate } from '@/utils/format';
 
