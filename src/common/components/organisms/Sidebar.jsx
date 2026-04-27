@@ -54,20 +54,18 @@ function getInitials(user) {
   if (user?.firstname && user?.lastname) {
     return `${user.firstname[0]}${user.lastname[0]}`.toUpperCase();
   }
-  if (user?.username) return user.username.slice(0, 2).toUpperCase();
   if (user?.email) return user.email.slice(0, 2).toUpperCase();
   return '?';
 }
 
 function getDisplayName(user) {
   if (user?.firstname && user?.lastname) return `${user.firstname} ${user.lastname}`;
-  if (user?.username) return user.username;
   return user?.email || '';
 }
 
 export default function Sidebar({ activePage, onNavigate }) {
   const { user, logout } = useUser();
-  const navItems = NAV_ITEMS.filter(({ id }) => id !== 'admin' || user?.isAdmin);
+  const navItems = NAV_ITEMS.filter(({ id }) => id !== 'admin' || user?.role === 'admin');
   const navigate = useNavigate();
 
   const handleLogout = async () => {

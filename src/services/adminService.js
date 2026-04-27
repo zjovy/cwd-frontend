@@ -27,17 +27,10 @@ const adminService = {
     return request(`${BASE_URL}/users`);
   },
 
-  setApproved(uid, isApproved) {
-    return request(`${BASE_URL}/users/${uid}/approve`, {
+  setRole(uid, role) {
+    return request(`${BASE_URL}/users/${uid}/role`, {
       method: 'PATCH',
-      body: JSON.stringify({ isApproved }),
-    });
-  },
-
-  setAdmin(uid, isAdmin) {
-    return request(`${BASE_URL}/users/${uid}/admin`, {
-      method: 'PATCH',
-      body: JSON.stringify({ isAdmin }),
+      body: JSON.stringify({ role }),
     });
   },
 };

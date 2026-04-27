@@ -10,7 +10,7 @@ export function PrivateRoute() {
   }
 
   if (!user) return <Navigate to='/login' replace />;
-  if (!user.isApproved) return <Navigate to='/no-access' replace />;
+  if (user.role === 'pending') return <Navigate to='/no-access' replace />;
   return <Outlet />;
 }
 
@@ -21,7 +21,7 @@ export function AdminRoute() {
     return <div>Loading...</div>;
   }
 
-  return user?.isAdmin && user?.isApproved ? <Outlet /> : <Navigate to='/' replace />;
+  return user?.role === 'admin' ? <Outlet /> : <Navigate to='/' replace />;
 }
 
 export function PublicOnlyRoute() {

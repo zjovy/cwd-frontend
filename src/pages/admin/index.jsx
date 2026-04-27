@@ -55,11 +55,11 @@ const styles = {
 /* ── AdminPage ───────────────────────────────────────── */
 
 export default function AdminPage() {
-  const { users, loading, error, setApproved, setAdmin, approveAsAdmin } = useUsers();
+  const { users, loading, error, setRole } = useUsers();
 
-  const requesting = users.filter((u) => !u.isApproved);
-  const activeUsers = users.filter((u) => u.isApproved && !u.isAdmin);
-  const admins = users.filter((u) => u.isApproved && u.isAdmin);
+  const requesting = users.filter((u) => u.role === 'pending');
+  const activeUsers = users.filter((u) => u.role === 'member');
+  const admins = users.filter((u) => u.role === 'admin');
 
   if (error) {
     return (
@@ -75,7 +75,7 @@ export default function AdminPage() {
     );
   }
 
-  const tableProps = { onSetApproved: setApproved, onSetAdmin: setAdmin, onApproveAsAdmin: approveAsAdmin };
+  const tableProps = { onSetRole: setRole };
 
   return (
     <main style={styles.main}>

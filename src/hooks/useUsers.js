@@ -24,9 +24,9 @@ export default function useUsers() {
     fetchUsers();
   }, [fetchUsers]);
 
-  const setApproved = async (uid, isApproved) => {
+  const setRole = async (uid, role) => {
     try {
-      const response = await adminService.setApproved(uid, isApproved);
+      const response = await adminService.setRole(uid, role);
       setUsers((prev) =>
         prev.map((u) => (u.firebaseUid === uid ? response.user : u)),
       );
@@ -35,29 +35,5 @@ export default function useUsers() {
     }
   };
 
-  const setAdmin = async (uid, isAdmin) => {
-    try {
-      const response = await adminService.setAdmin(uid, isAdmin);
-      setUsers((prev) =>
-        prev.map((u) => (u.firebaseUid === uid ? response.user : u)),
-      );
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
-  const approveAsAdmin = async (uid) => {
-    try {
-      await adminService.setApproved(uid, true);
-      const response = await adminService.setAdmin(uid, true);
-      setUsers((prev) =>
-        prev.map((u) => (u.firebaseUid === uid ? response.user : u)),
-      );
-    } catch (err) {
-      setError(err.message);
-      await fetchUsers();
-    }
-  };
-
-  return { users, loading, error, setApproved, setAdmin, approveAsAdmin };
+  return { users, loading, error, setRole };
 }
