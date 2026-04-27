@@ -12,6 +12,7 @@ import PropTypes from 'prop-types';
 const colorMap = {
   sent: { background: '#00A63E', color: '#fff' },
   pending: { background: '#FF8040', color: '#fff' },
+  expired: { background: '#9ca3af', color: '#fff' },
 };
 
 const badgeStyle = (status) => ({

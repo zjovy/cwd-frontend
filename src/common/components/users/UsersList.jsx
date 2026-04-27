@@ -100,8 +100,7 @@ export default function UsersList() {
           <UserInfo>
             <div>
               <UserName>
-                {user.firstname} {user.lastname} (
-                {user.username || 'No username'})
+                {user.firstname} {user.lastname}
               </UserName>
               <UserEmail>{user.email}</UserEmail>
             </div>

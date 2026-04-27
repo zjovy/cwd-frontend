@@ -22,7 +22,6 @@ export default function SignUp() {
     lastname: '',
     email: '',
     password: '',
-    username: '',
   });
 
   const handleChangeFirstname = (e) => {
@@ -42,11 +41,6 @@ export default function SignUp() {
 
   const handleChangePassword = (e) => {
     setFormState({ ...formState, password: e.target.value });
-    setError('');
-  };
-
-  const handleChangeUsername = (e) => {
-    setFormState({ ...formState, username: e.target.value });
     setError('');
   };
 
@@ -74,7 +68,6 @@ export default function SignUp() {
           body: JSON.stringify({
             email: formState.email,
             password: formState.password,
-            username: formState.username || undefined,
             firstname: formState.firstname || undefined,
             lastname: formState.lastname || undefined,
           }),
@@ -123,12 +116,6 @@ export default function SignUp() {
           value={formState.email}
           onChange={handleChangeEmail}
           required
-        />
-        <Input.Text
-          title='Username'
-          placeholder='johnsmith'
-          value={formState.username}
-          onChange={handleChangeUsername}
         />
         <Input.Password
           title='Password'

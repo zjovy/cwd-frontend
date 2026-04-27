@@ -33,7 +33,7 @@ const styles = {
 
 export default function DashboardPage() {
   const { user } = useUser();
-  const firstName = user?.firstname || user?.username || 'there';
+  const firstName = user?.firstname || 'there';
 
   return (
     <main style={styles.main}>

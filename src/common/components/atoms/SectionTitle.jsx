@@ -15,10 +15,11 @@ const titleStyle = {
   marginBottom: '20px',
 };
 
-export default function SectionTitle({ children }) {
-  return <div style={titleStyle}>{children}</div>;
+export default function SectionTitle({ children, style }) {
+  return <div style={{ ...titleStyle, ...style }}>{children}</div>;
 }
 
 SectionTitle.propTypes = {
   children: PropTypes.node.isRequired,
+  style: PropTypes.object,
 };
