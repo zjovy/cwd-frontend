@@ -75,8 +75,8 @@ const donorService = {
     return normalizeDonorsListPayload(raw);
   },
 
-  getById(id) {
-    return request(`${BASE_URL}/${id}`);
+  getById(id, signal) {
+    return request(`${BASE_URL}/${id}`, { signal });
   },
 
   create(data) {

@@ -53,11 +53,6 @@ export default function useDonors(filters = {}) {
     await fetchDonors({ ...filtersRef.current, page: 1 });
   };
 
-  const createDonor = async (data) => {
-    await donorService.create(data);
-    await refetchAtPage1();
-  };
-
   const updateDonor = async (id, data) => {
     await donorService.update(id, data);
     // Update doesn't change total count — re-fetch at current page
@@ -76,9 +71,6 @@ export default function useDonors(filters = {}) {
     totalPages: Math.max(0, Math.ceil((Number(total) || 0) / PAGE_SIZE)),
     loading,
     error,
-    onPageResetRef,
-    createDonor,
-    updateDonor,
-    deleteDonor,
+    onPageResetRef
   };
 }

@@ -88,7 +88,7 @@ export default function DonorTable({
         {donors.length === 0 ? (
           <tr>
             <td colSpan={COLUMNS.length + 1} style={statusMsg}>
-              No donations found.
+              No donors found.
             </td>
           </tr>
         ) : (
@@ -111,14 +111,23 @@ export default function DonorTable({
               <td style={tdStyle}>{d.email}</td>
               <td style={tdStyle}>{addressCell(d)}</td>
               <td style={tdStyle}>{d.phone}</td>
-              <td style={tdStyle}>{formatAmount(d.total_donations)}</td>
-              <td style={tdStyle}>{d.donation_count}</td>
-              <td style={tdStyle}>{formatDate(d.most_recent)}</td>
+              <td style={tdStyle}>
+                {d.total_donations != null && d.total_donations !== ''
+                  ? formatAmount(d.total_donations)
+                  : '—'}
+              </td>
+              <td style={tdStyle}>
+                {d.donation_count != null && d.donation_count !== '' ? d.donation_count : '—'}
+              </td>
+              <td style={tdStyle}>
+                {d.most_recent ? formatDate(d.most_recent) : '—'}
+              </td>
               <td style={tdStyle} onClick={(e) => e.stopPropagation()}>
                 <ActionsMenu
                   actions={[
-                    { label: 'Edit', onClick: () => onEdit(d) },
-                    { label: 'Delete', onClick: () => onDelete(d), danger: true },
+                    {label: 'placeholder', onClick: () => onEdit(d)}
+                    // { label: 'Edit', onClick: () => onEdit(d) },
+                    // { label: 'Delete', onClick: () => onDelete(d), danger: true },
                   ]}
                 />
               </td>

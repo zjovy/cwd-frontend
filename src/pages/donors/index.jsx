@@ -3,11 +3,11 @@ import { useEffect, useState } from 'react';
 import Card from '@/common/components/atoms/Card';
 import Pagination from '@/common/components/atoms/Pagination';
 import DeleteConfirmModal from '@/common/components/organisms/DeleteConfirmModal';
-import DonorModal from '@/common/components/organisms/DonorModal';
+
+import DonorEditModal from './DonorEditModal';
 import DonorTable from '@/common/components/organisms/DonorsTable';
 import useDonors from '@/hooks/useDonors';
 import { PAGE_SIZE } from '@/utils/pagination';
-import { Plus } from 'lucide-react';
 
 import DonorsFilterBar from './DonorsFilterBar';
 
@@ -37,19 +37,6 @@ const styles = {
     fontSize: '14px',
     color: '#6b7280',
   },
-  addBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '9px 16px',
-    border: 'none',
-    borderRadius: '8px',
-    background: '#2563eb',
-    color: '#fff',
-    fontSize: '13px',
-    fontWeight: '500',
-    cursor: 'pointer',
-  },
 };
 
 const INITIAL_FILTERS = { search: ''};
@@ -64,7 +51,7 @@ export default function DonorsPage() {
   const [editing, setEditing] = useState(null);
   const [deleting, setDeleting] = useState(null);
 
-  const { donors, total, totalPages, loading, error, onPageResetRef, createDonor, updateDonor, deleteDonor } =
+  const { donors, total, totalPages, loading, error, onPageResetRef} =
     useDonors({ ...filters, page });
 
   useEffect(() => {
@@ -93,21 +80,23 @@ export default function DonorsPage() {
     setSelected(new Set());
   };
 
-  const openCreate = () => { setEditing(null); setModalOpen(true); };
-  const openEdit = (d) => { setEditing(d); setModalOpen(true); };
-
-  const handleSubmit = async (data) => {
-    if (editing) {
-      await updateDonor(editing.id, data);
-    } else {
-      await createDonor(data);
-    }
+  // when click on action (now is a placeholder for possible action)
+  // will use editing to locate that specific donor but won't open any editing or deleting modal
+  const openEdit = (d) => {
+    setEditing(d);
+    // setModalOpen(true);
   };
 
-  const handleDelete = async () => {
-    await deleteDonor(deleting.id);
-    setDeleting(null);
-  };
+  // editing will be handled in donor detail page
+  // const handleEdit = async (data) => {
+  //   await updateDonor(editing.id, data);
+  // };
+
+  // currently deletion is not needed, comment out for possible furture use
+  // const handleDelete = async () => {
+  //   await deleteDonor(deleting.id);
+  //   setDeleting(null);
+  // };
 
   return (
     <main style={styles.main}>
@@ -116,9 +105,6 @@ export default function DonorsPage() {
           <div style={styles.title}>Donors</div>
           <div style={styles.subtitle}>View donor details and contributions in one place.</div>
         </div>
-        <button style={styles.addBtn} onClick={openCreate}>
-          <Plus size={14} /> Add Donor
-        </button>
       </div>
 
       <DonorsFilterBar
@@ -148,19 +134,19 @@ export default function DonorsPage() {
         />
       </Card>
 
-      <DonorModal
+      {/* <DonorEditModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        onSubmit={handleSubmit}
+        onSubmit={handleEdit}
         donor={editing}
-      />
+      /> */}
 
-      <DeleteConfirmModal
+      {/* <DeleteConfirmModal
         open={Boolean(deleting)}
         onClose={() => setDeleting(null)}
         onConfirm={handleDelete}
         donorName={deleting?.name}
-      />
+      /> */}
     </main>
   );
 }

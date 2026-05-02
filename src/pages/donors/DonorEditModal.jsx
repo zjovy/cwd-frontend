@@ -85,6 +85,33 @@ function toFormValues(donor) {
   };
 }
 
+/** Empty / whitespace → JSON null (backend SQL NULL). */
+function nullIfEmptyStr(value) {
+  if (value == null) return null;
+  const s = String(value).trim();
+  return s === '' ? null : s;
+}
+
+/** Pass-through aggregates for backends that require every column in one UPDATE (not editable in UI). */
+function aggregatePayloadFromDonor(donor) {
+  if (!donor) {
+    return {
+      total_donations: null,
+      donation_count: null,
+      most_recent: null,
+    };
+  }
+  const mr = donor.most_recent;
+  return {
+    total_donations: donor.total_donations ?? null,
+    donation_count: donor.donation_count ?? null,
+    most_recent:
+      mr != null && mr !== ''
+        ? String(mr).slice(0, 10)
+        : null,
+  };
+}
+
 export default function DonorEditModal({ open, onClose, onSubmit, donor }) {
   const [form, setForm] = useState(toFormValues(donor));
   const [error, setError] = useState(null);
@@ -106,10 +133,11 @@ export default function DonorEditModal({ open, onClose, onSubmit, donor }) {
     setError(null);
     try {
       await onSubmit({
-        ...form,
-        total_donations: donor?.total_donations ?? 0,
-        donation_count: donor?.donation_count ?? 0,
-        most_recent: donor?.most_recent?.slice(0, 10) ?? null,
+        name: form.name.trim(),
+        email: form.email.trim(),
+        phone: nullIfEmptyStr(form.phone),
+        address: nullIfEmptyStr(form.address),
+        ...aggregatePayloadFromDonor(donor),
       });
       onClose();
     } catch (err) {
