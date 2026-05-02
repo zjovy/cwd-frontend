@@ -44,33 +44,16 @@ function normalizeDonorsListPayload(raw) {
   return { donors, total };
 }
 
-/** Optional string fields: empty string / undefined → null for SQL-friendly JSON bodies. */
-const OPTIONAL_NULL_STRING_KEYS = ['address', 'phone', 'most_recent'];
-
 function normalizeDonorBody(data) {
   if (data == null || typeof data !== 'object') return data;
   const out = { ...data };
-  for (const key of OPTIONAL_NULL_STRING_KEYS) {
+  for (const key of ['address', 'phone']) {
     if (!(key in out)) continue;
     const v = out[key];
-    if (v === undefined || v === null) {
-      out[key] = null;
-    } else if (typeof v === 'string' && v.trim() === '') {
+    if (v === undefined || v === null || (typeof v === 'string' && v.trim() === '')) {
       out[key] = null;
     }
   }
-  const td = out.total_donations;
-  if (td === '' || td === undefined) out.total_donations = null;
-  else if (typeof td === 'number' && !Number.isFinite(td))
-    out.total_donations = null;
-
-  const dc = out.donation_count;
-  if (dc === '' || dc === undefined) out.donation_count = null;
-  else if (typeof dc === 'number' && !Number.isFinite(dc))
-    out.donation_count = null;
-  else if (typeof dc === 'string' && dc.trim() === '')
-    out.donation_count = null;
-
   return out;
 }
 
