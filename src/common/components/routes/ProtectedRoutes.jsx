@@ -21,7 +21,11 @@ export function AdminRoute() {
     return <div>Loading...</div>;
   }
 
-  return user?.role === 'admin' ? <Outlet /> : <Navigate to='/' replace />;
+  return user?.role === 'admin' ? (
+    <Outlet />
+  ) : (
+    <Navigate to={user ? '/' : '/login'} replace />
+  )
 }
 
 export function PublicOnlyRoute() {
