@@ -29,7 +29,7 @@ const COLUMNS = [
   { label: 'Address' },
   { label: 'Phone' },
   { label: 'Total Donations', style: { textAlign: 'center' } },
-  { label: 'Donation Count' },
+  { label: 'Donation Count', style: { textAlign: 'center' } },
   { label: 'Most Recent' },
   { label: 'Actions' },
 ];
@@ -112,7 +112,7 @@ export default function DonorTable({
               <td style={tdStyle}>{addressCell(d)}</td>
               <td style={tdStyle}>{d.phone}</td>
               <td style={{ ...tdStyle, textAlign: 'center' }}>{formatAmount(d.total_donations)}</td>
-              <td style={tdStyle}>{d.donation_count}</td>
+              <td style={{ ...tdStyle, textAlign: 'center' }}>{d.donation_count}</td>
               <td style={tdStyle}>{formatDate(d.most_recent)}</td>
               <td style={tdStyle} onClick={(e) => e.stopPropagation()}>
                 <ActionsMenu
