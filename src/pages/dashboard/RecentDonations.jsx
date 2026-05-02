@@ -56,7 +56,9 @@ export default function RecentDonations() {
     }
   }, []);
 
-  useEffect(() => { fetchRecent(); }, [fetchRecent]);
+  useEffect(() => {
+    fetchRecent();
+  }, [fetchRecent]);
 
   const handleSelectChange = (id) => {
     setSelected((prev) => {
@@ -71,8 +73,14 @@ export default function RecentDonations() {
     setSelected(selectAll ? new Set(donations.map((d) => d.id)) : new Set());
   };
 
-  const openCreate = () => { setEditing(null); setModalOpen(true); };
-  const openEdit = (d) => { setEditing(d); setModalOpen(true); };
+  const openCreate = () => {
+    setEditing(null);
+    setModalOpen(true);
+  };
+  const openEdit = (d) => {
+    setEditing(d);
+    setModalOpen(true);
+  };
 
   const handleSubmit = async (data) => {
     if (editing) {

@@ -1,6 +1,5 @@
-import styled from 'styled-components';
-
 import Button from '@/common/components/atoms/CommonButton';
+import styled from 'styled-components';
 
 export const StyledForm = styled.form`
   display: flex;

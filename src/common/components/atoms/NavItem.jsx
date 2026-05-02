@@ -8,7 +8,6 @@
     - active (boolean): Whether the item is active.
     - onClick (function): The function to call when the item is clicked.
 */
-
 import PropTypes from 'prop-types';
 
 const btnStyle = (active) => ({

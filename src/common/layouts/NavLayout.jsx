@@ -1,7 +1,7 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
-import Sidebar from '@/common/components/organisms/Sidebar';
 import NavBar from '@/common/components/navigation/NavBar';
+import Sidebar from '@/common/components/organisms/Sidebar';
 import styled from 'styled-components';
 
 const Layout = styled.div`

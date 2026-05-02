@@ -9,7 +9,6 @@
     pageSize – rows per page
     total    – total matching records (null while loading)
 */
-
 import Card from '@/common/components/atoms/Card';
 import { Search } from 'lucide-react';
 import PropTypes from 'prop-types';
@@ -70,7 +69,13 @@ const styles = {
   },
 };
 
-export default function DonationsFilterBar({ filters, onChange, page, pageSize, total }) {
+export default function DonationsFilterBar({
+  filters,
+  onChange,
+  page,
+  pageSize,
+  total,
+}) {
   const { search, status, minAmount, maxAmount } = filters;
 
   const firstItem = total === null ? null : (page - 1) * pageSize + 1;
@@ -117,12 +122,11 @@ export default function DonationsFilterBar({ filters, onChange, page, pageSize, 
 
       {total !== null && total > 0 && (
         <div style={styles.count}>
-          Showing {firstItem}–{lastItem} of {total} donation{total !== 1 ? 's' : ''}
+          Showing {firstItem}–{lastItem} of {total} donation
+          {total !== 1 ? 's' : ''}
         </div>
       )}
-      {total === 0 && (
-        <div style={styles.count}>No donations found.</div>
-      )}
+      {total === 0 && <div style={styles.count}>No donations found.</div>}
     </Card>
   );
 }

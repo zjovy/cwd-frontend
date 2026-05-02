@@ -11,7 +11,9 @@ export default function useDonations(filters = {}) {
 
   // Lets mutations re-fetch with the latest filters without stale closures
   const filtersRef = useRef(filters);
-  useEffect(() => { filtersRef.current = filters; });
+  useEffect(() => {
+    filtersRef.current = filters;
+  });
 
   // Callback exposed to the page so it can reset page to 1 after a mutation
   const onPageResetRef = useRef(null);
@@ -40,7 +42,10 @@ export default function useDonations(filters = {}) {
   useEffect(() => {
     const controller = new AbortController();
     const timer = setTimeout(() => {
-      fetchDonations({ search, status, minAmount, maxAmount, page }, controller.signal);
+      fetchDonations(
+        { search, status, minAmount, maxAmount, page },
+        controller.signal
+      );
     }, 300);
     return () => {
       clearTimeout(timer);

@@ -6,7 +6,6 @@
     - initials (string): The initials to display.
     - size (number, optional): The diameter of the avatar in pixels. Defaults to 34.
 */
-
 import PropTypes from 'prop-types';
 
 const avatarStyle = (size) => ({
