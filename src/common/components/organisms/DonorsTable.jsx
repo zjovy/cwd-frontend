@@ -24,14 +24,14 @@ const checkboxTd = {
 /* ── DonorTable ───────────────────────────────────── */
 
 const COLUMNS = [
-  'Name',
-  'Email',
-  'Address',
-  'Phone',
-  'Total Donations',
-  'Donation Count',
-  'Most Recent',
-  'Actions',
+  { label: 'Name' },
+  { label: 'Email' },
+  { label: 'Address' },
+  { label: 'Phone' },
+  { label: 'Total Donations', style: { textAlign: 'center' } },
+  { label: 'Donation Count' },
+  { label: 'Most Recent' },
+  { label: 'Actions' },
 ];
 
 function addressCell(d) {
@@ -77,9 +77,9 @@ export default function DonorTable({
               onChange={(e) => onSelectAll(e.target.checked)}
             />
           </th>
-          {COLUMNS.map((h) => (
-            <th key={h} style={thStyle}>
-              {h}
+          {COLUMNS.map(({ label, style }) => (
+            <th key={label} style={{ ...thStyle, ...style }}>
+              {label}
             </th>
           ))}
         </tr>
@@ -111,7 +111,7 @@ export default function DonorTable({
               <td style={tdStyle}>{d.email}</td>
               <td style={tdStyle}>{addressCell(d)}</td>
               <td style={tdStyle}>{d.phone}</td>
-              <td style={tdStyle}>{formatAmount(d.total_donations)}</td>
+              <td style={{ ...tdStyle, textAlign: 'center' }}>{formatAmount(d.total_donations)}</td>
               <td style={tdStyle}>{d.donation_count}</td>
               <td style={tdStyle}>{formatDate(d.most_recent)}</td>
               <td style={tdStyle} onClick={(e) => e.stopPropagation()}>
