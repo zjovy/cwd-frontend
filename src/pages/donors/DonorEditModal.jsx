@@ -105,12 +105,7 @@ export default function DonorEditModal({ open, onClose, onSubmit, donor }) {
     setSaving(true);
     setError(null);
     try {
-      await onSubmit({
-        ...form,
-        total_donations: donor?.total_donations ?? 0,
-        donation_count: donor?.donation_count ?? 0,
-        most_recent: donor?.most_recent?.slice(0, 10) ?? null,
-      });
+      await onSubmit({ ...form });
       onClose();
     } catch (err) {
       setError(err.message);
