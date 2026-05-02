@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 
 import { auth, googleProvider } from '@/firebase-config';
 import {
@@ -9,6 +8,7 @@ import {
   signInWithPopup,
   signOut,
 } from 'firebase/auth';
+import PropTypes from 'prop-types';
 
 export const UserContext = React.createContext({
   user: null,
@@ -37,6 +37,16 @@ export function UserProvider({ children }) {
       if (firebaseUser) {
         try {
           const idToken = await firebaseUser.getIdToken();
+
+          // Refresh the backend session cookie on every auth state restore,
+          // not just on fresh logins, so credentials: 'include' calls work.
+          await fetch(buildUrl('/auth/token'), {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idToken }),
+          });
+
           const response = await fetch(buildUrl('/auth/me'), {
             headers: { Authorization: `Bearer ${idToken}` },
           });

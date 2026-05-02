@@ -1,7 +1,8 @@
+import { useEffect, useState } from 'react';
+
 import Card from '@/common/components/atoms/Card';
 import SectionTitle from '@/common/components/atoms/SectionTitle';
 import PropTypes from 'prop-types';
-import { useEffect, useState } from 'react';
 import {
   Bar,
   BarChart,
@@ -46,7 +47,9 @@ function CustomTooltip({ active, payload, label }) {
     return (
       <div style={tooltipStyle}>
         <div style={tooltipLabelStyle}>{label}</div>
-        <div style={tooltipValueStyle}>${Number(payload[0].value).toLocaleString()}</div>
+        <div style={tooltipValueStyle}>
+          ${Number(payload[0].value).toLocaleString()}
+        </div>
       </div>
     );
   }
@@ -73,15 +76,15 @@ export default function ChartsRow() {
     fetch(`${import.meta.env.VITE_BACKEND_URL}/dashboard/trend`, {
       credentials: 'include',
     })
-      .then((res) => res.json())
-      .then((data) => setTrendData(data))
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => setTrendData(Array.isArray(data) ? data : []))
       .catch((err) => console.error('Failed to fetch trend data:', err));
 
     fetch(`${import.meta.env.VITE_BACKEND_URL}/dashboard/last6months`, {
       credentials: 'include',
     })
-      .then((res) => res.json())
-      .then((data) => setMonthlyData(data))
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => setMonthlyData(Array.isArray(data) ? data : []))
       .catch((err) => console.error('Failed to fetch monthly data:', err));
   }, []);
 

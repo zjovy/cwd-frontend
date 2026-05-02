@@ -68,7 +68,12 @@ const errorStyle = {
   marginBottom: '10px',
 };
 
-export default function DeleteConfirmModal({ open, onClose, onConfirm, donorName }) {
+export default function DeleteConfirmModal({
+  open,
+  onClose,
+  onConfirm,
+  donorName,
+}) {
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState(null);
 

@@ -3,14 +3,15 @@
   the full Donations page.
 
   Props:
-    donations     – array of donation objects
-    loading       – bool
-    error         – string | null
-    selected      – Set<id>  (controlled by parent)
+    donations      – array of donation objects
+    loading        – bool
+    error          – string | null
+    selected       – Set<id>  (controlled by parent)
     onSelectChange – (id) => void   toggles one row
     onSelectAll    – (bool) => void  select / deselect all visible rows
-    onEdit        – (donation) => void
-    onDelete      – (donation) => void
+    onRowClick     – (donation) => void  optional, opens row detail
+    onEdit         – (donation) => void  optional, shows ActionsMenu
+    onDelete       – (donation) => void  optional, shows ActionsMenu
 */
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
@@ -43,14 +44,7 @@ const donorLinkStyle = {
 
 /* ── DonationTable ───────────────────────────────────── */
 
-const COLUMNS = [
-  'Donor Name',
-  'Email',
-  'Amount',
-  'Date',
-  'Receipt Status',
-  'Actions',
-];
+const COLUMNS = ['Donor Name', 'Email', 'Amount', 'Date', 'Receipt Status'];
 
 export default function DonationTable({
   donations,
@@ -59,12 +53,14 @@ export default function DonationTable({
   selected,
   onSelectChange,
   onSelectAll,
+  onRowClick,
   onEdit,
   onDelete,
 }) {
   const allChecked =
     donations.length > 0 && donations.every((d) => selected.has(d.id));
   const someChecked = donations.some((d) => selected.has(d.id));
+  const showActions = Boolean(onEdit || onDelete);
 
   const selectAllRef = useRef(null);
   useEffect(() => {
@@ -76,6 +72,8 @@ export default function DonationTable({
   if (loading) return <div style={statusMsg}>Loading donations…</div>;
   if (error)
     return <div style={{ ...statusMsg, color: '#dc2626' }}>Error: {error}</div>;
+
+  const colSpan = COLUMNS.length + 1 + (showActions ? 1 : 0);
 
   return (
     <table style={tableStyle}>
@@ -94,19 +92,24 @@ export default function DonationTable({
               {h}
             </th>
           ))}
+          {showActions && <th style={thStyle} />}
         </tr>
       </thead>
       <tbody>
         {donations.length === 0 ? (
           <tr>
-            <td colSpan={COLUMNS.length + 1} style={statusMsg}>
+            <td colSpan={colSpan} style={statusMsg}>
               No donations found.
             </td>
           </tr>
         ) : (
           donations.map((d) => (
-            <tr key={d.id}>
-              <td style={checkboxTd}>
+            <tr
+              key={d.id}
+              style={{ cursor: onRowClick ? 'pointer' : 'default' }}
+              onClick={onRowClick ? () => onRowClick(d) : undefined}
+            >
+              <td style={checkboxTd} onClick={(e) => e.stopPropagation()}>
                 <input
                   type='checkbox'
                   checked={selected.has(d.id)}
@@ -115,7 +118,11 @@ export default function DonationTable({
               </td>
               <td style={{ ...tdStyle, fontWeight: '500', color: '#1a1a1a' }}>
                 {d.donor_id ? (
-                  <Link to={`/donors/${d.donor_id}`} style={donorLinkStyle}>
+                  <Link
+                    to={`/donors/${d.donor_id}`}
+                    style={donorLinkStyle}
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     {d.donor_name}
                   </Link>
                 ) : (
@@ -128,14 +135,18 @@ export default function DonationTable({
               <td style={tdStyle}>
                 <Badge status={d.receipt_status} />
               </td>
-              <td style={tdStyle}>
-                <ActionsMenu
-                  actions={[
-                    { label: 'Edit', onClick: () => onEdit(d) },
-                    { label: 'Delete', onClick: () => onDelete(d), danger: true },
-                  ]}
-                />
-              </td>
+              {showActions && (
+                <td style={tdStyle} onClick={(e) => e.stopPropagation()}>
+                  <ActionsMenu
+                    actions={[
+                      ...(onEdit ? [{ label: 'Edit', onClick: () => onEdit(d) }] : []),
+                      ...(onDelete
+                        ? [{ label: 'Delete', onClick: () => onDelete(d), danger: true }]
+                        : []),
+                    ]}
+                  />
+                </td>
+              )}
             </tr>
           ))
         )}
@@ -151,6 +162,7 @@ DonationTable.propTypes = {
   selected: PropTypes.instanceOf(Set).isRequired,
   onSelectChange: PropTypes.func.isRequired,
   onSelectAll: PropTypes.func.isRequired,
-  onEdit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
+  onRowClick: PropTypes.func,
+  onEdit: PropTypes.func,
+  onDelete: PropTypes.func,
 };

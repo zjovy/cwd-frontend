@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react';
 
 import Card from '@/common/components/atoms/Card';
 import Pagination from '@/common/components/atoms/Pagination';
-import DeleteConfirmModal from '@/common/components/organisms/DeleteConfirmModal';
 import DonationModal from '@/common/components/organisms/DonationModal';
 import DonationTable from '@/common/components/organisms/DonationTable';
 import useDonations from '@/hooks/useDonations';
 import { PAGE_SIZE } from '@/utils/pagination';
 import { Plus } from 'lucide-react';
 
+import DonationViewModal from './DonationViewModal';
 import DonationsFilterBar from './DonationsFilterBar';
 
 /* ── styles ─────────────────────────────────────────── */
@@ -52,7 +52,12 @@ const styles = {
   },
 };
 
-const INITIAL_FILTERS = { search: '', status: '', minAmount: '', maxAmount: '' };
+const INITIAL_FILTERS = {
+  search: '',
+  status: '',
+  minAmount: '',
+  maxAmount: '',
+};
 
 /* ── component ───────────────────────────────────────── */
 
@@ -61,15 +66,26 @@ export default function DonationsPage() {
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState(new Set());
   const [modalOpen, setModalOpen] = useState(false);
-  const [editing, setEditing] = useState(null);
-  const [deleting, setDeleting] = useState(null);
+  const [viewing, setViewing] = useState(null);
 
-  const { donations, total, totalPages, loading, error, onPageResetRef, createDonation, updateDonation, deleteDonation } =
-    useDonations({ ...filters, page });
+  const {
+    donations,
+    total,
+    totalPages,
+    loading,
+    error,
+    onPageResetRef,
+    createDonation,
+    updateDonation,
+    deleteDonation,
+  } = useDonations({ ...filters, page });
 
   // Give the hook a way to reset the page to 1 after create/delete
   useEffect(() => {
-    onPageResetRef.current = () => { setPage(1); setSelected(new Set()); };
+    onPageResetRef.current = () => {
+      setPage(1);
+      setSelected(new Set());
+    };
   });
 
   // Reset to page 1 whenever a filter value changes
@@ -95,20 +111,15 @@ export default function DonationsPage() {
     setSelected(new Set());
   };
 
-  const openCreate = () => { setEditing(null); setModalOpen(true); };
-  const openEdit = (d) => { setEditing(d); setModalOpen(true); };
+  const openCreate = () => setModalOpen(true);
 
-  const handleSubmit = async (data) => {
-    if (editing) {
-      await updateDonation(editing.id, data);
-    } else {
-      await createDonation(data);
-    }
+  const handleCreate = async (data) => {
+    await createDonation(data);
   };
 
-  const handleDelete = async () => {
-    await deleteDonation(deleting.id);
-    setDeleting(null);
+  const handleDelete = async (id) => {
+    await deleteDonation(id);
+    setViewing(null);
   };
 
   return (
@@ -116,7 +127,9 @@ export default function DonationsPage() {
       <div style={styles.topRow}>
         <div>
           <div style={styles.title}>Donations</div>
-          <div style={styles.subtitle}>View and manage all donation records.</div>
+          <div style={styles.subtitle}>
+            View and manage all donation records.
+          </div>
         </div>
         <button style={styles.addBtn} onClick={openCreate}>
           <Plus size={14} /> Add Donation
@@ -139,8 +152,7 @@ export default function DonationsPage() {
           selected={selected}
           onSelectChange={handleSelectChange}
           onSelectAll={handleSelectAll}
-          onEdit={openEdit}
-          onDelete={(d) => setDeleting(d)}
+          onRowClick={(d) => setViewing(d)}
         />
 
         <Pagination
@@ -153,15 +165,15 @@ export default function DonationsPage() {
       <DonationModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        onSubmit={handleSubmit}
-        donation={editing}
+        onSubmit={handleCreate}
       />
 
-      <DeleteConfirmModal
-        open={Boolean(deleting)}
-        onClose={() => setDeleting(null)}
-        onConfirm={handleDelete}
-        donorName={deleting?.donor_name}
+      <DonationViewModal
+        open={Boolean(viewing)}
+        onClose={() => setViewing(null)}
+        donation={viewing}
+        onSave={updateDonation}
+        onDelete={handleDelete}
       />
     </main>
   );

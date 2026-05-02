@@ -62,7 +62,8 @@ export default function DonationHistoryCard({ donations, loading, error }) {
   );
 
   const renderBody = () => {
-    if (loading) return <div style={styles.empty}>Loading donation history…</div>;
+    if (loading)
+      return <div style={styles.empty}>Loading donation history…</div>;
     if (error)
       return (
         <div style={{ ...styles.empty, color: '#dc2626' }}>Error: {error}</div>
@@ -92,7 +93,9 @@ export default function DonationHistoryCard({ donations, loading, error }) {
                     {d.payment_method || 'Credit Card'}
                   </span>
                 </td>
-                <td style={{ ...styles.td, textAlign: 'right', fontWeight: 500 }}>
+                <td
+                  style={{ ...styles.td, textAlign: 'right', fontWeight: 500 }}
+                >
                   {formatAmount(d.amount)}
                 </td>
               </tr>

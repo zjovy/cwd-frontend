@@ -6,7 +6,6 @@
     - children (node): The content to display inside the card.
     - style (object, optional): Additional CSS styles to apply to the card.
 */
-
 import PropTypes from 'prop-types';
 
 const baseStyle = {

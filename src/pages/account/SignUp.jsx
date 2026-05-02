@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
-
 import { useNavigate } from 'react-router-dom';
 
 import GoogleButton from '@/common/components/atoms/GoogleButton';
 import { Form, FormTitle } from '@/common/components/form/Form';
 import { Input } from '@/common/components/form/Input';
 import SubmitButton from '@/common/components/form/SubmitButton';
-import { useUser } from '@/common/contexts/UserContext';
 import { RedSpan } from '@/common/components/form/styles';
+import { useUser } from '@/common/contexts/UserContext';
 
 import { StyledPage } from './styles';
 

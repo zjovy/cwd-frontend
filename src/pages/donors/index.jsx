@@ -39,7 +39,7 @@ const styles = {
   },
 };
 
-const INITIAL_FILTERS = { search: ''};
+const INITIAL_FILTERS = { search: '' };
 
 /* ── component ───────────────────────────────────────── */
 
@@ -55,7 +55,10 @@ export default function DonorsPage() {
     useDonors({ ...filters, page });
 
   useEffect(() => {
-    onPageResetRef.current = () => { setPage(1); setSelected(new Set()); };
+    onPageResetRef.current = () => {
+      setPage(1);
+      setSelected(new Set());
+    };
   });
 
   const handleFilterChange = (field, value) => {
@@ -103,7 +106,9 @@ export default function DonorsPage() {
       <div style={styles.topRow}>
         <div>
           <div style={styles.title}>Donors</div>
-          <div style={styles.subtitle}>View donor details and contributions in one place.</div>
+          <div style={styles.subtitle}>
+            View donor details and contributions in one place.
+          </div>
         </div>
       </div>
 
