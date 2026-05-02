@@ -95,15 +95,19 @@ export function UserProvider({ children }) {
       const result = await signInWithPopup(auth, googleProvider);
       const idToken = await result.user.getIdToken();
 
-      await fetch(buildUrl('/auth/token'), {
+      const res = await fetch(buildUrl('/auth/token'), {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ idToken }),
       });
+
+      if (!res.ok) {
+        throw new Error('Failed to sync account with server');
+      }
     } catch (error) {
       console.error('Google auth error:', error);
-      throw new Error('Failed to complete Google authentication');
+      throw error;
     }
   };
 
