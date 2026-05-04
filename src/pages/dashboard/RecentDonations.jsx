@@ -48,7 +48,7 @@ export default function RecentDonations() {
     } catch (err) {
       if (err.name !== 'AbortError') setError(err.message);
     } finally {
-      setLoading(false);
+      if (!signal?.aborted) setLoading(false);
     }
   }, []);
 

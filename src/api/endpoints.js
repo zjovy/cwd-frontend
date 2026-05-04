@@ -1,7 +1,6 @@
 export const ENDPOINTS = {
   DONATIONS: '/donations',
   DONATION_BY_ID: (id) => `/donations/${id}`,
-  DONATION_RECEIPT: (id) => `/donations/${id}/send-receipt`,
   DONORS: '/donors',
   DONOR_BY_ID: (id) => `/donors/${id}`,
   DASHBOARD_SUMMARY: '/dashboard/summary',

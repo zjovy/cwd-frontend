@@ -1,7 +1,6 @@
 import Card from '@/common/components/atoms/Card';
 import SectionTitle from '@/common/components/atoms/SectionTitle';
 import { formatAmount, formatDate } from '@/utils/format';
-import { CreditCard } from 'lucide-react';
 import PropTypes from 'prop-types';
 
 const styles = {
@@ -31,7 +30,6 @@ const styles = {
     color: '#374151',
     borderBottom: '1px solid #f9f9f8',
   },
-  method: { display: 'inline-flex', alignItems: 'center', gap: '8px' },
   empty: {
     padding: '40px 0',
     textAlign: 'center',
@@ -77,8 +75,6 @@ export default function DonationHistoryCard({ donations, loading, error }) {
           <thead>
             <tr>
               <th style={styles.th}>Date</th>
-              <th style={styles.th}>Campaign</th>
-              <th style={styles.th}>Method</th>
               <th style={{ ...styles.th, textAlign: 'right' }}>Amount</th>
             </tr>
           </thead>
@@ -86,13 +82,6 @@ export default function DonationHistoryCard({ donations, loading, error }) {
             {donations.map((d) => (
               <tr key={d.id}>
                 <td style={styles.td}>{formatDate(d.donation_date)}</td>
-                <td style={styles.td}>{d.campaign || 'General Fund'}</td>
-                <td style={styles.td}>
-                  <span style={styles.method}>
-                    <CreditCard size={16} strokeWidth={1.8} color='#9ca3af' />
-                    {d.payment_method || 'Credit Card'}
-                  </span>
-                </td>
                 <td
                   style={{ ...styles.td, textAlign: 'right', fontWeight: 500 }}
                 >

@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react';
 
 import donationService from '@/services/donationService';
 import { Send } from 'lucide-react';
-import { PropTypes } from 'prop-types';
+import PropTypes from 'prop-types';
 
 import EmailPreviewModal from './EmailPreviewModal';
 
@@ -229,8 +229,9 @@ export default function DonationViewModal({
     setConfirmDelete(false);
     setDeleting(false);
 
+    const controller = new AbortController();
     donationService
-      .getById(donation.id)
+      .getById(donation.id, controller.signal)
       .then((detail) => {
         setForm((prev) => ({
           ...prev,
@@ -238,9 +239,11 @@ export default function DonationViewModal({
           address: detail.address ?? '',
         }));
       })
-      .catch((err) =>
-        console.error('[DonationViewModal] detail fetch failed:', err)
-      );
+      .catch((err) => {
+        if (err.name !== 'AbortError')
+          console.error('[DonationViewModal] detail fetch failed:', err);
+      });
+    return () => controller.abort();
   }, [open, donation?.id]);
 
   if (!open) return null;

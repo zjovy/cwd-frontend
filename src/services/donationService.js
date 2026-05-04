@@ -22,8 +22,8 @@ const donationService = {
     return transformDonationList(raw);
   },
 
-  async getById(id) {
-    const raw = await request(buildUrl(ENDPOINTS.DONATION_BY_ID(id)));
+  async getById(id, signal) {
+    const raw = await request(buildUrl(ENDPOINTS.DONATION_BY_ID(id)), { signal });
     return transformDonation(raw);
   },
 
@@ -47,12 +47,6 @@ const donationService = {
     });
   },
 
-  sendReceipt(id, body) {
-    return request(buildUrl(ENDPOINTS.DONATION_RECEIPT(id)), {
-      method: 'POST',
-      body: JSON.stringify({ body }),
-    });
-  },
 };
 
 export default donationService;

@@ -179,7 +179,7 @@ export default function DonorsPage() {
         open={Boolean(deleting)}
         onClose={() => setDeleting(null)}
         onConfirm={handleDelete}
-        donorName={deleting?.name}
+        donorName={deleting?.fullName}
       />
     </main>
   );
