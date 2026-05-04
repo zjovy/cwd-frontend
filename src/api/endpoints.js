@@ -4,7 +4,6 @@ export const ENDPOINTS = {
   DONATION_RECEIPT: (id) => `/donations/${id}/send-receipt`,
   DONORS: '/donors',
   DONOR_BY_ID: (id) => `/donors/${id}`,
-  DONOR_UPSERT: '/donors/upsert-by-email',
   DASHBOARD_SUMMARY: '/dashboard/summary',
   DASHBOARD_TREND: '/dashboard/trend',
   DASHBOARD_LAST6: '/dashboard/last6months',

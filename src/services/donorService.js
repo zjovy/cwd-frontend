@@ -46,12 +46,6 @@ const donorService = {
     });
   },
 
-  upsertByEmail(data) {
-    return request(buildUrl(ENDPOINTS.DONOR_UPSERT), {
-      method: 'PATCH',
-      body: JSON.stringify(data),
-    });
-  },
 };
 
 export default donorService;
