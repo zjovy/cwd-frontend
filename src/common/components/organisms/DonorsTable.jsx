@@ -1,11 +1,14 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import PropTypes from 'prop-types';
-
-import { tableStyle, tdStyle, thStyle, statusMsg } from '@/common/components/atoms/tableStyles';
+import {
+  statusMsg,
+  tableStyle,
+  tdStyle,
+  thStyle,
+} from '@/common/components/atoms/tableStyles';
 import ActionsMenu from '@/common/components/molecules/ActionsMenu';
-import { formatAmount, formatDate } from '@/utils/format';
+import PropTypes from 'prop-types';
 
 const clickableRowStyle = { cursor: 'pointer' };
 
@@ -28,9 +31,6 @@ const COLUMNS = [
   { label: 'Email' },
   { label: 'Address' },
   { label: 'Phone' },
-  { label: 'Total Donations', style: { textAlign: 'center' } },
-  { label: 'Donation Count', style: { textAlign: 'center' } },
-  { label: 'Most Recent' },
   { label: 'Actions' },
 ];
 
@@ -106,19 +106,20 @@ export default function DonorTable({
                 />
               </td>
               <td style={{ ...tdStyle, fontWeight: '500', color: '#1a1a1a' }}>
-                {d.name}
+                {d.fullName}
               </td>
               <td style={tdStyle}>{d.email}</td>
               <td style={tdStyle}>{addressCell(d)}</td>
               <td style={tdStyle}>{d.phone}</td>
-              <td style={{ ...tdStyle, textAlign: 'center' }}>{formatAmount(d.total_donations)}</td>
-              <td style={{ ...tdStyle, textAlign: 'center' }}>{d.donation_count}</td>
-              <td style={tdStyle}>{formatDate(d.most_recent)}</td>
               <td style={tdStyle} onClick={(e) => e.stopPropagation()}>
                 <ActionsMenu
                   actions={[
                     { label: 'Edit', onClick: () => onEdit(d) },
-                    { label: 'Delete', onClick: () => onDelete(d), danger: true },
+                    {
+                      label: 'Delete',
+                      onClick: () => onDelete(d),
+                      danger: true,
+                    },
                   ]}
                 />
               </td>

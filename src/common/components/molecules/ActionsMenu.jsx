@@ -102,6 +102,6 @@ ActionsMenu.propTypes = {
       onClick: PropTypes.func.isRequired,
       danger: PropTypes.bool,
       disabled: PropTypes.bool,
-    }),
+    })
   ).isRequired,
 };

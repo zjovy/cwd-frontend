@@ -78,7 +78,8 @@ const errorStyle = {
 
 function toFormValues(donor) {
   return {
-    name: donor?.name ?? '',
+    first_name: donor?.first_name ?? '',
+    last_name: donor?.last_name ?? '',
     email: donor?.email ?? '',
     phone: donor?.phone ?? '',
     address: donor?.address ?? '',
@@ -125,14 +126,25 @@ export default function DonorEditModal({ open, onClose, onSubmit, donor }) {
 
         {error && <div style={errorStyle}>{error}</div>}
 
-        <div style={fieldGroup}>
-          <label style={labelStyle}>Name</label>
-          <input
-            style={inputStyle}
-            value={form.name}
-            onChange={set('name')}
-            required
-          />
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <div style={{ ...fieldGroup, flex: 1 }}>
+            <label style={labelStyle}>First Name</label>
+            <input
+              style={inputStyle}
+              value={form.first_name}
+              onChange={set('first_name')}
+              required
+            />
+          </div>
+          <div style={{ ...fieldGroup, flex: 1 }}>
+            <label style={labelStyle}>Last Name</label>
+            <input
+              style={inputStyle}
+              value={form.last_name}
+              onChange={set('last_name')}
+              required
+            />
+          </div>
         </div>
 
         <div style={fieldGroup}>

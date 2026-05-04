@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
+import { buildUrl } from '@/api/client';
+import { ENDPOINTS } from '@/api/endpoints';
 import { auth, googleProvider } from '@/firebase-config';
 import {
   onAuthStateChanged,
@@ -23,11 +25,6 @@ UserProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-const buildUrl = (endpoint) => {
-  const base = import.meta.env.VITE_BACKEND_URL ?? '';
-  return `${String(base).replace(/\/$/, '')}${endpoint}`;
-};
-
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -40,14 +37,19 @@ export function UserProvider({ children }) {
 
           // Refresh the backend session cookie on every auth state restore,
           // not just on fresh logins, so credentials: 'include' calls work.
-          await fetch(buildUrl('/auth/token'), {
+          const tokenRes = await fetch(buildUrl(ENDPOINTS.AUTH_TOKEN), {
             method: 'POST',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ idToken }),
           });
+          if (!tokenRes.ok) {
+            console.warn(
+              '[UserContext] /auth/token failed — session cookie not set'
+            );
+          }
 
-          const response = await fetch(buildUrl('/auth/me'), {
+          const response = await fetch(buildUrl(ENDPOINTS.AUTH_ME), {
             headers: { Authorization: `Bearer ${idToken}` },
           });
 
@@ -95,7 +97,7 @@ export function UserProvider({ children }) {
       const result = await signInWithPopup(auth, googleProvider);
       const idToken = await result.user.getIdToken();
 
-      const res = await fetch(buildUrl('/auth/token'), {
+      const res = await fetch(buildUrl(ENDPOINTS.AUTH_TOKEN), {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },

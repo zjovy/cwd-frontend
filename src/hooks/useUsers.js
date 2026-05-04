@@ -30,7 +30,7 @@ export default function useUsers() {
     try {
       const response = await adminService.setRole(uid, role);
       setUsers((prev) =>
-        prev.map((u) => (u.firebaseUid === uid ? response.user : u)),
+        prev.map((u) => (u.firebaseUid === uid ? response.user : u))
       );
     } catch (err) {
       setActionError(err.message);

@@ -16,12 +16,16 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
-import PropTypes from 'prop-types';
-
-import { tableStyle, tdStyle, thStyle, statusMsg } from '@/common/components/atoms/tableStyles';
 import Badge from '@/common/components/atoms/Badge';
+import {
+  statusMsg,
+  tableStyle,
+  tdStyle,
+  thStyle,
+} from '@/common/components/atoms/tableStyles';
 import ActionsMenu from '@/common/components/molecules/ActionsMenu';
 import { formatAmount, formatDate } from '@/utils/format';
+import PropTypes from 'prop-types';
 
 /* ── styles ─────────────────────────────────────────── */
 
@@ -123,13 +127,13 @@ export default function DonationTable({
                     style={donorLinkStyle}
                     onClick={(e) => e.stopPropagation()}
                   >
-                    {d.donor_name}
+                    {d.donorFullName}
                   </Link>
                 ) : (
-                  d.donor_name
+                  d.donorFullName
                 )}
               </td>
-              <td style={tdStyle}>{d.donor_email}</td>
+              <td style={tdStyle}>{d.donorEmail}</td>
               <td style={tdStyle}>{formatAmount(d.amount)}</td>
               <td style={tdStyle}>{formatDate(d.donation_date)}</td>
               <td style={tdStyle}>
@@ -139,9 +143,17 @@ export default function DonationTable({
                 <td style={tdStyle} onClick={(e) => e.stopPropagation()}>
                   <ActionsMenu
                     actions={[
-                      ...(onEdit ? [{ label: 'Edit', onClick: () => onEdit(d) }] : []),
+                      ...(onEdit
+                        ? [{ label: 'Edit', onClick: () => onEdit(d) }]
+                        : []),
                       ...(onDelete
-                        ? [{ label: 'Delete', onClick: () => onDelete(d), danger: true }]
+                        ? [
+                            {
+                              label: 'Delete',
+                              onClick: () => onDelete(d),
+                              danger: true,
+                            },
+                          ]
                         : []),
                     ]}
                   />

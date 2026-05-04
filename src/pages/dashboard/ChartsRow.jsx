@@ -104,7 +104,9 @@ export default function ChartsRow() {
       <Card style={{ flex: 1, padding: '22px 22px 16px' }}>
         <SectionTitle>Donation Trend</SectionTitle>
         {error ? (
-          <div style={{ color: '#dc2626', padding: '20px', textAlign: 'center' }}>
+          <div
+            style={{ color: '#dc2626', padding: '20px', textAlign: 'center' }}
+          >
             Failed to load chart data: {error}
           </div>
         ) : (
@@ -118,67 +120,72 @@ export default function ChartsRow() {
                 stroke='#f0f0ee'
                 vertical={false}
               />
-            <XAxis
-              dataKey='year'
-              tick={{ fontSize: 12, fill: '#9ca3af' }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis
-              tick={{ fontSize: 12, fill: '#9ca3af' }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <Tooltip
-              content={<CustomTooltip />}
-              cursor={{ stroke: '#e8e8e6', strokeWidth: 1 }}
-            />
-            <Line
-              type='monotone'
-              dataKey='amount'
-              stroke='#3b82f6'
-              strokeWidth={2.5}
-              dot={false}
-              activeDot={{ r: 5 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+              <XAxis
+                dataKey='year'
+                tick={{ fontSize: 12, fill: '#9ca3af' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                tick={{ fontSize: 12, fill: '#9ca3af' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip
+                content={<CustomTooltip />}
+                cursor={{ stroke: '#e8e8e6', strokeWidth: 1 }}
+              />
+              <Line
+                type='monotone'
+                dataKey='amount'
+                stroke='#3b82f6'
+                strokeWidth={2.5}
+                dot={false}
+                activeDot={{ r: 5 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
         )}
       </Card>
 
       <Card style={{ flex: 1, padding: '22px 22px 16px' }}>
         <SectionTitle>Last 6 Months</SectionTitle>
         {error ? (
-          <div style={{ color: '#dc2626', padding: '20px', textAlign: 'center' }}>
+          <div
+            style={{ color: '#dc2626', padding: '20px', textAlign: 'center' }}
+          >
             Failed to load chart data: {error}
           </div>
         ) : (
           <ResponsiveContainer width='100%' height={200}>
-          <BarChart
-            data={monthlyData}
-            margin={{ top: 4, right: 4, left: -20, bottom: 0 }}
-            barSize={28}
-          >
-            <CartesianGrid
-              strokeDasharray='3 3'
-              stroke='#f0f0ee'
-              vertical={false}
-            />
-            <XAxis
-              dataKey='month'
-              tick={{ fontSize: 12, fill: '#9ca3af' }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis
-              tick={{ fontSize: 12, fill: '#9ca3af' }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f5f5f4' }} />
-            <Bar dataKey='amount' fill='#3b82f6' radius={[4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+            <BarChart
+              data={monthlyData}
+              margin={{ top: 4, right: 4, left: -20, bottom: 0 }}
+              barSize={28}
+            >
+              <CartesianGrid
+                strokeDasharray='3 3'
+                stroke='#f0f0ee'
+                vertical={false}
+              />
+              <XAxis
+                dataKey='month'
+                tick={{ fontSize: 12, fill: '#9ca3af' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                tick={{ fontSize: 12, fill: '#9ca3af' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip
+                content={<CustomTooltip />}
+                cursor={{ fill: '#f5f5f4' }}
+              />
+              <Bar dataKey='amount' fill='#3b82f6' radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
         )}
       </Card>
     </div>

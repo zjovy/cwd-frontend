@@ -1,61 +1,10 @@
-import { auth } from '@/firebase-config';
-
-const BASE_URL = `${import.meta.env.VITE_BACKEND_URL}/donors`;
-
-async function authHeaders() {
-  const token = await auth.currentUser?.getIdToken();
-  return {
-    'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` }),
-  };
-}
-
-async function request(url, options = {}) {
-  const { signal, ...rest } = options;
-  const headers = await authHeaders();
-  const res = await fetch(url, {
-    ...rest,
-    headers,
-    credentials: 'include',
-    signal,
-  });
-
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(
-      body.error || body.message || `Request failed (${res.status})`
-    );
-  }
-
-  return res.json();
-}
-
-function normalizeDonorsListPayload(raw) {
-  if (raw == null) return { donors: [], total: 0 };
-  if (Array.isArray(raw)) return { donors: raw, total: raw.length };
-  if (typeof raw !== 'object') return { donors: [], total: 0 };
-
-  const rows = raw.donors ?? raw.data ?? raw.results;
-  const donors = Array.isArray(rows) ? rows : [];
-  const totalRaw = raw.total ?? raw.count ?? raw.meta?.total;
-  const n = typeof totalRaw === 'number' ? totalRaw : Number(totalRaw);
-  const total = Number.isFinite(n) && n >= 0 ? n : donors.length;
-
-  return { donors, total };
-}
-
-function normalizeDonorBody(data) {
-  if (data == null || typeof data !== 'object') return data;
-  const out = { ...data };
-  for (const key of ['address', 'phone']) {
-    if (!(key in out)) continue;
-    const v = out[key];
-    if (v === undefined || v === null || (typeof v === 'string' && v.trim() === '')) {
-      out[key] = null;
-    }
-  }
-  return out;
-}
+import { buildUrl, request } from '@/api/client';
+import { ENDPOINTS } from '@/api/endpoints';
+import {
+  buildDonorRequestBody,
+  transformDonor,
+  transformDonorList,
+} from '@/api/transformers';
 
 const donorService = {
   async getAll(params = {}, signal) {
@@ -65,40 +14,35 @@ const donorService = {
         Object.entries(rest).filter(([, v]) => v != null && v !== '')
       )
     ).toString();
-    const raw = await request(`${BASE_URL}${query ? `?${query}` : ''}`, {
-      signal,
-    });
-    return normalizeDonorsListPayload(raw);
+    const raw = await request(
+      buildUrl(`${ENDPOINTS.DONORS}${query ? `?${query}` : ''}`),
+      { signal }
+    );
+    return transformDonorList(raw);
   },
 
-  getById(id) {
-    return request(`${BASE_URL}/${id}`);
+  async getById(id, signal) {
+    const raw = await request(buildUrl(ENDPOINTS.DONOR_BY_ID(id)), { signal });
+    return transformDonor(raw);
   },
 
   create(data) {
-    return request(BASE_URL, {
+    return request(buildUrl(ENDPOINTS.DONORS), {
       method: 'POST',
-      body: JSON.stringify(normalizeDonorBody(data)),
+      body: JSON.stringify(buildDonorRequestBody(data)),
     });
   },
 
   update(id, data) {
-    return request(`${BASE_URL}/${id}`, {
+    return request(buildUrl(ENDPOINTS.DONOR_BY_ID(id)), {
       method: 'PUT',
-      body: JSON.stringify(normalizeDonorBody(data)),
+      body: JSON.stringify(buildDonorRequestBody(data)),
     });
   },
 
   delete(id) {
-    return request(`${BASE_URL}/${id}`, {
+    return request(buildUrl(ENDPOINTS.DONOR_BY_ID(id)), {
       method: 'DELETE',
-    });
-  },
-
-  upsertByEmail(data) {
-    return request(`${BASE_URL}/upsert-by-email`, {
-      method: 'PATCH',
-      body: JSON.stringify(data),
     });
   },
 };

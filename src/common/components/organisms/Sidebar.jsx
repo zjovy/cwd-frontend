@@ -59,13 +59,16 @@ function getInitials(user) {
 }
 
 function getDisplayName(user) {
-  if (user?.firstname && user?.lastname) return `${user.firstname} ${user.lastname}`;
+  if (user?.firstname && user?.lastname)
+    return `${user.firstname} ${user.lastname}`;
   return user?.email || '';
 }
 
 export default function Sidebar({ activePage, onNavigate }) {
   const { user, logout } = useUser();
-  const navItems = NAV_ITEMS.filter(({ id }) => id !== 'admin' || user?.role === 'admin');
+  const navItems = NAV_ITEMS.filter(
+    ({ id }) => id !== 'admin' || user?.role === 'admin'
+  );
   const navigate = useNavigate();
 
   const handleLogout = async () => {

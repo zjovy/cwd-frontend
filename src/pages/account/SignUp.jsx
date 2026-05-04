@@ -7,6 +7,7 @@ import { Input } from '@/common/components/form/Input';
 import SubmitButton from '@/common/components/form/SubmitButton';
 import { RedSpan } from '@/common/components/form/styles';
 import { useUser } from '@/common/contexts/UserContext';
+import adminService from '@/services/adminService';
 
 import { StyledPage } from './styles';
 
@@ -57,27 +58,12 @@ export default function SignUp() {
     setError('');
 
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/auth/signup`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: formState.email,
-            password: formState.password,
-            firstname: formState.firstname || undefined,
-            lastname: formState.lastname || undefined,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to create account');
-      }
+      await adminService.signup({
+        email: formState.email,
+        password: formState.password,
+        firstname: formState.firstname || undefined,
+        lastname: formState.lastname || undefined,
+      });
       navigate('/login', {
         state: {
           message:
