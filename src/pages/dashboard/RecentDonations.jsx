@@ -5,7 +5,6 @@ import SectionTitle from '@/common/components/atoms/SectionTitle';
 import DeleteConfirmModal from '@/common/components/organisms/DeleteConfirmModal';
 import DonationModal from '@/common/components/organisms/DonationModal';
 import DonationTable from '@/common/components/organisms/DonationTable';
-import dashboardService from '@/services/dashboardService';
 import donationService from '@/services/donationService';
 import { Plus } from 'lucide-react';
 
@@ -43,8 +42,8 @@ export default function RecentDonations() {
     setLoading(true);
     setError(null);
     try {
-      const data = await dashboardService.getRecentDonations(signal);
-      setDonations(Array.isArray(data) ? data : (data?.donations ?? []));
+      const data = await donationService.getAll({ limit: 5 }, signal);
+      setDonations(data.donations);
       setSelected(new Set());
     } catch (err) {
       if (err.name !== 'AbortError') setError(err.message);

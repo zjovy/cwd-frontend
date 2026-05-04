@@ -8,7 +8,6 @@ export const ENDPOINTS = {
   DASHBOARD_SUMMARY: '/dashboard/summary',
   DASHBOARD_TREND: '/dashboard/trend',
   DASHBOARD_LAST6: '/dashboard/last6months',
-  DASHBOARD_RECENT: '/dashboard/recent',
   AUTH_SIGNUP: '/auth/signup',
   AUTH_TOKEN: '/auth/token',
   AUTH_ME: '/auth/me',

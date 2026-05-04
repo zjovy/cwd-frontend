@@ -14,9 +14,6 @@ const dashboardService = {
     return request(buildUrl(ENDPOINTS.DASHBOARD_SUMMARY), { signal });
   },
 
-  getRecentDonations(signal) {
-    return request(buildUrl(ENDPOINTS.DASHBOARD_RECENT), { signal });
-  },
 };
 
 export default dashboardService;
