@@ -13,7 +13,6 @@ const dashboardService = {
   getSummary(signal) {
     return request(buildUrl(ENDPOINTS.DASHBOARD_SUMMARY), { signal });
   },
-
 };
 
 export default dashboardService;

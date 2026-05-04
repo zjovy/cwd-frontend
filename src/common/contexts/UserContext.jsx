@@ -44,7 +44,9 @@ export function UserProvider({ children }) {
             body: JSON.stringify({ idToken }),
           });
           if (!tokenRes.ok) {
-            console.warn('[UserContext] /auth/token failed — session cookie not set');
+            console.warn(
+              '[UserContext] /auth/token failed — session cookie not set'
+            );
           }
 
           const response = await fetch(buildUrl(ENDPOINTS.AUTH_ME), {

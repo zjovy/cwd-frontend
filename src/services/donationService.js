@@ -23,7 +23,9 @@ const donationService = {
   },
 
   async getById(id, signal) {
-    const raw = await request(buildUrl(ENDPOINTS.DONATION_BY_ID(id)), { signal });
+    const raw = await request(buildUrl(ENDPOINTS.DONATION_BY_ID(id)), {
+      signal,
+    });
     return transformDonation(raw);
   },
 
@@ -46,7 +48,6 @@ const donationService = {
       method: 'DELETE',
     });
   },
-
 };
 
 export default donationService;

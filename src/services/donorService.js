@@ -45,7 +45,6 @@ const donorService = {
       method: 'DELETE',
     });
   },
-
 };
 
 export default donorService;
