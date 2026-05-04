@@ -1,50 +1,21 @@
-import { auth } from '@/firebase-config';
-
-const BASE_URL = `${import.meta.env.VITE_BACKEND_URL}/dashboard`;
-
-async function authHeaders() {
-  const token = await auth.currentUser?.getIdToken();
-  return {
-    'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` }),
-  };
-}
-
-async function request(url, options = {}) {
-  const { signal, ...rest } = options;
-  const headers = await authHeaders();
-  const res = await fetch(url, {
-    ...rest,
-    headers,
-    credentials: 'include',
-    signal,
-  });
-
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(
-      body.error || body.message || `Request failed (${res.status})`
-    );
-  }
-
-  return res.json();
-}
+import { buildUrl, request } from '@/api/client';
+import { ENDPOINTS } from '@/api/endpoints';
 
 const dashboardService = {
-  async getTrend(signal) {
-    return request(`${BASE_URL}/trend`, { signal });
+  getTrend(signal) {
+    return request(buildUrl(ENDPOINTS.DASHBOARD_TREND), { signal });
   },
 
-  async getLast6Months(signal) {
-    return request(`${BASE_URL}/last6months`, { signal });
+  getLast6Months(signal) {
+    return request(buildUrl(ENDPOINTS.DASHBOARD_LAST6), { signal });
   },
 
-  async getSummary(signal) {
-    return request(`${BASE_URL}/summary`, { signal });
+  getSummary(signal) {
+    return request(buildUrl(ENDPOINTS.DASHBOARD_SUMMARY), { signal });
   },
 
-  async getRecentDonations(signal) {
-    return request(`${BASE_URL}/recent`, { signal });
+  getRecentDonations(signal) {
+    return request(buildUrl(ENDPOINTS.DASHBOARD_RECENT), { signal });
   },
 };
 
