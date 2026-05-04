@@ -32,7 +32,7 @@ export default function useDonorDetails(id) {
             signal
           );
           const ownDonations = donations.filter(
-            (d) => d.donor_email === detail.email
+            (d) => d.donorEmail === detail.email
           );
           setHistory(ownDonations);
         } else {

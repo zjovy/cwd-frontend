@@ -25,7 +25,7 @@ export function AdminRoute() {
     <Outlet />
   ) : (
     <Navigate to={user ? '/' : '/login'} replace />
-  )
+  );
 }
 
 export function PublicOnlyRoute() {

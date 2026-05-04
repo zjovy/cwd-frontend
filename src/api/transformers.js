@@ -66,7 +66,11 @@ export function buildDonorRequestBody(data) {
   for (const key of ['address', 'phone']) {
     if (!(key in out)) continue;
     const v = out[key];
-    if (v === undefined || v === null || (typeof v === 'string' && v.trim() === '')) {
+    if (
+      v === undefined ||
+      v === null ||
+      (typeof v === 'string' && v.trim() === '')
+    ) {
       out[key] = null;
     }
   }

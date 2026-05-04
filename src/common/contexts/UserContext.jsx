@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
+import { buildUrl } from '@/api/client';
 import { auth, googleProvider } from '@/firebase-config';
 import {
   onAuthStateChanged,
@@ -21,11 +22,6 @@ export const UserContext = React.createContext({
 
 UserProvider.propTypes = {
   children: PropTypes.node.isRequired,
-};
-
-const buildUrl = (endpoint) => {
-  const base = import.meta.env.VITE_BACKEND_URL ?? '';
-  return `${String(base).replace(/\/$/, '')}${endpoint}`;
 };
 
 export function UserProvider({ children }) {

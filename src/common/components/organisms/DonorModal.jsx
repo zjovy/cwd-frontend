@@ -86,7 +86,8 @@ const errorStyle = {
 };
 
 const EMPTY = {
-  name: '',
+  first_name: '',
+  last_name: '',
   email: '',
   address: '',
   phone: '',
@@ -102,7 +103,8 @@ function nullIfEmptyStr(value) {
 function toFormValues(donor) {
   if (!donor) return { ...EMPTY };
   return {
-    name: donor.name ?? '',
+    first_name: donor.first_name ?? '',
+    last_name: donor.last_name ?? '',
     email: donor.email ?? '',
     address: donor.address ?? '',
     phone: donor.phone ?? '',
@@ -131,7 +133,8 @@ export default function DonorModal({ open, onClose, onSubmit, donor }) {
     setError(null);
     try {
       await onSubmit({
-        name: form.name.trim(),
+        first_name: form.first_name.trim(),
+        last_name: form.last_name.trim(),
         email: form.email.trim(),
         address: nullIfEmptyStr(form.address),
         phone: nullIfEmptyStr(form.phone),
@@ -155,14 +158,25 @@ export default function DonorModal({ open, onClose, onSubmit, donor }) {
 
         {error && <div style={errorStyle}>{error}</div>}
 
-        <div style={fieldGroup}>
-          <label style={labelStyle}>Name</label>
-          <input
-            style={inputStyle}
-            value={form.name}
-            onChange={set('name')}
-            required
-          />
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <div style={{ ...fieldGroup, flex: 1 }}>
+            <label style={labelStyle}>First Name</label>
+            <input
+              style={inputStyle}
+              value={form.first_name}
+              onChange={set('first_name')}
+              required
+            />
+          </div>
+          <div style={{ ...fieldGroup, flex: 1 }}>
+            <label style={labelStyle}>Last Name</label>
+            <input
+              style={inputStyle}
+              value={form.last_name}
+              onChange={set('last_name')}
+              required
+            />
+          </div>
         </div>
 
         <div style={fieldGroup}>

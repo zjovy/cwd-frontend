@@ -1,8 +1,12 @@
-import PropTypes from 'prop-types';
-
-import { tableStyle, tdStyle, thStyle, statusMsg } from '@/common/components/atoms/tableStyles';
+import {
+  statusMsg,
+  tableStyle,
+  tdStyle,
+  thStyle,
+} from '@/common/components/atoms/tableStyles';
 import ActionsMenu from '@/common/components/molecules/ActionsMenu';
 import { useUser } from '@/common/contexts/UserContext';
+import PropTypes from 'prop-types';
 
 /* ── styles ─────────────────────────────────────────── */
 
@@ -37,8 +41,14 @@ function getActions(u, currentUser, { onSetRole }) {
 
   if (u.role === 'pending') {
     return [
-      { label: 'Approve as User', onClick: () => onSetRole(u.firebaseUid, 'member') },
-      { label: 'Approve as Admin', onClick: () => onSetRole(u.firebaseUid, 'admin') },
+      {
+        label: 'Approve as User',
+        onClick: () => onSetRole(u.firebaseUid, 'member'),
+      },
+      {
+        label: 'Approve as Admin',
+        onClick: () => onSetRole(u.firebaseUid, 'admin'),
+      },
     ];
   }
 
@@ -56,7 +66,10 @@ function getActions(u, currentUser, { onSetRole }) {
           danger: true,
           disabled: isSelf,
         }
-      : { label: 'Make Admin', onClick: () => onSetRole(u.firebaseUid, 'admin') },
+      : {
+          label: 'Make Admin',
+          onClick: () => onSetRole(u.firebaseUid, 'admin'),
+        },
   ];
 }
 
@@ -101,10 +114,16 @@ export default function UsersTable({ users, loading, onSetRole }) {
                 </span>
               </td>
               <td style={tdStyle}>
-                {u.role === 'admin' ? <span style={adminBadge}>Admin</span> : '—'}
+                {u.role === 'admin' ? (
+                  <span style={adminBadge}>Admin</span>
+                ) : (
+                  '—'
+                )}
               </td>
               <td style={tdStyle}>
-                <ActionsMenu actions={getActions(u, currentUser, { onSetRole })} />
+                <ActionsMenu
+                  actions={getActions(u, currentUser, { onSetRole })}
+                />
               </td>
             </tr>
           ))

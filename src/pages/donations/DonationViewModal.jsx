@@ -5,7 +5,7 @@
   Props:
     open       – bool
     onClose    – () => void
-    donation   – row object { id, donor_name, donor_email, amount, donation_date, receipt_status }
+    donation   – row object { id, donor_id, first_name, last_name, donorEmail, amount, donation_date, receipt_status }
     onSave     – async (id, data) => void  (calls useDonations.updateDonation, handles refetch)
 */
 import { useEffect, useState } from 'react';
@@ -180,8 +180,9 @@ const successStyle = {
 /* ── helpers ────────────────────────────────────── */
 
 const EMPTY = {
-  donor_name: '',
-  donor_email: '',
+  first_name: '',
+  last_name: '',
+  email: '',
   amount: '',
   donation_date: '',
   receipt_status: 'pending',
@@ -192,8 +193,9 @@ const EMPTY = {
 function fromDonationRow(d) {
   if (!d) return { ...EMPTY };
   return {
-    donor_name: d.donor_name ?? '',
-    donor_email: d.donor_email ?? '',
+    first_name: d.first_name ?? '',
+    last_name: d.last_name ?? '',
+    email: d.donorEmail ?? '',
     amount: d.amount ?? '',
     donation_date: d.donation_date?.slice(0, 10) ?? '',
     receipt_status: d.receipt_status ?? 'pending',
@@ -236,7 +238,9 @@ export default function DonationViewModal({
           address: detail.address ?? '',
         }));
       })
-      .catch((err) => console.error('[DonationViewModal] detail fetch failed:', err));
+      .catch((err) =>
+        console.error('[DonationViewModal] detail fetch failed:', err)
+      );
   }, [open, donation?.id]);
 
   if (!open) return null;
@@ -250,8 +254,6 @@ export default function DonationViewModal({
     setError(null);
     try {
       await onSave(donation.id, {
-        donor_name: form.donor_name,
-        donor_email: form.donor_email,
         amount: parseFloat(form.amount),
         donation_date: form.donation_date,
         receipt_status: form.receipt_status,
@@ -267,7 +269,7 @@ export default function DonationViewModal({
   function buildEmailBody() {
     const amount = parseFloat(form.amount || 0).toLocaleString();
     return [
-      `Dear ${form.donor_name},`,
+      `Dear ${form.first_name} ${form.last_name},`,
       '',
       `The C&W Market Foundation has received your generous gift of $${amount} to support our annual efforts. Your contribution makes a meaningful difference in the work we do for our community.`,
       '',
@@ -296,17 +298,17 @@ export default function DonationViewModal({
 
   const handleConfirmSend = (body) => {
     const subject = 'Donation Receipt — C&W Market Foundation';
-    const mailto = `mailto:${encodeURIComponent(form.donor_email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const mailto = `mailto:${encodeURIComponent(form.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.open(mailto, '_blank');
     setEmailPreview(false);
-    setEmailMsg(`Opened mail client for ${form.donor_email}`);
+    setEmailMsg(`Opened mail client for ${form.email}`);
   };
 
   return (
     <>
       <EmailPreviewModal
         open={emailPreview}
-        to={form.donor_email}
+        to={form.email}
         subject='Donation Receipt — C&W Market Foundation'
         body={buildEmailBody()}
         onClose={() => setEmailPreview(false)}
@@ -330,31 +332,55 @@ export default function DonationViewModal({
           <div style={sectionBox}>
             <div style={sectionTitle}>Donor Information</div>
 
-            <div style={fieldGroup}>
-              <label style={labelStyle}>Name</label>
-              <input
-                style={inputStyle}
-                value={form.donor_name}
-                onChange={set('donor_name')}
-                required
-              />
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <div style={{ ...fieldGroup, flex: 1 }}>
+                <label style={labelStyle}>First Name</label>
+                <input
+                  style={{
+                    ...inputStyle,
+                    background: '#f3f4f6',
+                    color: '#6b7280',
+                  }}
+                  value={form.first_name}
+                  readOnly
+                />
+              </div>
+              <div style={{ ...fieldGroup, flex: 1 }}>
+                <label style={labelStyle}>Last Name</label>
+                <input
+                  style={{
+                    ...inputStyle,
+                    background: '#f3f4f6',
+                    color: '#6b7280',
+                  }}
+                  value={form.last_name}
+                  readOnly
+                />
+              </div>
             </div>
 
             <div style={fieldGroup}>
               <label style={labelStyle}>Email</label>
               <input
-                style={inputStyle}
+                style={{
+                  ...inputStyle,
+                  background: '#f3f4f6',
+                  color: '#6b7280',
+                }}
                 type='email'
-                value={form.donor_email}
-                onChange={set('donor_email')}
-                required
+                value={form.email}
+                readOnly
               />
             </div>
 
             <div style={fieldGroup}>
               <label style={labelStyle}>Phone</label>
               <input
-                style={{ ...inputStyle, background: '#f3f4f6', color: '#6b7280' }}
+                style={{
+                  ...inputStyle,
+                  background: '#f3f4f6',
+                  color: '#6b7280',
+                }}
                 value={form.phone}
                 readOnly
                 placeholder='—'
@@ -364,7 +390,11 @@ export default function DonationViewModal({
             <div style={fieldGroupLast}>
               <label style={labelStyle}>Address</label>
               <input
-                style={{ ...inputStyle, background: '#f3f4f6', color: '#6b7280' }}
+                style={{
+                  ...inputStyle,
+                  background: '#f3f4f6',
+                  color: '#6b7280',
+                }}
                 value={form.address}
                 readOnly
                 placeholder='—'

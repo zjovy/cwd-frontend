@@ -5,6 +5,7 @@ import SectionTitle from '@/common/components/atoms/SectionTitle';
 import DeleteConfirmModal from '@/common/components/organisms/DeleteConfirmModal';
 import DonationModal from '@/common/components/organisms/DonationModal';
 import DonationTable from '@/common/components/organisms/DonationTable';
+import dashboardService from '@/services/dashboardService';
 import donationService from '@/services/donationService';
 import { Plus } from 'lucide-react';
 
@@ -38,26 +39,24 @@ export default function RecentDonations() {
   const [editing, setEditing] = useState(null);
   const [deleting, setDeleting] = useState(null);
 
-  const fetchRecent = useCallback(async () => {
+  const fetchRecent = useCallback(async (signal) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/dashboard/recent-donations`,
-        { credentials: 'include' }
-      );
-      if (!res.ok) throw new Error(`Request failed (${res.status})`);
-      setDonations(await res.json());
+      const data = await dashboardService.getRecentDonations(signal);
+      setDonations(Array.isArray(data) ? data : (data?.donations ?? []));
       setSelected(new Set());
     } catch (err) {
-      setError(err.message);
+      if (err.name !== 'AbortError') setError(err.message);
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchRecent();
+    const controller = new AbortController();
+    fetchRecent(controller.signal);
+    return () => controller.abort();
   }, [fetchRecent]);
 
   const handleSelectChange = (id) => {
@@ -130,7 +129,7 @@ export default function RecentDonations() {
         open={Boolean(deleting)}
         onClose={() => setDeleting(null)}
         onConfirm={handleDelete}
-        donorName={deleting?.donor_name}
+        donorName={deleting?.donorFullName}
       />
     </>
   );
