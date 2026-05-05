@@ -1,11 +1,14 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import PropTypes from 'prop-types';
-
-import { tableStyle, tdStyle, thStyle, statusMsg } from '@/common/components/atoms/tableStyles';
+import {
+  statusMsg,
+  tableStyle,
+  tdStyle,
+  thStyle,
+} from '@/common/components/atoms/tableStyles';
 import ActionsMenu from '@/common/components/molecules/ActionsMenu';
-import { formatAmount, formatDate } from '@/utils/format';
+import PropTypes from 'prop-types';
 
 const clickableRowStyle = { cursor: 'pointer' };
 
@@ -24,14 +27,11 @@ const checkboxTd = {
 /* ── DonorTable ───────────────────────────────────── */
 
 const COLUMNS = [
-  'Name',
-  'Email',
-  'Address',
-  'Phone',
-  'Total Donations',
-  'Donation Count',
-  'Most Recent',
-  'Actions',
+  { label: 'Name' },
+  { label: 'Email' },
+  { label: 'Address' },
+  { label: 'Phone' },
+  { label: 'Actions' },
 ];
 
 function addressCell(d) {
@@ -77,9 +77,9 @@ export default function DonorTable({
               onChange={(e) => onSelectAll(e.target.checked)}
             />
           </th>
-          {COLUMNS.map((h) => (
-            <th key={h} style={thStyle}>
-              {h}
+          {COLUMNS.map(({ label, style }) => (
+            <th key={label} style={{ ...thStyle, ...style }}>
+              {label}
             </th>
           ))}
         </tr>
@@ -106,22 +106,11 @@ export default function DonorTable({
                 />
               </td>
               <td style={{ ...tdStyle, fontWeight: '500', color: '#1a1a1a' }}>
-                {d.name}
+                {d.fullName}
               </td>
               <td style={tdStyle}>{d.email}</td>
               <td style={tdStyle}>{addressCell(d)}</td>
               <td style={tdStyle}>{d.phone}</td>
-              <td style={tdStyle}>
-                {d.total_donations != null && d.total_donations !== ''
-                  ? formatAmount(d.total_donations)
-                  : '—'}
-              </td>
-              <td style={tdStyle}>
-                {d.donation_count != null && d.donation_count !== '' ? d.donation_count : '—'}
-              </td>
-              <td style={tdStyle}>
-                {d.most_recent ? formatDate(d.most_recent) : '—'}
-              </td>
               <td style={tdStyle} onClick={(e) => e.stopPropagation()}>
                 <ActionsMenu
                   actions={[

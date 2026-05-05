@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import StatCard from '@/common/components/atoms/StatCard';
+import dashboardService from '@/services/dashboardService';
 import { formatAmount } from '@/utils/format';
 import { ArrowUpRight, DollarSign, TrendingUp, Users } from 'lucide-react';
 
@@ -13,12 +14,15 @@ export default function StatsRow() {
   const [summary, setSummary] = useState(null);
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_BACKEND_URL}/dashboard/summary`, {
-      credentials: 'include',
-    })
-      .then((res) => res.json())
+    const controller = new AbortController();
+    dashboardService
+      .getSummary(controller.signal)
       .then((data) => setSummary(data))
-      .catch((err) => console.error('Failed to fetch dashboard summary:', err));
+      .catch((err) => {
+        if (err.name !== 'AbortError')
+          console.error('Failed to fetch dashboard summary:', err);
+      });
+    return () => controller.abort();
   }, []);
 
   const growthRate = summary?.growth_rate;

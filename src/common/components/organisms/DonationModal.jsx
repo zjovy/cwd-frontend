@@ -91,8 +91,11 @@ const errorStyle = {
 };
 
 const EMPTY = {
-  donor_name: '',
-  donor_email: '',
+  first_name: '',
+  last_name: '',
+  email: '',
+  phone: '',
+  address: '',
   amount: '',
   donation_date: '',
   receipt_status: 'pending',
@@ -101,8 +104,11 @@ const EMPTY = {
 function toFormValues(donation) {
   if (!donation) return { ...EMPTY };
   return {
-    donor_name: donation.donor_name ?? '',
-    donor_email: donation.donor_email ?? '',
+    first_name: donation.first_name ?? '',
+    last_name: donation.last_name ?? '',
+    email: donation.donorEmail ?? '',
+    phone: donation.phone ?? '',
+    address: donation.address ?? '',
     amount: donation.amount ?? '',
     donation_date: donation.donation_date?.slice(0, 10) ?? '',
     receipt_status: donation.receipt_status ?? 'pending',
@@ -155,24 +161,79 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
 
         {error && <div style={errorStyle}>{error}</div>}
 
-        <div style={fieldGroup}>
-          <label style={labelStyle}>Donor Name</label>
-          <input
-            style={inputStyle}
-            value={form.donor_name}
-            onChange={set('donor_name')}
-            required
-          />
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <div style={{ ...fieldGroup, flex: 1 }}>
+            <label style={labelStyle}>First Name</label>
+            <input
+              style={
+                isEdit
+                  ? { ...inputStyle, background: '#f3f4f6', color: '#6b7280' }
+                  : inputStyle
+              }
+              value={form.first_name}
+              onChange={set('first_name')}
+              readOnly={isEdit}
+              required={!isEdit}
+            />
+          </div>
+          <div style={{ ...fieldGroup, flex: 1 }}>
+            <label style={labelStyle}>Last Name</label>
+            <input
+              style={
+                isEdit
+                  ? { ...inputStyle, background: '#f3f4f6', color: '#6b7280' }
+                  : inputStyle
+              }
+              value={form.last_name}
+              onChange={set('last_name')}
+              readOnly={isEdit}
+              required={!isEdit}
+            />
+          </div>
         </div>
 
         <div style={fieldGroup}>
           <label style={labelStyle}>Donor Email</label>
           <input
-            style={inputStyle}
+            style={
+              isEdit
+                ? { ...inputStyle, background: '#f3f4f6', color: '#6b7280' }
+                : inputStyle
+            }
             type='email'
-            value={form.donor_email}
-            onChange={set('donor_email')}
-            required
+            value={form.email}
+            onChange={set('email')}
+            readOnly={isEdit}
+            required={!isEdit}
+          />
+        </div>
+
+        <div style={fieldGroup}>
+          <label style={labelStyle}>Phone</label>
+          <input
+            style={
+              isEdit
+                ? { ...inputStyle, background: '#f3f4f6', color: '#6b7280' }
+                : inputStyle
+            }
+            type='tel'
+            value={form.phone}
+            onChange={set('phone')}
+            readOnly={isEdit}
+          />
+        </div>
+
+        <div style={fieldGroup}>
+          <label style={labelStyle}>Address</label>
+          <input
+            style={
+              isEdit
+                ? { ...inputStyle, background: '#f3f4f6', color: '#6b7280' }
+                : inputStyle
+            }
+            value={form.address}
+            onChange={set('address')}
+            readOnly={isEdit}
           />
         </div>
 

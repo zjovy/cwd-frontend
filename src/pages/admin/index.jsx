@@ -79,7 +79,15 @@ export default function AdminPage() {
           <button
             type='button'
             onClick={refetch}
-            style={{ marginLeft: '8px', cursor: 'pointer', textDecoration: 'underline', background: 'none', border: 'none', color: '#dc2626', fontSize: '14px' }}
+            style={{
+              marginLeft: '8px',
+              cursor: 'pointer',
+              textDecoration: 'underline',
+              background: 'none',
+              border: 'none',
+              color: '#dc2626',
+              fontSize: '14px',
+            }}
           >
             Retry
           </button>
@@ -97,7 +105,9 @@ export default function AdminPage() {
 
       <Card style={{ padding: '24px' }}>
         <div style={styles.sectionHeader}>
-          <SectionTitle style={{ marginBottom: 0 }}>Requesting Access</SectionTitle>
+          <SectionTitle style={{ marginBottom: 0 }}>
+            Requesting Access
+          </SectionTitle>
           <span style={styles.countPill}>{requesting.length}</span>
         </div>
         <UsersTable users={requesting} loading={loading} {...tableProps} />

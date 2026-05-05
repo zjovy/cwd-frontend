@@ -1,0 +1,14 @@
+export const ENDPOINTS = {
+  DONATIONS: '/donations',
+  DONATION_BY_ID: (id) => `/donations/${id}`,
+  DONORS: '/donors',
+  DONOR_BY_ID: (id) => `/donors/${id}`,
+  DASHBOARD_SUMMARY: '/dashboard/summary',
+  DASHBOARD_TREND: '/dashboard/trend',
+  DASHBOARD_LAST6: '/dashboard/last6months',
+  AUTH_SIGNUP: '/auth/signup',
+  AUTH_TOKEN: '/auth/token',
+  AUTH_ME: '/auth/me',
+  AUTH_USERS: '/auth/users',
+  AUTH_SET_ROLE: (uid) => `/auth/users/${uid}/role`,
+};

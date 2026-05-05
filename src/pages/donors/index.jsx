@@ -2,9 +2,7 @@ import { useEffect, useState } from 'react';
 
 import Card from '@/common/components/atoms/Card';
 import Pagination from '@/common/components/atoms/Pagination';
-import DeleteConfirmModal from '@/common/components/organisms/DeleteConfirmModal';
 
-import DonorEditModal from './DonorEditModal';
 import DonorTable from '@/common/components/organisms/DonorsTable';
 import useDonors from '@/hooks/useDonors';
 import { PAGE_SIZE } from '@/utils/pagination';
@@ -106,6 +104,9 @@ export default function DonorsPage() {
       <div style={styles.topRow}>
         <div>
           <div style={styles.title}>Donors</div>
+          <div style={styles.subtitle}>
+            View donor details and contributions in one place.
+          </div>
           <div style={styles.subtitle}>
             View donor details and contributions in one place.
           </div>

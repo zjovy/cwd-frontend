@@ -1,36 +1,22 @@
-import { auth } from '@/firebase-config';
-
-const BASE_URL = `${import.meta.env.VITE_BACKEND_URL}/auth`;
-
-async function authHeaders() {
-  const token = await auth.currentUser?.getIdToken();
-  return {
-    'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` }),
-  };
-}
-
-async function request(url, options = {}) {
-  const headers = await authHeaders();
-  const res = await fetch(url, { ...options, headers });
-
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(body.error || body.message || `Request failed (${res.status})`);
-  }
-
-  return res.json();
-}
+import { buildUrl, request } from '@/api/client';
+import { ENDPOINTS } from '@/api/endpoints';
 
 const adminService = {
   getUsers() {
-    return request(`${BASE_URL}/users`);
+    return request(buildUrl(ENDPOINTS.AUTH_USERS));
   },
 
   setRole(uid, role) {
-    return request(`${BASE_URL}/users/${uid}/role`, {
+    return request(buildUrl(ENDPOINTS.AUTH_SET_ROLE(uid)), {
       method: 'PATCH',
       body: JSON.stringify({ role }),
+    });
+  },
+
+  signup(data) {
+    return request(buildUrl(ENDPOINTS.AUTH_SIGNUP), {
+      method: 'POST',
+      body: JSON.stringify(data),
     });
   },
 };

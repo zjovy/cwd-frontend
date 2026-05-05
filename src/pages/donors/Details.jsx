@@ -56,10 +56,8 @@ const styles = {
 function deriveTags(donor, history) {
   if (!donor) return [];
   const tags = [];
-  const count =
-    Number(donor.donation_count ?? donor.donation_counts ?? history.length) ||
-    0;
-  const total = parseFloat(donor.total_donations) || 0;
+  const count = history.length;
+  const total = history.reduce((sum, d) => sum + parseFloat(d.amount || 0), 0);
 
   if (count >= 5) tags.push('Monthly Donor');
   if (total >= 1000) tags.push('Major Donor');
@@ -84,6 +82,10 @@ export default function DonorDetailsPage() {
 
   const tags = useMemo(() => deriveTags(donor, history), [donor, history]);
   const memberSince = useMemo(() => earliestDonationDate(history), [history]);
+  const historyTotal = useMemo(
+    () => history.reduce((sum, d) => sum + parseFloat(d.amount || 0), 0),
+    [history]
+  );
 
   if (loading && !donor) {
     return (
@@ -117,7 +119,7 @@ export default function DonorDetailsPage() {
           Back
         </Button>
         <div style={styles.titleBlock}>
-          <div style={styles.name}>{donor.name}</div>
+          <div style={styles.name}>{donor.fullName}</div>
           <div style={styles.subtitle}>Donor Profile</div>
           <div style={styles.tagRow}>
             {tags.map((t) => (
@@ -130,11 +132,9 @@ export default function DonorDetailsPage() {
       </div>
 
       <DonorStatsRow
-        totalDonated={donor.total_donations}
+        totalDonated={historyTotal}
         memberSince={memberSince}
-        totalDonations={
-          donor.donation_count ?? donor.donation_counts ?? history.length
-        }
+        totalDonations={history.length}
       />
 
       <ContactInfoCard

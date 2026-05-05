@@ -51,11 +51,6 @@ const inputStyle = {
   boxSizing: 'border-box',
 };
 
-const selectStyle = {
-  ...inputStyle,
-  cursor: 'pointer',
-};
-
 const row = {
   display: 'flex',
   justifyContent: 'flex-end',
@@ -91,13 +86,11 @@ const errorStyle = {
 };
 
 const EMPTY = {
-  name: '',
+  first_name: '',
+  last_name: '',
   email: '',
   address: '',
   phone: '',
-  total_donations: '',
-  donation_count: '',
-  most_recent: '',
 };
 
 /** Empty / whitespace-only → null so JSON has explicit null (SQL NULL), not omitted undefined. */
@@ -107,28 +100,14 @@ function nullIfEmptyStr(value) {
   return s === '' ? null : s;
 }
 
-function nullIfEmptyFloat(value) {
-  if (value == null || value === '') return null;
-  const n = parseFloat(value);
-  return Number.isFinite(n) ? n : null;
-}
-
-function nullIfEmptyInt(value) {
-  if (value == null || value === '') return null;
-  const n = parseInt(String(value), 10);
-  return Number.isFinite(n) ? n : null;
-}
-
 function toFormValues(donor) {
   if (!donor) return { ...EMPTY };
   return {
-    name: donor.name ?? '',
+    first_name: donor.first_name ?? '',
+    last_name: donor.last_name ?? '',
     email: donor.email ?? '',
     address: donor.address ?? '',
     phone: donor.phone ?? '',
-    total_donations: donor.total_donations ?? '',
-    donation_count: donor.donation_count ?? '',
-    most_recent: donor.most_recent?.slice(0, 10) ?? '',
   };
 }
 
@@ -154,13 +133,11 @@ export default function DonorModal({ open, onClose, onSubmit, donor }) {
     setError(null);
     try {
       await onSubmit({
-        name: form.name.trim(),
+        first_name: form.first_name.trim(),
+        last_name: form.last_name.trim(),
         email: form.email.trim(),
         address: nullIfEmptyStr(form.address),
         phone: nullIfEmptyStr(form.phone),
-        total_donations: nullIfEmptyFloat(form.total_donations),
-        donation_count: nullIfEmptyInt(form.donation_count),
-        most_recent: nullIfEmptyStr(form.most_recent),
       });
       onClose();
     } catch (err) {
@@ -181,14 +158,25 @@ export default function DonorModal({ open, onClose, onSubmit, donor }) {
 
         {error && <div style={errorStyle}>{error}</div>}
 
-        <div style={fieldGroup}>
-          <label style={labelStyle}>Name</label>
-          <input
-            style={inputStyle}
-            value={form.name}
-            onChange={set('name')}
-            required
-          />
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <div style={{ ...fieldGroup, flex: 1 }}>
+            <label style={labelStyle}>First Name</label>
+            <input
+              style={inputStyle}
+              value={form.first_name}
+              onChange={set('first_name')}
+              required
+            />
+          </div>
+          <div style={{ ...fieldGroup, flex: 1 }}>
+            <label style={labelStyle}>Last Name</label>
+            <input
+              style={inputStyle}
+              value={form.last_name}
+              onChange={set('last_name')}
+              required
+            />
+          </div>
         </div>
 
         <div style={fieldGroup}>
@@ -218,40 +206,6 @@ export default function DonorModal({ open, onClose, onSubmit, donor }) {
             type='tel'
             value={form.phone}
             onChange={set('phone')}
-          />
-        </div>
-
-        <div style={fieldGroup}>
-          <label style={labelStyle}>Total Donation Amount ($)</label>
-          <input
-            style={inputStyle}
-            type='number'
-            step='0.01'
-            min='0'
-            value={form.total_donations}
-            onChange={set('total_donations')}
-          />
-        </div>
-
-        <div style={fieldGroup}>
-          <label style={labelStyle}>Donation Count</label>
-          <input
-            style={inputStyle}
-            type='number'
-            step='1'
-            min='0'
-            value={form.donation_count}
-            onChange={set('donation_count')}
-          />
-        </div>
-
-        <div style={fieldGroup}>
-          <label style={labelStyle}>Most Recent Donation Date</label>
-          <input
-            style={inputStyle}
-            type='date'
-            value={form.most_recent}
-            onChange={set('most_recent')}
           />
         </div>
 

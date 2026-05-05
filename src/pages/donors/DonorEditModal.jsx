@@ -78,39 +78,14 @@ const errorStyle = {
 
 function toFormValues(donor) {
   return {
-    name: donor?.name ?? '',
+    first_name: donor?.first_name ?? '',
+    last_name: donor?.last_name ?? '',
     email: donor?.email ?? '',
     phone: donor?.phone ?? '',
     address: donor?.address ?? '',
   };
 }
 
-/** Empty / whitespace → JSON null (backend SQL NULL). */
-function nullIfEmptyStr(value) {
-  if (value == null) return null;
-  const s = String(value).trim();
-  return s === '' ? null : s;
-}
-
-/** Pass-through aggregates for backends that require every column in one UPDATE (not editable in UI). */
-function aggregatePayloadFromDonor(donor) {
-  if (!donor) {
-    return {
-      total_donations: null,
-      donation_count: null,
-      most_recent: null,
-    };
-  }
-  const mr = donor.most_recent;
-  return {
-    total_donations: donor.total_donations ?? null,
-    donation_count: donor.donation_count ?? null,
-    most_recent:
-      mr != null && mr !== ''
-        ? String(mr).slice(0, 10)
-        : null,
-  };
-}
 
 export default function DonorEditModal({ open, onClose, onSubmit, donor }) {
   const [form, setForm] = useState(toFormValues(donor));
@@ -132,13 +107,7 @@ export default function DonorEditModal({ open, onClose, onSubmit, donor }) {
     setSaving(true);
     setError(null);
     try {
-      await onSubmit({
-        name: form.name.trim(),
-        email: form.email.trim(),
-        phone: nullIfEmptyStr(form.phone),
-        address: nullIfEmptyStr(form.address),
-        ...aggregatePayloadFromDonor(donor),
-      });
+      await onSubmit({ ...form });
       onClose();
     } catch (err) {
       setError(err.message);
@@ -158,14 +127,25 @@ export default function DonorEditModal({ open, onClose, onSubmit, donor }) {
 
         {error && <div style={errorStyle}>{error}</div>}
 
-        <div style={fieldGroup}>
-          <label style={labelStyle}>Name</label>
-          <input
-            style={inputStyle}
-            value={form.name}
-            onChange={set('name')}
-            required
-          />
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <div style={{ ...fieldGroup, flex: 1 }}>
+            <label style={labelStyle}>First Name</label>
+            <input
+              style={inputStyle}
+              value={form.first_name}
+              onChange={set('first_name')}
+              required
+            />
+          </div>
+          <div style={{ ...fieldGroup, flex: 1 }}>
+            <label style={labelStyle}>Last Name</label>
+            <input
+              style={inputStyle}
+              value={form.last_name}
+              onChange={set('last_name')}
+              required
+            />
+          </div>
         </div>
 
         <div style={fieldGroup}>
