@@ -30,9 +30,6 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
-    height: 'auto',
-    position: 'sticky',
-    top: 0,
   },
   logo: {
     padding: '28px 24px 20px',

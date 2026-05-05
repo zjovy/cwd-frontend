@@ -5,7 +5,7 @@ import Sidebar from '@/common/components/organisms/Sidebar';
 import styled from 'styled-components';
 
 const Layout = styled.div`
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
 `;
@@ -13,9 +13,8 @@ const Layout = styled.div`
 const Body = styled.div`
   display: flex;
   flex: 1;
-  height: calc(100vh - 20px);
-  background: #f5f5f4;
   overflow: hidden;
+  background: #f5f5f4;
 `;
 
 export default function NavLayout() {

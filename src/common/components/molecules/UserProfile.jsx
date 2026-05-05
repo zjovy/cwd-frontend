@@ -23,16 +23,23 @@ const styles = {
   userInfo: {
     marginLeft: '10px',
     flex: 1,
+    minWidth: 0,
   },
   userName: {
     fontSize: '13px',
     fontWeight: '600',
     color: '#1a1a1a',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
   userEmail: {
     fontSize: '11px',
     color: '#9ca3af',
     marginTop: '1px',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
   logoutBtn: {
     background: 'none',
