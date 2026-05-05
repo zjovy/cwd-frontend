@@ -38,7 +38,7 @@ const LogoButton = styled.button`
 `;
 
 const LogoImg = styled.img`
-  height: 36px;
+  height: 52px;
   width: auto;
   display: block;
 `;
