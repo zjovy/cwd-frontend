@@ -7,7 +7,6 @@ import {
   tdStyle,
   thStyle,
 } from '@/common/components/atoms/tableStyles';
-import ActionsMenu from '@/common/components/molecules/ActionsMenu';
 import PropTypes from 'prop-types';
 
 const clickableRowStyle = { cursor: 'pointer' };
@@ -45,9 +44,7 @@ export default function DonorTable({
   error,
   selected,
   onSelectChange,
-  onSelectAll,
-  onEdit,
-  onDelete,
+  onSelectAll
 }) {
   const navigate = useNavigate();
   const allChecked =
@@ -111,15 +108,6 @@ export default function DonorTable({
               <td style={tdStyle}>{d.email}</td>
               <td style={tdStyle}>{addressCell(d)}</td>
               <td style={tdStyle}>{d.phone}</td>
-              <td style={tdStyle} onClick={(e) => e.stopPropagation()}>
-                <ActionsMenu
-                  actions={[
-                    {label: 'placeholder', onClick: () => onEdit(d)}
-                    // { label: 'Edit', onClick: () => onEdit(d) },
-                    // { label: 'Delete', onClick: () => onDelete(d), danger: true },
-                  ]}
-                />
-              </td>
             </tr>
           ))
         )}

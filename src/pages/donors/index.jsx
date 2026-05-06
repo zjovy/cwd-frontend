@@ -46,8 +46,6 @@ export default function DonorsPage() {
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState(new Set());
   const [modalOpen, setModalOpen] = useState(false);
-  const [editing, setEditing] = useState(null);
-  const [deleting, setDeleting] = useState(null);
 
   const { donors, total, totalPages, loading, error, onPageResetRef} =
     useDonors({ ...filters, page });
@@ -81,23 +79,7 @@ export default function DonorsPage() {
     setSelected(new Set());
   };
 
-  // when click on action (now is a placeholder for possible action)
-  // will use editing to locate that specific donor but won't open any editing or deleting modal
-  const openEdit = (d) => {
-    setEditing(d);
-    // setModalOpen(true);
-  };
 
-  // editing will be handled in donor detail page
-  // const handleEdit = async (data) => {
-  //   await updateDonor(editing.id, data);
-  // };
-
-  // currently deletion is not needed, comment out for possible furture use
-  // const handleDelete = async () => {
-  //   await deleteDonor(deleting.id);
-  //   setDeleting(null);
-  // };
 
   return (
     <main style={styles.main}>
@@ -129,8 +111,6 @@ export default function DonorsPage() {
           selected={selected}
           onSelectChange={handleSelectChange}
           onSelectAll={handleSelectAll}
-          onEdit={openEdit}
-          onDelete={(d) => setDeleting(d)}
         />
 
         <Pagination
@@ -139,20 +119,6 @@ export default function DonorsPage() {
           onPageChange={handlePageChange}
         />
       </Card>
-
-      {/* <DonorEditModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSubmit={handleEdit}
-        donor={editing}
-      /> */}
-
-      {/* <DeleteConfirmModal
-        open={Boolean(deleting)}
-        onClose={() => setDeleting(null)}
-        onConfirm={handleDelete}
-        donorName={deleting?.name}
-      /> */}
     </main>
   );
 }
