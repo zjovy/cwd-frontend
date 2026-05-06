@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 
 import PropTypes from 'prop-types';
 
+import RequiredStar from '@/common/components/atoms/RequiredStar';
 import { formatPhone } from '@/utils/formatPhone';
+import { validateDonorFields } from '@/utils/validators';
 
 const overlay = {
   position: 'fixed',
@@ -87,6 +89,12 @@ const errorStyle = {
   marginBottom: '10px',
 };
 
+const requiredNote = {
+  fontSize: '12px',
+  color: '#6b7280',
+  marginTop: '6px',
+};
+
 const EMPTY = {
   first_name: '',
   last_name: '',
@@ -95,7 +103,6 @@ const EMPTY = {
   phone: '',
 };
 
-/** Empty / whitespace-only → null so JSON has explicit null (SQL NULL), not omitted undefined. */
 function nullIfEmptyStr(value) {
   if (value == null) return null;
   const s = String(value).trim();
@@ -134,8 +141,15 @@ export default function DonorModal({ open, onClose, onSubmit, donor }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSaving(true);
     setError(null);
+
+    const validationError = validateDonorFields(form);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    setSaving(true);
     try {
       await onSubmit({
         first_name: form.first_name.trim(),
@@ -165,18 +179,24 @@ export default function DonorModal({ open, onClose, onSubmit, donor }) {
 
         <div style={{ display: 'flex', gap: '12px' }}>
           <div style={{ ...fieldGroup, flex: 1 }}>
-            <label style={labelStyle}>First Name</label>
+            <label style={labelStyle}>
+              First Name<RequiredStar />
+            </label>
             <input
               style={inputStyle}
+              placeholder='Jane'
               value={form.first_name}
               onChange={set('first_name')}
               required
             />
           </div>
           <div style={{ ...fieldGroup, flex: 1 }}>
-            <label style={labelStyle}>Last Name</label>
+            <label style={labelStyle}>
+              Last Name<RequiredStar />
+            </label>
             <input
               style={inputStyle}
+              placeholder='Doe'
               value={form.last_name}
               onChange={set('last_name')}
               required
@@ -185,10 +205,13 @@ export default function DonorModal({ open, onClose, onSubmit, donor }) {
         </div>
 
         <div style={fieldGroup}>
-          <label style={labelStyle}>Email</label>
+          <label style={labelStyle}>
+            Email<RequiredStar />
+          </label>
           <input
             style={inputStyle}
             type='email'
+            placeholder='jane.doe@example.com'
             value={form.email}
             onChange={set('email')}
             required
@@ -199,6 +222,7 @@ export default function DonorModal({ open, onClose, onSubmit, donor }) {
           <label style={labelStyle}>Address</label>
           <input
             style={inputStyle}
+            placeholder='123 Main St, City, ST 12345'
             value={form.address}
             onChange={set('address')}
           />
@@ -213,6 +237,10 @@ export default function DonorModal({ open, onClose, onSubmit, donor }) {
             value={form.phone}
             onChange={handlePhoneChange}
           />
+        </div>
+
+        <div style={requiredNote}>
+          <RequiredStar /> Required
         </div>
 
         <div style={row}>

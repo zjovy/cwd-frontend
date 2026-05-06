@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 
 import PropTypes from 'prop-types';
 
+import RequiredStar from '@/common/components/atoms/RequiredStar';
 import { formatPhone } from '@/utils/formatPhone';
+import { validateDonationFields } from '@/utils/validators';
 
 const overlay = {
   position: 'fixed',
@@ -41,11 +43,6 @@ const labelStyle = {
   fontSize: '13px',
   fontWeight: '500',
   color: '#374151',
-};
-
-const requiredStar = {
-  color: '#dc2626',
-  marginLeft: '2px',
 };
 
 const inputStyle = {
@@ -128,9 +125,6 @@ function toFormValues(donation) {
   };
 }
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PHONE_RE = /^\+?[\d\s\-().]{7,20}$/;
-const AMOUNT_RE = /^\d+(\.\d{1,2})?$/;
 
 export default function DonationModal({ open, onClose, onSubmit, donation }) {
   const isEdit = Boolean(donation);
@@ -155,32 +149,13 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
     e.preventDefault();
     setError(null);
 
-    if (!isEdit) {
-      if (!form.email || !EMAIL_RE.test(form.email)) {
-        setError('Please enter a valid email address');
-        return;
-      }
-      if (form.phone && !PHONE_RE.test(form.phone)) {
-        setError('Please enter a valid phone number, e.g. (555) 555-5555');
-        return;
-      }
-    }
-
-    if (!form.donation_date) {
-      setError('Donation date is required');
+    const validationError = validateDonationFields(form, isEdit);
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
     const amount = parseFloat(form.amount);
-    if (!form.amount || isNaN(amount) || amount <= 0) {
-      setError('Amount must be a positive number');
-      return;
-    }
-    if (!AMOUNT_RE.test(String(form.amount))) {
-      setError('Amount must have at most 2 decimal places');
-      return;
-    }
-
     setSaving(true);
     try {
       await onSubmit({ ...form, amount });
@@ -210,7 +185,7 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
         <div style={{ display: 'flex', gap: '12px' }}>
           <div style={{ ...fieldGroup, flex: 1 }}>
             <label style={labelStyle}>
-              First Name{!isEdit && <span style={requiredStar}>*</span>}
+              First Name{!isEdit && <RequiredStar />}
             </label>
             <input
               style={isEdit ? readonlyInput : inputStyle}
@@ -223,7 +198,7 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
           </div>
           <div style={{ ...fieldGroup, flex: 1 }}>
             <label style={labelStyle}>
-              Last Name{!isEdit && <span style={requiredStar}>*</span>}
+              Last Name{!isEdit && <RequiredStar />}
             </label>
             <input
               style={isEdit ? readonlyInput : inputStyle}
@@ -238,7 +213,7 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
 
         <div style={fieldGroup}>
           <label style={labelStyle}>
-            Donor Email{!isEdit && <span style={requiredStar}>*</span>}
+            Donor Email{!isEdit && <RequiredStar />}
           </label>
           <input
             style={isEdit ? readonlyInput : inputStyle}
@@ -276,7 +251,7 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
 
         <div style={fieldGroup}>
           <label style={labelStyle}>
-            Amount ($)<span style={requiredStar}>*</span>
+            Amount ($)<RequiredStar />
           </label>
           <input
             style={inputStyle}
@@ -292,7 +267,7 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
 
         <div style={fieldGroup}>
           <label style={labelStyle}>
-            Donation Date<span style={requiredStar}>*</span>
+            Donation Date<RequiredStar />
           </label>
           <input
             style={inputStyle}
@@ -316,7 +291,7 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
         </div>
 
         <div style={requiredNote}>
-          <span style={{ color: '#dc2626' }}>*</span> Required
+          <RequiredStar /> Required
         </div>
 
         <div style={row}>
