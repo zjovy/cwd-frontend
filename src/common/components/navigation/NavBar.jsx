@@ -28,14 +28,19 @@ const LeftAligned = styled.div`
   gap: 10px;
 `;
 
-const LogoPlaceholder = styled.button`
+const LogoButton = styled.button`
   border: none;
   background: transparent;
   cursor: pointer;
   padding: 0;
-  font-size: 1.7rem;
-  font-weight: bold;
-  font-family: monospace;
+  display: flex;
+  align-items: center;
+`;
+
+const LogoImg = styled.img`
+  height: 52px;
+  width: auto;
+  display: block;
 `;
 
 export default function NavBar() {
@@ -64,7 +69,9 @@ export default function NavBar() {
   return (
     <StyledNav>
       <LeftAligned>
-        <LogoPlaceholder onClick={() => navigate('/')}>[LOGO]</LogoPlaceholder>
+        <LogoButton onClick={() => navigate('/')}>
+          <LogoImg src='/logo.png' alt='C&W Market' />
+        </LogoButton>
       </LeftAligned>
       {user ? (
         <Button variant='outline' onClick={handleLogoutClick}>

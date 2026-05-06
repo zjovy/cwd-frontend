@@ -5,7 +5,7 @@ import Sidebar from '@/common/components/organisms/Sidebar';
 import styled from 'styled-components';
 
 const Layout = styled.div`
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
 `;
@@ -13,9 +13,8 @@ const Layout = styled.div`
 const Body = styled.div`
   display: flex;
   flex: 1;
-  height: calc(100vh - 20px);
-  background: #f5f5f4;
   overflow: hidden;
+  background: #f5f5f4;
 `;
 
 export default function NavLayout() {
@@ -23,7 +22,9 @@ export default function NavLayout() {
   const location = useLocation();
 
   const activePage = location.pathname.replace('/', '') || 'dashboard';
-  const hideSidebar = ['/login', '/no-access'].includes(location.pathname);
+  const authPaths = ['/login', '/signup', '/forgot-password'];
+  const isAuthPage = authPaths.includes(location.pathname);
+  const hideSidebar = isAuthPage || location.pathname === '/no-access';
 
   const handleNavigate = (pageId) => {
     navigate(`/${pageId}`);
@@ -31,7 +32,7 @@ export default function NavLayout() {
 
   return (
     <Layout>
-      <NavBar />
+      {!isAuthPage && <NavBar />}
       <Body>
         {!hideSidebar && (
           <Sidebar activePage={activePage} onNavigate={handleNavigate} />
