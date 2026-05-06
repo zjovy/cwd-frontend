@@ -17,7 +17,6 @@ import DashboardPage from '@/pages/dashboard';
 import DonationsPage from '@/pages/donations';
 import DonorsPage from '@/pages/donors';
 import DonorDetailsPage from '@/pages/donors/Details';
-import Home from '@/pages/home/Home';
 import NoAccess from '@/pages/no-access/NoAccess';
 import NotFound from '@/pages/not-found/NotFound';
 
@@ -30,7 +29,7 @@ export default function App() {
         <Routes>
           <Route path='/' element={<NavLayout />}>
             <Route element={<PrivateRoute />}>
-              <Route index element={<Home />} />
+              <Route index element={<DashboardPage />} />
               <Route path='dashboard' element={<DashboardPage />} />
               <Route path='donations' element={<DonationsPage />} />
               <Route path='donors' element={<DonorsPage />} />
