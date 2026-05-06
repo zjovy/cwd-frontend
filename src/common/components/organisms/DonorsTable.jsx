@@ -7,7 +7,6 @@ import {
   tdStyle,
   thStyle,
 } from '@/common/components/atoms/tableStyles';
-import ActionsMenu from '@/common/components/molecules/ActionsMenu';
 import { formatPhone } from '@/utils/formatPhone';
 import PropTypes from 'prop-types';
 
@@ -32,7 +31,6 @@ const COLUMNS = [
   { label: 'Email' },
   { label: 'Address' },
   { label: 'Phone' },
-  { label: 'Actions' },
 ];
 
 function addressCell(d) {
@@ -47,8 +45,6 @@ export default function DonorTable({
   selected,
   onSelectChange,
   onSelectAll,
-  onEdit,
-  onDelete,
 }) {
   const navigate = useNavigate();
   const allChecked =
@@ -78,8 +74,8 @@ export default function DonorTable({
               onChange={(e) => onSelectAll(e.target.checked)}
             />
           </th>
-          {COLUMNS.map(({ label, style }) => (
-            <th key={label} style={{ ...thStyle, ...style }}>
+          {COLUMNS.map(({ label }) => (
+            <th key={label} style={thStyle}>
               {label}
             </th>
           ))}
@@ -89,7 +85,7 @@ export default function DonorTable({
         {donors.length === 0 ? (
           <tr>
             <td colSpan={COLUMNS.length + 1} style={statusMsg}>
-              No donations found.
+              No donors found.
             </td>
           </tr>
         ) : (
@@ -112,18 +108,6 @@ export default function DonorTable({
               <td style={tdStyle}>{d.email}</td>
               <td style={tdStyle}>{addressCell(d)}</td>
               <td style={tdStyle}>{formatPhone(d.phone) || '—'}</td>
-              <td style={tdStyle} onClick={(e) => e.stopPropagation()}>
-                <ActionsMenu
-                  actions={[
-                    { label: 'Edit', onClick: () => onEdit(d) },
-                    {
-                      label: 'Delete',
-                      onClick: () => onDelete(d),
-                      danger: true,
-                    },
-                  ]}
-                />
-              </td>
             </tr>
           ))
         )}
@@ -139,6 +123,4 @@ DonorTable.propTypes = {
   selected: PropTypes.instanceOf(Set).isRequired,
   onSelectChange: PropTypes.func.isRequired,
   onSelectAll: PropTypes.func.isRequired,
-  onEdit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
 };

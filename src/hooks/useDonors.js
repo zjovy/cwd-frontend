@@ -50,37 +50,12 @@ export default function useDonors(filters = {}) {
     };
   }, [search, page, fetchDonors]);
 
-  const refetchAtPage1 = async () => {
-    onPageResetRef.current?.();
-    await fetchDonors({ ...filtersRef.current, page: 1 });
-  };
-
-  const createDonor = async (data) => {
-    await donorService.create(data);
-    await refetchAtPage1();
-  };
-
-  const updateDonor = async (id, data) => {
-    await donorService.update(id, data);
-    // Update doesn't change total count — re-fetch at current page
-    await fetchDonors(filtersRef.current);
-  };
-
-  const deleteDonor = async (id) => {
-    await donorService.delete(id);
-    // Delete changes total count — go back to page 1 to avoid empty page
-    await refetchAtPage1();
-  };
-
   return {
     donors,
     total,
     totalPages: Math.max(0, Math.ceil((Number(total) || 0) / PAGE_SIZE)),
     loading,
     error,
-    onPageResetRef,
-    createDonor,
-    updateDonor,
-    deleteDonor,
+    onPageResetRef
   };
 }
