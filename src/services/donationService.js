@@ -48,6 +48,13 @@ const donationService = {
       method: 'DELETE',
     });
   },
+
+  sendReceipt(id, body) {
+    return request(`${BASE_URL}/${id}/send-receipt`, {
+      method: 'POST',
+      body: JSON.stringify({ body }),
+    });
+  },
 };
 
 export default donationService;

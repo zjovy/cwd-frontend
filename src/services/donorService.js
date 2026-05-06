@@ -45,6 +45,13 @@ const donorService = {
       method: 'DELETE',
     });
   },
+
+  upsertByEmail(data) {
+    return request(`${BASE_URL}/upsert-by-email`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  },
 };
 
 export default donorService;
