@@ -89,9 +89,6 @@ export default function DonorsPage() {
           <div style={styles.subtitle}>
             View donor details and contributions in one place.
           </div>
-          <div style={styles.subtitle}>
-            View donor details and contributions in one place.
-          </div>
         </div>
       </div>
 
