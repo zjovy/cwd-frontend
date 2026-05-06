@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 
 import PropTypes from 'prop-types';
 
+import { formatPhone } from '@/utils/formatPhone';
+
 const overlay = {
   position: 'fixed',
   inset: 0,
@@ -39,6 +41,11 @@ const labelStyle = {
   fontSize: '13px',
   fontWeight: '500',
   color: '#374151',
+};
+
+const requiredStar = {
+  color: '#dc2626',
+  marginLeft: '2px',
 };
 
 const inputStyle = {
@@ -90,6 +97,12 @@ const errorStyle = {
   marginBottom: '10px',
 };
 
+const requiredNote = {
+  fontSize: '12px',
+  color: '#6b7280',
+  marginTop: '6px',
+};
+
 const EMPTY = {
   first_name: '',
   last_name: '',
@@ -107,13 +120,17 @@ function toFormValues(donation) {
     first_name: donation.first_name ?? '',
     last_name: donation.last_name ?? '',
     email: donation.donorEmail ?? '',
-    phone: donation.phone ?? '',
+    phone: formatPhone(donation.phone ?? ''),
     address: donation.address ?? '',
     amount: donation.amount ?? '',
     donation_date: donation.donation_date?.slice(0, 10) ?? '',
     receipt_status: donation.receipt_status ?? 'pending',
   };
 }
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_RE = /^\+?[\d\s\-().]{7,20}$/;
+const AMOUNT_RE = /^\d+(\.\d{1,2})?$/;
 
 export default function DonationModal({ open, onClose, onSubmit, donation }) {
   const isEdit = Boolean(donation);
@@ -131,15 +148,42 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
   const set = (field) => (e) =>
     setForm((f) => ({ ...f, [field]: e.target.value }));
 
+  const handlePhoneChange = (e) =>
+    setForm((f) => ({ ...f, phone: formatPhone(e.target.value) }));
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSaving(true);
     setError(null);
+
+    if (!isEdit) {
+      if (!form.email || !EMAIL_RE.test(form.email)) {
+        setError('Please enter a valid email address');
+        return;
+      }
+      if (form.phone && !PHONE_RE.test(form.phone)) {
+        setError('Please enter a valid phone number, e.g. (555) 555-5555');
+        return;
+      }
+    }
+
+    if (!form.donation_date) {
+      setError('Donation date is required');
+      return;
+    }
+
+    const amount = parseFloat(form.amount);
+    if (!form.amount || isNaN(amount) || amount <= 0) {
+      setError('Amount must be a positive number');
+      return;
+    }
+    if (!AMOUNT_RE.test(String(form.amount))) {
+      setError('Amount must have at most 2 decimal places');
+      return;
+    }
+
+    setSaving(true);
     try {
-      await onSubmit({
-        ...form,
-        amount: parseFloat(form.amount),
-      });
+      await onSubmit({ ...form, amount });
       onClose();
     } catch (err) {
       setError(err.message);
@@ -147,6 +191,8 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
       setSaving(false);
     }
   };
+
+  const readonlyInput = { ...inputStyle, background: '#f3f4f6', color: '#6b7280' };
 
   return (
     <div style={overlay} onClick={onClose}>
@@ -163,13 +209,12 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
 
         <div style={{ display: 'flex', gap: '12px' }}>
           <div style={{ ...fieldGroup, flex: 1 }}>
-            <label style={labelStyle}>First Name</label>
+            <label style={labelStyle}>
+              First Name{!isEdit && <span style={requiredStar}>*</span>}
+            </label>
             <input
-              style={
-                isEdit
-                  ? { ...inputStyle, background: '#f3f4f6', color: '#6b7280' }
-                  : inputStyle
-              }
+              style={isEdit ? readonlyInput : inputStyle}
+              placeholder='Jane'
               value={form.first_name}
               onChange={set('first_name')}
               readOnly={isEdit}
@@ -177,13 +222,12 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
             />
           </div>
           <div style={{ ...fieldGroup, flex: 1 }}>
-            <label style={labelStyle}>Last Name</label>
+            <label style={labelStyle}>
+              Last Name{!isEdit && <span style={requiredStar}>*</span>}
+            </label>
             <input
-              style={
-                isEdit
-                  ? { ...inputStyle, background: '#f3f4f6', color: '#6b7280' }
-                  : inputStyle
-              }
+              style={isEdit ? readonlyInput : inputStyle}
+              placeholder='Doe'
               value={form.last_name}
               onChange={set('last_name')}
               readOnly={isEdit}
@@ -193,14 +237,13 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
         </div>
 
         <div style={fieldGroup}>
-          <label style={labelStyle}>Donor Email</label>
+          <label style={labelStyle}>
+            Donor Email{!isEdit && <span style={requiredStar}>*</span>}
+          </label>
           <input
-            style={
-              isEdit
-                ? { ...inputStyle, background: '#f3f4f6', color: '#6b7280' }
-                : inputStyle
-            }
+            style={isEdit ? readonlyInput : inputStyle}
             type='email'
+            placeholder='jane.doe@example.com'
             value={form.email}
             onChange={set('email')}
             readOnly={isEdit}
@@ -211,14 +254,11 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
         <div style={fieldGroup}>
           <label style={labelStyle}>Phone</label>
           <input
-            style={
-              isEdit
-                ? { ...inputStyle, background: '#f3f4f6', color: '#6b7280' }
-                : inputStyle
-            }
+            style={isEdit ? readonlyInput : inputStyle}
             type='tel'
+            placeholder='(555) 555-5555'
             value={form.phone}
-            onChange={set('phone')}
+            onChange={handlePhoneChange}
             readOnly={isEdit}
           />
         </div>
@@ -226,11 +266,8 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
         <div style={fieldGroup}>
           <label style={labelStyle}>Address</label>
           <input
-            style={
-              isEdit
-                ? { ...inputStyle, background: '#f3f4f6', color: '#6b7280' }
-                : inputStyle
-            }
+            style={isEdit ? readonlyInput : inputStyle}
+            placeholder='123 Main St, City, ST 12345'
             value={form.address}
             onChange={set('address')}
             readOnly={isEdit}
@@ -238,12 +275,15 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
         </div>
 
         <div style={fieldGroup}>
-          <label style={labelStyle}>Amount ($)</label>
+          <label style={labelStyle}>
+            Amount ($)<span style={requiredStar}>*</span>
+          </label>
           <input
             style={inputStyle}
             type='number'
             step='0.01'
             min='0'
+            placeholder='0.00'
             value={form.amount}
             onChange={set('amount')}
             required
@@ -251,7 +291,9 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
         </div>
 
         <div style={fieldGroup}>
-          <label style={labelStyle}>Donation Date</label>
+          <label style={labelStyle}>
+            Donation Date<span style={requiredStar}>*</span>
+          </label>
           <input
             style={inputStyle}
             type='date'
@@ -271,6 +313,10 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
             <option value='pending'>Pending</option>
             <option value='sent'>Sent</option>
           </select>
+        </div>
+
+        <div style={requiredNote}>
+          <span style={{ color: '#dc2626' }}>*</span> Required
         </div>
 
         <div style={row}>

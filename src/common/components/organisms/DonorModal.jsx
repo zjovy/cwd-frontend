@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 
 import PropTypes from 'prop-types';
 
+import { formatPhone } from '@/utils/formatPhone';
+
 const overlay = {
   position: 'fixed',
   inset: 0,
@@ -107,7 +109,7 @@ function toFormValues(donor) {
     last_name: donor.last_name ?? '',
     email: donor.email ?? '',
     address: donor.address ?? '',
-    phone: donor.phone ?? '',
+    phone: formatPhone(donor.phone ?? ''),
   };
 }
 
@@ -126,6 +128,9 @@ export default function DonorModal({ open, onClose, onSubmit, donor }) {
 
   const set = (field) => (e) =>
     setForm((f) => ({ ...f, [field]: e.target.value }));
+
+  const handlePhoneChange = (e) =>
+    setForm((f) => ({ ...f, phone: formatPhone(e.target.value) }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -204,8 +209,9 @@ export default function DonorModal({ open, onClose, onSubmit, donor }) {
           <input
             style={inputStyle}
             type='tel'
+            placeholder='(555) 555-5555'
             value={form.phone}
-            onChange={set('phone')}
+            onChange={handlePhoneChange}
           />
         </div>
 

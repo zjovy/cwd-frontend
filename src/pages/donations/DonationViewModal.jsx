@@ -11,6 +11,7 @@
 import { useEffect, useState } from 'react';
 
 import donationService from '@/services/donationService';
+import { formatPhone } from '@/utils/formatPhone';
 import { Send } from 'lucide-react';
 import PropTypes from 'prop-types';
 
@@ -235,7 +236,7 @@ export default function DonationViewModal({
       .then((detail) => {
         setForm((prev) => ({
           ...prev,
-          phone: detail.phone ?? '',
+          phone: formatPhone(detail.phone ?? ''),
           address: detail.address ?? '',
         }));
       })

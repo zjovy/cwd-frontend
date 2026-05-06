@@ -8,6 +8,7 @@ import {
   thStyle,
 } from '@/common/components/atoms/tableStyles';
 import ActionsMenu from '@/common/components/molecules/ActionsMenu';
+import { formatPhone } from '@/utils/formatPhone';
 import PropTypes from 'prop-types';
 
 const clickableRowStyle = { cursor: 'pointer' };
@@ -110,7 +111,7 @@ export default function DonorTable({
               </td>
               <td style={tdStyle}>{d.email}</td>
               <td style={tdStyle}>{addressCell(d)}</td>
-              <td style={tdStyle}>{d.phone}</td>
+              <td style={tdStyle}>{formatPhone(d.phone) || '—'}</td>
               <td style={tdStyle} onClick={(e) => e.stopPropagation()}>
                 <ActionsMenu
                   actions={[
