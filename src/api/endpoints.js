@@ -3,6 +3,7 @@ export const ENDPOINTS = {
   DONATION_BY_ID: (id) => `/donations/${id}`,
   DONORS: '/donors',
   DONOR_BY_ID: (id) => `/donors/${id}`,
+  DONOR_UPSERT_BY_EMAIL: '/donors/upsert-by-email',
   DASHBOARD_SUMMARY: '/dashboard/summary',
   DASHBOARD_TREND: '/dashboard/trend',
   DASHBOARD_LAST6: '/dashboard/last6months',
