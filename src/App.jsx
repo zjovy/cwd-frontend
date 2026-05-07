@@ -15,6 +15,7 @@ import SignUp from '@/pages/account/SignUp';
 import AdminPage from '@/pages/admin';
 import DashboardPage from '@/pages/dashboard';
 import DonationsPage from '@/pages/donations';
+import DonationDetailsPage from '@/pages/donations/Details';
 import DonorsPage from '@/pages/donors';
 import DonorDetailsPage from '@/pages/donors/Details';
 import NoAccess from '@/pages/no-access/NoAccess';
@@ -32,6 +33,7 @@ export default function App() {
               <Route index element={<DashboardPage />} />
               <Route path='dashboard' element={<DashboardPage />} />
               <Route path='donations' element={<DonationsPage />} />
+              <Route path='donations/:id' element={<DonationDetailsPage />} />
               <Route path='donors' element={<DonorsPage />} />
               <Route path='donors/:id' element={<DonorDetailsPage />} />
               <Route element={<AdminRoute />}>

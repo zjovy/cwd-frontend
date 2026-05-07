@@ -53,7 +53,7 @@ const styles = {
   },
 };
 
-export default function DonationHistoryCard({ donations, loading, error }) {
+export default function DonationHistoryCard({ donations, loading, error, onRowClick }) {
   const total = donations.reduce(
     (sum, d) => sum + (parseFloat(d.amount) || 0),
     0
@@ -80,7 +80,11 @@ export default function DonationHistoryCard({ donations, loading, error }) {
           </thead>
           <tbody>
             {donations.map((d) => (
-              <tr key={d.id}>
+              <tr
+                key={d.id}
+                style={onRowClick ? { cursor: 'pointer' } : undefined}
+                onClick={onRowClick ? () => onRowClick(d) : undefined}
+              >
                 <td style={styles.td}>{formatDate(d.donation_date)}</td>
                 <td
                   style={{ ...styles.td, textAlign: 'right', fontWeight: 500 }}
@@ -120,8 +124,10 @@ DonationHistoryCard.propTypes = {
   donations: PropTypes.array.isRequired,
   loading: PropTypes.bool.isRequired,
   error: PropTypes.string,
+  onRowClick: PropTypes.func,
 };
 
 DonationHistoryCard.defaultProps = {
   error: null,
+  onRowClick: null,
 };
