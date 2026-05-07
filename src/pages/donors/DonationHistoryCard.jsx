@@ -1,3 +1,4 @@
+import Badge from '@/common/components/atoms/Badge';
 import Card from '@/common/components/atoms/Card';
 import SectionTitle from '@/common/components/atoms/SectionTitle';
 import { formatAmount, formatDate } from '@/utils/format';
@@ -75,6 +76,7 @@ export default function DonationHistoryCard({ donations, loading, error, onRowCl
           <thead>
             <tr>
               <th style={styles.th}>Date</th>
+              <th style={{ ...styles.th, textAlign: 'center' }}>Receipt Status</th>
               <th style={{ ...styles.th, textAlign: 'right' }}>Amount</th>
             </tr>
           </thead>
@@ -86,6 +88,9 @@ export default function DonationHistoryCard({ donations, loading, error, onRowCl
                 onClick={onRowClick ? () => onRowClick(d) : undefined}
               >
                 <td style={styles.td}>{formatDate(d.donation_date)}</td>
+                <td style={{ ...styles.td, textAlign: 'center' }}>
+                  <Badge status={d.receipt_status} />
+                </td>
                 <td
                   style={{ ...styles.td, textAlign: 'right', fontWeight: 500 }}
                 >
