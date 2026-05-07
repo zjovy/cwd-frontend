@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import RequiredStar from '@/common/components/atoms/RequiredStar';
+import { validateDonationFields } from '@/utils/validators';
 import PropTypes from 'prop-types';
 
 const overlay = {
@@ -90,6 +92,12 @@ const errorStyle = {
   marginBottom: '10px',
 };
 
+const requiredNote = {
+  fontSize: '12px',
+  color: '#6b7280',
+  marginTop: '6px',
+};
+
 const EMPTY = {
   first_name: '',
   last_name: '',
@@ -131,21 +139,35 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
   const set = (field) => (e) =>
     setForm((f) => ({ ...f, [field]: e.target.value }));
 
+  const handlePhoneChange = (e) =>
+    setForm((f) => ({ ...f, phone: e.target.value.replace(/[^\d+() -]/g, '') }));
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSaving(true);
     setError(null);
+
+    const validationError = validateDonationFields(form, isEdit);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    const amount = parseFloat(form.amount);
+    setSaving(true);
     try {
-      await onSubmit({
-        ...form,
-        amount: parseFloat(form.amount),
-      });
+      await onSubmit({ ...form, amount });
       onClose();
     } catch (err) {
       setError(err.message);
     } finally {
       setSaving(false);
     }
+  };
+
+  const readonlyInput = {
+    ...inputStyle,
+    background: '#f3f4f6',
+    color: '#6b7280',
   };
 
   return (
@@ -163,13 +185,12 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
 
         <div style={{ display: 'flex', gap: '12px' }}>
           <div style={{ ...fieldGroup, flex: 1 }}>
-            <label style={labelStyle}>First Name</label>
+            <label style={labelStyle}>
+              First Name{!isEdit && <RequiredStar />}
+            </label>
             <input
-              style={
-                isEdit
-                  ? { ...inputStyle, background: '#f3f4f6', color: '#6b7280' }
-                  : inputStyle
-              }
+              style={isEdit ? readonlyInput : inputStyle}
+              placeholder='Jane'
               value={form.first_name}
               onChange={set('first_name')}
               readOnly={isEdit}
@@ -177,13 +198,12 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
             />
           </div>
           <div style={{ ...fieldGroup, flex: 1 }}>
-            <label style={labelStyle}>Last Name</label>
+            <label style={labelStyle}>
+              Last Name{!isEdit && <RequiredStar />}
+            </label>
             <input
-              style={
-                isEdit
-                  ? { ...inputStyle, background: '#f3f4f6', color: '#6b7280' }
-                  : inputStyle
-              }
+              style={isEdit ? readonlyInput : inputStyle}
+              placeholder='Doe'
               value={form.last_name}
               onChange={set('last_name')}
               readOnly={isEdit}
@@ -193,14 +213,13 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
         </div>
 
         <div style={fieldGroup}>
-          <label style={labelStyle}>Donor Email</label>
+          <label style={labelStyle}>
+            Donor Email{!isEdit && <RequiredStar />}
+          </label>
           <input
-            style={
-              isEdit
-                ? { ...inputStyle, background: '#f3f4f6', color: '#6b7280' }
-                : inputStyle
-            }
+            style={isEdit ? readonlyInput : inputStyle}
             type='email'
+            placeholder='jane.doe@example.com'
             value={form.email}
             onChange={set('email')}
             readOnly={isEdit}
@@ -211,14 +230,11 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
         <div style={fieldGroup}>
           <label style={labelStyle}>Phone</label>
           <input
-            style={
-              isEdit
-                ? { ...inputStyle, background: '#f3f4f6', color: '#6b7280' }
-                : inputStyle
-            }
+            style={isEdit ? readonlyInput : inputStyle}
             type='tel'
+            placeholder='5555555555'
             value={form.phone}
-            onChange={set('phone')}
+            onChange={handlePhoneChange}
             readOnly={isEdit}
           />
         </div>
@@ -226,11 +242,8 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
         <div style={fieldGroup}>
           <label style={labelStyle}>Address</label>
           <input
-            style={
-              isEdit
-                ? { ...inputStyle, background: '#f3f4f6', color: '#6b7280' }
-                : inputStyle
-            }
+            style={isEdit ? readonlyInput : inputStyle}
+            placeholder='123 Main St, City, ST 12345'
             value={form.address}
             onChange={set('address')}
             readOnly={isEdit}
@@ -238,12 +251,16 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
         </div>
 
         <div style={fieldGroup}>
-          <label style={labelStyle}>Amount ($)</label>
+          <label style={labelStyle}>
+            Amount ($)
+            <RequiredStar />
+          </label>
           <input
             style={inputStyle}
             type='number'
             step='0.01'
             min='0'
+            placeholder='0.00'
             value={form.amount}
             onChange={set('amount')}
             required
@@ -251,7 +268,10 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
         </div>
 
         <div style={fieldGroup}>
-          <label style={labelStyle}>Donation Date</label>
+          <label style={labelStyle}>
+            Donation Date
+            <RequiredStar />
+          </label>
           <input
             style={inputStyle}
             type='date'
@@ -271,6 +291,10 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
             <option value='pending'>Pending</option>
             <option value='sent'>Sent</option>
           </select>
+        </div>
+
+        <div style={requiredNote}>
+          <RequiredStar /> Required
         </div>
 
         <div style={row}>

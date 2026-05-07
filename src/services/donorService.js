@@ -47,7 +47,7 @@ const donorService = {
   },
 
   upsertByEmail(data) {
-    return request(`${BASE_URL}/upsert-by-email`, {
+    return request(buildUrl(ENDPOINTS.DONOR_UPSERT_BY_EMAIL), {
       method: 'PATCH',
       body: JSON.stringify(data),
     });
