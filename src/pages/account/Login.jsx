@@ -25,7 +25,11 @@ const PageWrapper = styled.div`
   display: flex;
   height: 100vh;
   overflow: hidden;
-  font-family: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    'Sora',
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
 
   @media (max-width: 640px) {
     flex-direction: column;
@@ -35,8 +39,16 @@ const PageWrapper = styled.div`
 const LeftPanel = styled.div`
   width: 42%;
   background:
-    radial-gradient(ellipse at 80% 10%, rgba(59, 130, 246, 0.22) 0%, transparent 55%),
-    radial-gradient(ellipse at 10% 90%, rgba(59, 130, 246, 0.14) 0%, transparent 50%),
+    radial-gradient(
+      ellipse at 80% 10%,
+      rgba(59, 130, 246, 0.22) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse at 10% 90%,
+      rgba(59, 130, 246, 0.14) 0%,
+      transparent 50%
+    ),
     #111111;
   display: flex;
   flex-direction: column;
@@ -50,7 +62,10 @@ const LeftPanel = styled.div`
     content: '';
     position: absolute;
     inset: 0;
-    background-image: radial-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px);
+    background-image: radial-gradient(
+      rgba(255, 255, 255, 0.055) 1px,
+      transparent 1px
+    );
     background-size: 28px 28px;
     pointer-events: none;
   }
@@ -213,7 +228,10 @@ const StyledInput = styled.input`
   background: #fafaf9;
   color: #1a1a1a;
   box-sizing: border-box;
-  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s,
+    background 0.15s;
   outline: none;
 
   &::placeholder {
@@ -281,7 +299,9 @@ const SubmitBtn = styled.button`
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
+  transition:
+    background 0.15s,
+    transform 0.1s;
   letter-spacing: -0.01em;
 
   &:hover:not(:disabled) {
@@ -333,7 +353,9 @@ const GoogleBtn = styled.button`
   font-family: inherit;
   color: #374151;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 
   &:hover:not(:disabled) {
     border-color: #d1d5db;

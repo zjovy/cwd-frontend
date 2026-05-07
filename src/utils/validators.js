@@ -1,12 +1,15 @@
 export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-export const PHONE_RE = /^\+?[\d\s\-().]{7,20}$/;
 export const AMOUNT_RE = /^\d+(\.\d{1,2})?$/;
 
 export function validateDonorFields(form) {
   if (!form.email || !EMAIL_RE.test(form.email))
     return 'Please enter a valid email address';
-  if (form.phone && !PHONE_RE.test(form.phone))
-    return 'Please enter a valid phone number, e.g. (555) 555-5555';
+  if (form.phone) {
+    if (/[^\d+() -]/.test(form.phone))
+      return 'Please enter a valid phone number';
+    if (form.phone.replace(/\D/g, '').length < 7)
+      return 'Please enter a valid phone number';
+  }
   return null;
 }
 

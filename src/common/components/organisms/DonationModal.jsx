@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
 
-import PropTypes from 'prop-types';
-
 import RequiredStar from '@/common/components/atoms/RequiredStar';
-import { formatPhone } from '@/utils/formatPhone';
 import { validateDonationFields } from '@/utils/validators';
+import PropTypes from 'prop-types';
 
 const overlay = {
   position: 'fixed',
@@ -117,14 +115,13 @@ function toFormValues(donation) {
     first_name: donation.first_name ?? '',
     last_name: donation.last_name ?? '',
     email: donation.donorEmail ?? '',
-    phone: formatPhone(donation.phone ?? ''),
+    phone: donation.phone ?? '',
     address: donation.address ?? '',
     amount: donation.amount ?? '',
     donation_date: donation.donation_date?.slice(0, 10) ?? '',
     receipt_status: donation.receipt_status ?? 'pending',
   };
 }
-
 
 export default function DonationModal({ open, onClose, onSubmit, donation }) {
   const isEdit = Boolean(donation);
@@ -143,7 +140,7 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
     setForm((f) => ({ ...f, [field]: e.target.value }));
 
   const handlePhoneChange = (e) =>
-    setForm((f) => ({ ...f, phone: formatPhone(e.target.value) }));
+    setForm((f) => ({ ...f, phone: e.target.value.replace(/[^\d+() -]/g, '') }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -167,7 +164,11 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
     }
   };
 
-  const readonlyInput = { ...inputStyle, background: '#f3f4f6', color: '#6b7280' };
+  const readonlyInput = {
+    ...inputStyle,
+    background: '#f3f4f6',
+    color: '#6b7280',
+  };
 
   return (
     <div style={overlay} onClick={onClose}>
@@ -231,7 +232,7 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
           <input
             style={isEdit ? readonlyInput : inputStyle}
             type='tel'
-            placeholder='(555) 555-5555'
+            placeholder='5555555555'
             value={form.phone}
             onChange={handlePhoneChange}
             readOnly={isEdit}
@@ -251,7 +252,8 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
 
         <div style={fieldGroup}>
           <label style={labelStyle}>
-            Amount ($)<RequiredStar />
+            Amount ($)
+            <RequiredStar />
           </label>
           <input
             style={inputStyle}
@@ -267,7 +269,8 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
 
         <div style={fieldGroup}>
           <label style={labelStyle}>
-            Donation Date<RequiredStar />
+            Donation Date
+            <RequiredStar />
           </label>
           <input
             style={inputStyle}

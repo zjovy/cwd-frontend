@@ -1,7 +1,6 @@
 import Card from '@/common/components/atoms/Card';
 import Button from '@/common/components/atoms/CommonButton';
 import SectionTitle from '@/common/components/atoms/SectionTitle';
-import { formatPhone } from '@/utils/formatPhone';
 import { Mail, MapPin, Phone, SquarePen } from 'lucide-react';
 import PropTypes from 'prop-types';
 
@@ -71,7 +70,7 @@ export default function ContactInfoCard({ email, phone, address, onEdit }) {
           {address}
         </Field>
         <Field icon={<Phone size={18} strokeWidth={1.8} />} label='Phone'>
-          {formatPhone(phone)}
+          {phone}
         </Field>
       </div>
     </Card>

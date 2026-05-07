@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
 
-import PropTypes from 'prop-types';
-
 import RequiredStar from '@/common/components/atoms/RequiredStar';
-import { formatPhone } from '@/utils/formatPhone';
 import { validateDonorFields } from '@/utils/validators';
+import PropTypes from 'prop-types';
 
 const overlay = {
   position: 'fixed',
@@ -91,11 +89,10 @@ function toFormValues(donor) {
     first_name: donor?.first_name ?? '',
     last_name: donor?.last_name ?? '',
     email: donor?.email ?? '',
-    phone: formatPhone(donor?.phone ?? ''),
+    phone: donor?.phone ?? '',
     address: donor?.address ?? '',
   };
 }
-
 
 export default function DonorEditModal({ open, onClose, onSubmit, donor }) {
   const [form, setForm] = useState(toFormValues(donor));
@@ -113,7 +110,7 @@ export default function DonorEditModal({ open, onClose, onSubmit, donor }) {
     setForm((f) => ({ ...f, [field]: e.target.value }));
 
   const handlePhoneChange = (e) =>
-    setForm((f) => ({ ...f, phone: formatPhone(e.target.value) }));
+    setForm((f) => ({ ...f, phone: e.target.value.replace(/[^\d+() -]/g, '') }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -150,7 +147,8 @@ export default function DonorEditModal({ open, onClose, onSubmit, donor }) {
         <div style={{ display: 'flex', gap: '12px' }}>
           <div style={{ ...fieldGroup, flex: 1 }}>
             <label style={labelStyle}>
-              First Name<RequiredStar />
+              First Name
+              <RequiredStar />
             </label>
             <input
               style={inputStyle}
@@ -162,7 +160,8 @@ export default function DonorEditModal({ open, onClose, onSubmit, donor }) {
           </div>
           <div style={{ ...fieldGroup, flex: 1 }}>
             <label style={labelStyle}>
-              Last Name<RequiredStar />
+              Last Name
+              <RequiredStar />
             </label>
             <input
               style={inputStyle}
@@ -176,7 +175,8 @@ export default function DonorEditModal({ open, onClose, onSubmit, donor }) {
 
         <div style={fieldGroup}>
           <label style={labelStyle}>
-            Email<RequiredStar />
+            Email
+            <RequiredStar />
           </label>
           <input
             style={inputStyle}
@@ -193,7 +193,7 @@ export default function DonorEditModal({ open, onClose, onSubmit, donor }) {
           <input
             style={inputStyle}
             type='tel'
-            placeholder='(555) 555-5555'
+            placeholder='5555555555'
             value={form.phone}
             onChange={handlePhoneChange}
           />
