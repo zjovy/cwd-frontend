@@ -56,6 +56,6 @@ export default function useDonors(filters = {}) {
     totalPages: Math.max(0, Math.ceil((Number(total) || 0) / PAGE_SIZE)),
     loading,
     error,
-    onPageResetRef
+    onPageResetRef,
   };
 }

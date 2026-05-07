@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 
 import Card from '@/common/components/atoms/Card';
 import Pagination from '@/common/components/atoms/Pagination';
-
 import DonorTable from '@/common/components/organisms/DonorsTable';
 import useDonors from '@/hooks/useDonors';
 import { PAGE_SIZE } from '@/utils/pagination';
@@ -47,7 +46,7 @@ export default function DonorsPage() {
   const [selected, setSelected] = useState(new Set());
   const [modalOpen, setModalOpen] = useState(false);
 
-  const { donors, total, totalPages, loading, error, onPageResetRef} =
+  const { donors, total, totalPages, loading, error, onPageResetRef } =
     useDonors({ ...filters, page });
 
   useEffect(() => {
@@ -78,8 +77,6 @@ export default function DonorsPage() {
     setPage(newPage);
     setSelected(new Set());
   };
-
-
 
   return (
     <main style={styles.main}>
