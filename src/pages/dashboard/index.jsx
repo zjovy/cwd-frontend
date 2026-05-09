@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import Button from '@/common/components/atoms/CommonButton';
 import { useUser } from '@/common/contexts/UserContext';
 import ChartsRow from '@/pages/dashboard/ChartsRow';
@@ -34,6 +36,12 @@ const styles = {
 export default function DashboardPage() {
   const { user } = useUser();
   const firstName = user?.firstname || 'there';
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [rangeInfo, setRangeInfo] = useState({
+    activeRange: null,
+    preset: null,
+  });
+  const handleMutate = () => setRefreshKey((k) => k + 1);
 
   return (
     <main style={styles.main}>
@@ -50,9 +58,9 @@ export default function DashboardPage() {
         </Button>
       </div>
 
-      <StatsRow />
-      <ChartsRow />
-      <RecentDonations />
+      <StatsRow refreshKey={refreshKey} rangeInfo={rangeInfo} />
+      <ChartsRow refreshKey={refreshKey} onRangeChange={setRangeInfo} />
+      <RecentDonations onMutate={handleMutate} />
     </main>
   );
 }
