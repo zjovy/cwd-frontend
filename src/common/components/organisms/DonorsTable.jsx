@@ -30,7 +30,6 @@ const COLUMNS = [
   { label: 'Email' },
   { label: 'Address' },
   { label: 'Phone' },
-  { label: 'Actions' },
 ];
 
 function addressCell(d) {
@@ -44,7 +43,7 @@ export default function DonorTable({
   error,
   selected,
   onSelectChange,
-  onSelectAll
+  onSelectAll,
 }) {
   const navigate = useNavigate();
   const allChecked =
@@ -74,8 +73,8 @@ export default function DonorTable({
               onChange={(e) => onSelectAll(e.target.checked)}
             />
           </th>
-          {COLUMNS.map(({ label, style }) => (
-            <th key={label} style={{ ...thStyle, ...style }}>
+          {COLUMNS.map(({ label }) => (
+            <th key={label} style={thStyle}>
               {label}
             </th>
           ))}
@@ -107,7 +106,7 @@ export default function DonorTable({
               </td>
               <td style={tdStyle}>{d.email}</td>
               <td style={tdStyle}>{addressCell(d)}</td>
-              <td style={tdStyle}>{d.phone}</td>
+              <td style={tdStyle}>{d.phone || '—'}</td>
             </tr>
           ))
         )}
@@ -123,6 +122,4 @@ DonorTable.propTypes = {
   selected: PropTypes.instanceOf(Set).isRequired,
   onSelectChange: PropTypes.func.isRequired,
   onSelectAll: PropTypes.func.isRequired,
-  onEdit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
 };
