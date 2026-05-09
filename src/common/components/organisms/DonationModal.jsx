@@ -140,7 +140,10 @@ export default function DonationModal({ open, onClose, onSubmit, donation }) {
     setForm((f) => ({ ...f, [field]: e.target.value }));
 
   const handlePhoneChange = (e) =>
-    setForm((f) => ({ ...f, phone: e.target.value.replace(/[^\d+() -]/g, '') }));
+    setForm((f) => ({
+      ...f,
+      phone: e.target.value.replace(/[^\d+() -]/g, ''),
+    }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();

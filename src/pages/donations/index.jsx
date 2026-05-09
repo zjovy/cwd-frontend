@@ -132,7 +132,7 @@ export default function DonationsPage() {
           </div>
         </div>
         <button style={styles.addBtn} onClick={openCreate}>
-          <Plus size={14} /> Add Donation
+          <Plus size={14} color='white' /> Add Donation
         </button>
       </div>
 

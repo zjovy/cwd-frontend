@@ -2,41 +2,17 @@ import { useCallback, useEffect, useState } from 'react';
 
 import Card from '@/common/components/atoms/Card';
 import SectionTitle from '@/common/components/atoms/SectionTitle';
-import DeleteConfirmModal from '@/common/components/organisms/DeleteConfirmModal';
-import DonationModal from '@/common/components/organisms/DonationModal';
 import DonationTable from '@/common/components/organisms/DonationTable';
 import donationService from '@/services/donationService';
-import { Plus } from 'lucide-react';
 
-const headerRow = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  marginBottom: '4px',
-};
-
-const addBtn = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '6px',
-  padding: '7px 14px',
-  border: '1px solid #e8e8e6',
-  borderRadius: '8px',
-  background: '#fff',
-  fontSize: '13px',
-  fontWeight: '500',
-  color: '#374151',
-  cursor: 'pointer',
-};
+import DonationViewModal from '../donations/DonationViewModal';
 
 export default function RecentDonations() {
   const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selected, setSelected] = useState(new Set());
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editing, setEditing] = useState(null);
-  const [deleting, setDeleting] = useState(null);
+  const [viewing, setViewing] = useState(null);
 
   const fetchRecent = useCallback(async (signal) => {
     setLoading(true);
@@ -71,39 +47,21 @@ export default function RecentDonations() {
     setSelected(selectAll ? new Set(donations.map((d) => d.id)) : new Set());
   };
 
-  const openCreate = () => {
-    setEditing(null);
-    setModalOpen(true);
-  };
-  const openEdit = (d) => {
-    setEditing(d);
-    setModalOpen(true);
-  };
-
-  const handleSubmit = async (data) => {
-    if (editing) {
-      await donationService.update(editing.id, data);
-    } else {
-      await donationService.create(data);
-    }
+  const handleUpdate = async (id, data) => {
+    await donationService.update(id, data);
     await fetchRecent();
   };
 
-  const handleDelete = async () => {
-    await donationService.delete(deleting.id);
-    setDeleting(null);
+  const handleDelete = async (id) => {
+    await donationService.delete(id);
+    setViewing(null);
     await fetchRecent();
   };
 
   return (
     <>
       <Card style={{ marginTop: '20px', padding: '24px' }}>
-        <div style={headerRow}>
-          <SectionTitle>Recent Donations</SectionTitle>
-          <button style={addBtn} onClick={openCreate}>
-            <Plus size={14} /> Add Donation
-          </button>
-        </div>
+        <SectionTitle>Recent Donations</SectionTitle>
 
         <DonationTable
           donations={donations}
@@ -112,23 +70,16 @@ export default function RecentDonations() {
           selected={selected}
           onSelectChange={handleSelectChange}
           onSelectAll={handleSelectAll}
-          onEdit={openEdit}
-          onDelete={(d) => setDeleting(d)}
+          onRowClick={(d) => setViewing(d)}
         />
       </Card>
 
-      <DonationModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSubmit={handleSubmit}
-        donation={editing}
-      />
-
-      <DeleteConfirmModal
-        open={Boolean(deleting)}
-        onClose={() => setDeleting(null)}
-        onConfirm={handleDelete}
-        donorName={deleting?.donorFullName}
+      <DonationViewModal
+        open={Boolean(viewing)}
+        onClose={() => setViewing(null)}
+        donation={viewing}
+        onSave={handleUpdate}
+        onDelete={handleDelete}
       />
     </>
   );
