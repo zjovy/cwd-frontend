@@ -368,6 +368,38 @@ const GoogleBtn = styled.button`
   }
 `;
 
+const SignUpBtn = styled.button`
+  width: 100%;
+  margin-top: 12px;
+  padding: 11px;
+  background: transparent;
+  border: 1.5px solid #1a1a1a;
+  color: #1a1a1a;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    transform 0.1s;
+
+  &:hover:not(:disabled) {
+    background: #1a1a1a;
+    color: #ffffff;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.99);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+`;
+
 const ErrorMsg = styled.p`
   font-size: 13px;
   color: #ef4444;
@@ -517,6 +549,10 @@ export default function Login() {
               </svg>
               Continue with Google
             </GoogleBtn>
+
+            <SignUpBtn type='button' onClick={() => navigate('/signup')}>
+              Create an account
+            </SignUpBtn>
           </FormCard>
         </RightPanel>
       </PageWrapper>

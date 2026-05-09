@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { signInWithCustomToken } from 'firebase/auth';
 
 import GoogleButton from '@/common/components/atoms/GoogleButton';
 import { Form, FormTitle } from '@/common/components/form/Form';
 import { Input } from '@/common/components/form/Input';
 import SubmitButton from '@/common/components/form/SubmitButton';
 import { RedSpan } from '@/common/components/form/styles';
+import { auth } from '@/firebase-config';
 import { useUser } from '@/common/contexts/UserContext';
 import adminService from '@/services/adminService';
 
@@ -58,18 +60,24 @@ export default function SignUp() {
     setError('');
 
     try {
-      await adminService.signup({
+      const response = await adminService.signup({
         email: formState.email,
         password: formState.password,
         firstname: formState.firstname || undefined,
         lastname: formState.lastname || undefined,
       });
-      navigate('/login', {
-        state: {
-          message:
-            'Account created successfully! Please check your email to verify your account.',
-        },
-      });
+
+      if (response?.customToken) {
+        await signInWithCustomToken(auth, response.customToken);
+        navigate('/');
+      } else {
+        navigate('/login', {
+          state: {
+            message:
+              'Account created successfully! Please check your email to verify your account.',
+          },
+        });
+      }
     } catch (error) {
       console.error('Signup error:', error);
       setError(error.message || 'Failed to create account. Please try again.');
