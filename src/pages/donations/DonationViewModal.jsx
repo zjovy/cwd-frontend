@@ -1,210 +1,25 @@
-/*
-  DonationViewModal — view + edit a donation record.
-  Pre-fills donation fields immediately from the passed `donation` prop.
-
-  Props:
-    open       – bool
-    onClose    – () => void
-    donation   – row object { id, donor_id, first_name, last_name, donorEmail, amount, donation_date, receipt_status }
-    onSave     – async (id, data) => void  (calls useDonations.updateDonation, handles refetch)
-*/
 import { useEffect, useState } from 'react';
 
 import donationService from '@/services/donationService';
-import { Send } from 'lucide-react';
+import { RECEIPT_SUBJECT, buildReceiptMessage } from '@/utils/receiptTemplate';
+import { X } from 'lucide-react';
 import PropTypes from 'prop-types';
 
+import DonationDeleteSection from './DonationDeleteSection';
+import DonationDonorInfoSection from './DonationDonorInfoSection';
+import DonationModalFooter from './DonationModalFooter';
+import DonationPaymentSection from './DonationPaymentSection';
+import DonationReceiptSection from './DonationReceiptSection';
+import {
+  closeBtn,
+  errorStyle,
+  headerRow,
+  modal,
+  overlay,
+  titleStyle,
+} from './DonationViewModal.styles';
 import EmailPreviewModal from './EmailPreviewModal';
-
-/* ── styles ─────────────────────────────────────── */
-
-const overlay = {
-  position: 'fixed',
-  inset: 0,
-  background: 'rgba(0,0,0,.45)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  zIndex: 1000,
-};
-
-const modal = {
-  background: '#fff',
-  borderRadius: '12px',
-  padding: '28px 32px',
-  width: '100%',
-  maxWidth: '520px',
-  boxShadow: '0 8px 30px rgba(0,0,0,.12)',
-  maxHeight: '90vh',
-  overflowY: 'auto',
-};
-
-const headerRow = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  marginBottom: '24px',
-};
-
-const titleStyle = {
-  fontSize: '18px',
-  fontWeight: '600',
-  color: '#1a1a1a',
-};
-
-const closeBtn = {
-  background: 'none',
-  border: 'none',
-  cursor: 'pointer',
-  color: '#9ca3af',
-  fontSize: '20px',
-  lineHeight: 1,
-  padding: '0 2px',
-};
-
-const sectionTitle = {
-  fontSize: '11px',
-  fontWeight: '600',
-  color: '#9ca3af',
-  textTransform: 'uppercase',
-  letterSpacing: '0.07em',
-  marginBottom: '12px',
-  marginTop: '4px',
-};
-
-const sectionBox = {
-  background: '#f9f9f8',
-  borderRadius: '8px',
-  padding: '16px',
-  marginBottom: '14px',
-};
-
-const fieldGroup = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '4px',
-  marginBottom: '12px',
-};
-
-const fieldGroupLast = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '4px',
-};
-
-const labelStyle = {
-  fontSize: '12px',
-  fontWeight: '500',
-  color: '#6b7280',
-};
-
-const inputStyle = {
-  fontSize: '14px',
-  padding: '8px 12px',
-  border: '1px solid #d1d5db',
-  borderRadius: '8px',
-  outline: 'none',
-  width: '100%',
-  boxSizing: 'border-box',
-  background: '#fff',
-};
-
-const selectStyle = {
-  ...inputStyle,
-  cursor: 'pointer',
-};
-
-const footerRow = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  marginTop: '22px',
-  gap: '10px',
-};
-
-const btnBase = {
-  padding: '8px 18px',
-  borderRadius: '8px',
-  fontSize: '13px',
-  fontWeight: '500',
-  cursor: 'pointer',
-  border: 'none',
-};
-
-const sendBtn = {
-  ...btnBase,
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '6px',
-  background: '#f0fdf4',
-  color: '#16a34a',
-  border: '1px solid #bbf7d0',
-};
-
-const cancelBtn = {
-  ...btnBase,
-  background: '#f3f4f6',
-  color: '#374151',
-};
-
-const saveBtn = {
-  ...btnBase,
-  background: '#2563eb',
-  color: '#fff',
-};
-
-const deleteBtn = {
-  ...btnBase,
-  background: '#fef2f2',
-  color: '#dc2626',
-  border: '1px solid #fecaca',
-};
-
-const deleteConfirmBtn = {
-  ...btnBase,
-  background: '#dc2626',
-  color: '#fff',
-};
-
-const errorStyle = {
-  color: '#dc2626',
-  fontSize: '13px',
-  marginBottom: '8px',
-};
-
-const successStyle = {
-  color: '#16a34a',
-  fontSize: '13px',
-};
-
-/* ── helpers ────────────────────────────────────── */
-
-const EMPTY = {
-  first_name: '',
-  last_name: '',
-  email: '',
-  amount: '',
-  donation_date: '',
-  receipt_status: 'pending',
-  phone: '',
-  address: '',
-};
-
-function fromDonationRow(d) {
-  if (!d) return { ...EMPTY };
-  return {
-    first_name: d.first_name ?? '',
-    last_name: d.last_name ?? '',
-    email: d.donorEmail ?? '',
-    amount: d.amount ?? '',
-    donation_date: d.donation_date?.slice(0, 10) ?? '',
-    receipt_status: d.receipt_status ?? 'pending',
-    phone: '',
-    address: '',
-  };
-}
-
-/* ── component ──────────────────────────────────── */
+import { EMPTY_DONATION_VIEW_FORM, fromDonationRow } from './donationViewForm';
 
 export default function DonationViewModal({
   open,
@@ -212,9 +27,11 @@ export default function DonationViewModal({
   donation,
   onSave,
   onDelete,
+  onReceiptSent,
 }) {
-  const [form, setForm] = useState(EMPTY);
+  const [form, setForm] = useState(EMPTY_DONATION_VIEW_FORM);
   const [saving, setSaving] = useState(false);
+  const [sending, setSending] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState(null);
   const [emailMsg, setEmailMsg] = useState(null);
@@ -228,6 +45,7 @@ export default function DonationViewModal({
     setEmailMsg(null);
     setConfirmDelete(false);
     setDeleting(false);
+    setSending(false);
 
     const controller = new AbortController();
     donationService
@@ -235,8 +53,8 @@ export default function DonationViewModal({
       .then((detail) => {
         setForm((prev) => ({
           ...prev,
-          phone: detail.phone ?? '',
           address: detail.address ?? '',
+          phone: detail.phone ?? '',
         }));
       })
       .catch((err) => {
@@ -244,12 +62,12 @@ export default function DonationViewModal({
           console.error('[DonationViewModal] detail fetch failed:', err);
       });
     return () => controller.abort();
-  }, [open, donation?.id]);
+  }, [open, donation]);
 
   if (!open) return null;
 
   const set = (field) => (e) =>
-    setForm((f) => ({ ...f, [field]: e.target.value }));
+    setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -269,20 +87,6 @@ export default function DonationViewModal({
     }
   };
 
-  function buildEmailBody() {
-    const amount = parseFloat(form.amount || 0).toLocaleString();
-    return [
-      `Dear ${form.first_name} ${form.last_name},`,
-      '',
-      `The C&W Market Foundation has received your generous gift of $${amount} to support our annual efforts. Your contribution makes a meaningful difference in the work we do for our community.`,
-      '',
-      'Thank you for your generosity and continued support.',
-      '',
-      'Sincerely,',
-      'The C&W Market Foundation',
-    ].join('\n');
-  }
-
   const handleConfirmDelete = async () => {
     setDeleting(true);
     try {
@@ -299,12 +103,21 @@ export default function DonationViewModal({
     setEmailPreview(true);
   };
 
-  const handleConfirmSend = (body) => {
-    const subject = 'Donation Receipt — C&W Market Foundation';
-    const mailto = `mailto:${encodeURIComponent(form.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.open(mailto, '_blank');
-    setEmailPreview(false);
-    setEmailMsg(`Opened mail client for ${form.email}`);
+  const handleConfirmSend = async (body) => {
+    setSending(true);
+    setEmailMsg(null);
+    setError(null);
+    try {
+      await donationService.sendReceipt(donation.id, body);
+      setForm((prev) => ({ ...prev, receipt_status: 'sent' }));
+      await onReceiptSent?.();
+      setEmailPreview(false);
+      setEmailMsg(`Receipt sent to ${form.email}`);
+    } catch (err) {
+      setEmailMsg(`Failed to send receipt: ${err.message}`);
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -312,205 +125,44 @@ export default function DonationViewModal({
       <EmailPreviewModal
         open={emailPreview}
         to={form.email}
-        subject='Donation Receipt — C&W Market Foundation'
-        body={buildEmailBody()}
+        subject={RECEIPT_SUBJECT}
+        body={buildReceiptMessage(form)}
+        sending={sending}
         onClose={() => setEmailPreview(false)}
         onConfirm={handleConfirmSend}
       />
-      <div style={overlay} onClick={onClose}>
+      <div style={overlay}>
         <form
+          aria-modal='true'
+          role='dialog'
           style={modal}
-          onClick={(e) => e.stopPropagation()}
           onSubmit={handleSave}
         >
           <div style={headerRow}>
             <div style={titleStyle}>Donation Details</div>
             <button type='button' style={closeBtn} onClick={onClose}>
-              ×
+              <X size={16} />
             </button>
           </div>
 
           {error && <div style={errorStyle}>{error}</div>}
 
-          <div style={sectionBox}>
-            <div style={sectionTitle}>Donor Information</div>
-
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <div style={{ ...fieldGroup, flex: 1 }}>
-                <label style={labelStyle}>First Name</label>
-                <input
-                  style={{
-                    ...inputStyle,
-                    background: '#f3f4f6',
-                    color: '#6b7280',
-                  }}
-                  value={form.first_name}
-                  readOnly
-                />
-              </div>
-              <div style={{ ...fieldGroup, flex: 1 }}>
-                <label style={labelStyle}>Last Name</label>
-                <input
-                  style={{
-                    ...inputStyle,
-                    background: '#f3f4f6',
-                    color: '#6b7280',
-                  }}
-                  value={form.last_name}
-                  readOnly
-                />
-              </div>
-            </div>
-
-            <div style={fieldGroup}>
-              <label style={labelStyle}>Email</label>
-              <input
-                style={{
-                  ...inputStyle,
-                  background: '#f3f4f6',
-                  color: '#6b7280',
-                }}
-                type='email'
-                value={form.email}
-                readOnly
-              />
-            </div>
-
-            <div style={fieldGroup}>
-              <label style={labelStyle}>Phone</label>
-              <input
-                style={{
-                  ...inputStyle,
-                  background: '#f3f4f6',
-                  color: '#6b7280',
-                }}
-                value={form.phone}
-                readOnly
-                placeholder='—'
-              />
-            </div>
-
-            <div style={fieldGroupLast}>
-              <label style={labelStyle}>Address</label>
-              <input
-                style={{
-                  ...inputStyle,
-                  background: '#f3f4f6',
-                  color: '#6b7280',
-                }}
-                value={form.address}
-                readOnly
-                placeholder='—'
-              />
-            </div>
-          </div>
-
-          <div style={sectionBox}>
-            <div style={sectionTitle}>Payment Details</div>
-
-            <div style={fieldGroup}>
-              <label style={labelStyle}>Amount ($)</label>
-              <input
-                style={inputStyle}
-                type='number'
-                step='0.01'
-                min='0'
-                value={form.amount}
-                onChange={set('amount')}
-                required
-              />
-            </div>
-
-            <div style={fieldGroup}>
-              <label style={labelStyle}>Date</label>
-              <input
-                style={inputStyle}
-                type='date'
-                value={form.donation_date}
-                onChange={set('donation_date')}
-                required
-              />
-            </div>
-
-            <div style={fieldGroupLast}>
-              <label style={labelStyle}>Receipt Status</label>
-              <select
-                style={selectStyle}
-                value={form.receipt_status}
-                onChange={set('receipt_status')}
-              >
-                <option value='pending'>Pending</option>
-                <option value='sent'>Sent</option>
-              </select>
-            </div>
-          </div>
-
-          <div style={footerRow}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <button type='button' style={sendBtn} onClick={handleSendEmail}>
-                <Send size={13} /> Send Email
-              </button>
-              {emailMsg && (
-                <span
-                  style={
-                    emailMsg.startsWith('Failed') ? errorStyle : successStyle
-                  }
-                >
-                  {emailMsg}
-                </span>
-              )}
-            </div>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button type='button' style={cancelBtn} onClick={onClose}>
-                Cancel
-              </button>
-              <button type='submit' style={saveBtn} disabled={saving}>
-                {saving ? 'Saving…' : 'Save'}
-              </button>
-            </div>
-          </div>
-
-          <div
-            style={{
-              borderTop: '1px solid #f0f0ee',
-              marginTop: '18px',
-              paddingTop: '16px',
-            }}
-          >
-            {confirmDelete ? (
-              <div
-                style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
-              >
-                <span style={{ fontSize: '13px', color: '#374151' }}>
-                  Delete this donation?
-                </span>
-                <button
-                  type='button'
-                  style={cancelBtn}
-                  onClick={() => setConfirmDelete(false)}
-                  disabled={deleting}
-                >
-                  Cancel
-                </button>
-                <button
-                  type='button'
-                  style={deleteConfirmBtn}
-                  onClick={handleConfirmDelete}
-                  disabled={deleting}
-                >
-                  {deleting ? 'Deleting…' : 'Yes, Delete'}
-                </button>
-              </div>
-            ) : (
-              <button
-                type='button'
-                style={deleteBtn}
-                onClick={() => setConfirmDelete(true)}
-              >
-                Delete Donation
-              </button>
-            )}
-          </div>
+          <DonationDonorInfoSection form={form} />
+          <DonationPaymentSection form={form} onChange={set} />
+          <DonationReceiptSection
+            email={form.email}
+            emailMsg={emailMsg}
+            onSendEmail={handleSendEmail}
+            status={form.receipt_status}
+          />
+          <DonationModalFooter onClose={onClose} saving={saving} />
+          <DonationDeleteSection
+            confirmDelete={confirmDelete}
+            deleting={deleting}
+            onCancel={() => setConfirmDelete(false)}
+            onConfirm={handleConfirmDelete}
+            onRequest={() => setConfirmDelete(true)}
+          />
         </form>
       </div>
     </>
@@ -523,4 +175,9 @@ DonationViewModal.propTypes = {
   donation: PropTypes.object,
   onSave: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
+  onReceiptSent: PropTypes.func,
+};
+
+DonationViewModal.defaultProps = {
+  onReceiptSent: null,
 };
