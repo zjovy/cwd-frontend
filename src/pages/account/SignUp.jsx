@@ -437,7 +437,7 @@ export default function SignUp() {
           <HeroText>
             <PanelAccentBar />
             <HeroTitle>C&amp;W Market Donation Dashboard</HeroTitle>
-            <HeroSubtitle>Join our community and start making an impact</HeroSubtitle>
+            <HeroSubtitle>Enter your details to get started</HeroSubtitle>
           </HeroText>
         </LeftPanel>
 
@@ -445,7 +445,7 @@ export default function SignUp() {
           <FormCard>
             <FormHeader>
               <FormTitle>Create an account</FormTitle>
-              <FormSubtitle>Get started with your free account</FormSubtitle>
+              <FormSubtitle>Get started</FormSubtitle>
             </FormHeader>
 
             {error && <ErrorMsg>{error}</ErrorMsg>}
