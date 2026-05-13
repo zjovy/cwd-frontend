@@ -1,0 +1,58 @@
+---
+sidebar_position: 4
+---
+
+# API client
+
+Core helpers live in **`src/api/client.js`** and **`src/api/endpoints.js`**.
+
+## `buildUrl(endpoint)`
+
+Concatenates **`VITE_BACKEND_URL`** (trimmed of trailing slash) with the endpoint path string.
+
+```text
+buildUrl('/donors')  →  http://localhost:5050/donors   (example)
+```
+
+Use this for every backend-relative path instead of hardcoding the origin.
+
+## `authHeaders()`
+
+Async function returning headers for JSON APIs:
+
+- Always sets **`Content-Type: application/json`**.  
+- If `auth.currentUser` exists, adds **`Authorization: Bearer <Firebase ID token>`**.
+
+## `request(url, options)`
+
+- Merges **`authHeaders()`** into the request.  
+- Sets **`credentials: 'include'`** so session cookies from `/auth/token` are sent on same-site / configured CORS setups.  
+- Supports **`signal`** for `AbortController` cancellation.  
+- On non-OK responses: reads JSON body and throws **`Error`** with `body.error`, `body.message`, or a status fallback.  
+- If response **`Content-Type`** is not JSON, returns **`null`**.
+
+## Services
+
+Domain modules wrap `request` + `buildUrl`:
+
+| Module | Path |
+|--------|------|
+| `src/services/donorService.js` | CRUD + `upsertByEmail` |
+| `src/services/donationService.js` | CRUD + receipt helper |
+| `src/services/dashboardService.js` | Summary / trend / last-6-months |
+| `src/services/adminService.js` | Users list, role patch, admin signup |
+
+They use **`src/api/transformers.js`** to normalize backend shapes for the UI.
+
+## Hooks
+
+List pages use hooks with **debounced fetch** and **`AbortController`** to avoid race conditions when filters change:
+
+- **`useDonors`** — `search`, `page`, `PAGE_SIZE` (25).  
+- **`useDonations`** — `search`, `status`, `minAmount`, `maxAmount`, `page`.  
+
+See [Donors](../application/donors) and [Donations](../application/donations).
+
+## Related
+
+- [Backend endpoints](../reference/backend-endpoints) — path list  

@@ -1,0 +1,146 @@
+---
+sidebar_position: 1
+---
+
+# Project Structure
+
+The backend follows a layered Express architecture: `routes -> middleware -> controllers -> repositories -> providers`, with infrastructure and deployment assets tracked in the same repository.
+
+## Directory Overview
+
+```text
+cwd-backend/
+├── src/                        # API runtime code
+├── sql/                        # Schema and seed SQL
+├── scripts/                    # Runtime/deploy shell scripts
+├── infra/                      # AWS CDK infrastructure-as-code project
+├── docs/                       # Deployment design and operations docs
+└── .github/workflows/          # CI/CD workflows
+```
+
+## Root Files (all tracked)
+
+- `.env.example`: Backend environment variable template.
+- `.gitignore`: Ignore rules.
+- `.prettierrc`: Formatter configuration.
+- `.vscode/extensions.json`: Recommended editor extensions.
+- `.vscode/settings.json`: Workspace editor settings.
+- `CLAUDE.md`: Agent/collaboration conventions.
+- `README.md`: Backend overview and setup.
+- `SETUP_GUIDE.md`: Detailed setup guide.
+- `docker-compose.yaml`: Local MySQL container orchestration.
+- `ecosystem.config.cjs`: PM2 process config for deployment/runtime.
+- `eslint.config.js`: Lint rules.
+- `jsconfig.json`: JavaScript tooling/path config.
+- `package-lock.json`: Locked dependency versions.
+- `package.json`: Backend scripts and dependencies.
+- `rds-config.ini.example`: AWS RDS migration/config template.
+
+## GitHub Workflow
+
+- `.github/workflows/deploy.yml`: Deploy pipeline (push -> EC2 deploy flow).
+
+## Documentation Assets
+
+- `docs/aws-deployment-guide.md`: AWS operations runbook.
+- `docs/plans/2026-05-03-aws-ec2-deployment.md`: Implementation plan.
+- `docs/specs/aws-deployment-design.md`: Full architecture design spec.
+
+## Infrastructure as Code (`infra/`)
+
+- `infra/.gitignore`: Infra-specific ignore rules.
+- `infra/.npmignore`: Infra package publish ignore config.
+- `infra/bin/infra.ts`: CDK app entrypoint (stack composition).
+- `infra/cdk.json`: CDK runtime/context config.
+- `infra/lib/cicd-stack.ts`: OIDC/GitHub Actions IAM stack.
+- `infra/lib/compute-stack.ts`: EC2 + IAM + networking stack.
+- `infra/lib/database-stack.ts`: RDS + secrets stack.
+- `infra/lib/network-stack.ts`: VPC/subnet/security baseline stack.
+- `infra/package-lock.json`: Infra dependency lock file.
+- `infra/package.json`: Infra package scripts/dependencies.
+- `infra/scripts/user-data.sh`: EC2 bootstrap script.
+- `infra/tsconfig.json`: Infra TypeScript config.
+
+## Init and SQL
+
+- `init/setup.sql`: Initial DB setup script.
+- `sql/create_tables.sql`: PostgreSQL/Supabase schema SQL.
+- `sql/create_tables_mysql.sql`: MySQL schema SQL.
+- `sql/seed.sql`: MySQL seed data script.
+- `sql/seed_postgres.sql`: PostgreSQL seed data script.
+
+## Runtime Scripts
+
+- `scripts/fetch-secrets.sh`: Pulls secrets from AWS Secrets Manager into runtime env.
+
+## Source (`src/`) File-by-File
+
+### App Bootstrap
+
+- `src/server.js`: Express app startup, middleware registration, CORS, health check, error handling.
+
+### Config
+
+- `src/config/database.js`: Database client/provider selection and initialization.
+- `src/config/firebase.js`: Firebase Admin setup for token verification.
+
+### Routes
+
+- `src/routes/authRoutes.js`: Auth/user-related API routes.
+- `src/routes/dashboardRoutes.js`: Dashboard metrics routes.
+- `src/routes/donationRoutes.js`: Donation CRUD and donation actions.
+- `src/routes/donorRoutes.js`: Donor CRUD and donor actions.
+
+### Middleware
+
+- `src/middleware/authMiddleware.js`: Bearer token validation and auth guard.
+- `src/middleware/adminMiddleware.js`: Admin-role access control.
+- `src/middleware/requireApprovalMiddleware.js`: Blocks non-approved/pending accounts.
+
+### Controllers
+
+- `src/controllers/authController.js`: Auth endpoint handlers.
+- `src/controllers/dashboardController.js`: Dashboard data handlers.
+- `src/controllers/donationController.js`: Donation handlers.
+- `src/controllers/donorController.js`: Donor handlers.
+
+### Repositories
+
+- `src/repositories/userRepository.js`: User data repository abstraction.
+- `src/repositories/dashboardRepository.js`: Dashboard query abstraction.
+- `src/repositories/donationRepository.js`: Donation query abstraction.
+- `src/repositories/donorRepository.js`: Donor query abstraction.
+
+### Providers
+
+- `src/providers/mysqlProvider.js`: MySQL SQL execution layer.
+- `src/providers/postgresProvider.js`: PostgreSQL SQL execution layer.
+
+### Utilities
+
+- `src/utils/emailKey.js`: Email-related helper utility.
+
+## Dependencies
+
+Key runtime dependencies used in this backend:
+
+- `express`: HTTP server framework.
+- `cors`: Cross-origin configuration.
+- `cookie-parser`: Cookie parsing middleware.
+- `firebase-admin`: Firebase token/admin operations.
+- `mysql2`, `pg`: Database clients.
+- `express-rate-limit`: Request throttling.
+- `dotenv`: Environment variable loading.
+
+## Tools Utilized
+
+- `eslint`: Linting.
+- `prettier`: Formatting.
+- `docker compose`: Local MySQL environment.
+- `pm2`: Process management in deployment.
+- `aws-cdk` (infra project): Infrastructure provisioning.
+
+## Notes
+
+- The list is based on tracked repository files.
+- Generated artifacts, dependencies, and local untracked files are intentionally excluded.

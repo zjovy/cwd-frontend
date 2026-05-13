@@ -1,0 +1,30 @@
+---
+sidebar_position: 2
+---
+
+# Website Layout
+
+The product UI is rendered under a shared navigation shell.
+
+## Layout composition
+
+- `NavLayout` wraps most routes
+- Top navigation is hidden on auth pages (`/login`, `/signup`, `/forgot-password`)
+- Sidebar is hidden on auth pages and `/no-access`
+- Main route outlet renders page content area
+
+## Route map
+
+- `/` and `/dashboard`: dashboard
+- `/donations`: donation management list
+- `/donors`: donor list
+- `/donors/:id`: donor detail
+- `/admin`: admin user/role management
+- `/auth/callback`: OAuth callback handling
+- `/auth/reset-password`: password reset flow
+
+## Guard rules
+
+- `PrivateRoute`: requires authenticated user
+- `AdminRoute`: requires `role === 'admin'`
+- `PublicOnlyRoute`: prevents showing login/signup to logged-in users

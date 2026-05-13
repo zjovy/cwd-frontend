@@ -1,0 +1,62 @@
+---
+sidebar_position: 2
+---
+
+# Installation
+
+## Clone and install dependencies
+
+From the repository root (`cwd-frontend`):
+
+```bash
+git clone <your-remote-url> cwd-frontend
+cd cwd-frontend
+npm install
+```
+
+That installs dependencies for the **Vite React application** only.
+
+## Documentation site dependencies
+
+The Docusaurus project lives in `website/`. Install when you plan to edit or build docs:
+
+```bash
+cd website
+npm install
+cd ..
+```
+
+Alternatively, running `npm run docs:dev` from the root uses `npm run start --prefix website`, which expects `website/node_modules` to exist—run `npm install` inside `website` once.
+
+## Environment file
+
+1. Copy the example file:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   On Windows PowerShell:
+
+   ```powershell
+   Copy-Item .env.example .env
+   ```
+
+2. Edit `.env` and fill in Firebase and backend values (see [Environment variables](./environment-variables)).
+
+## Verify
+
+```bash
+npm run dev
+```
+
+Vite prints a local URL (default **http://localhost:5173** unless the port is taken). The app should load; login and data features require valid Firebase and backend configuration.
+
+## Tests and lint (repo root)
+
+| Command | Purpose |
+|---------|---------|
+| `npm run test` | Vitest (jsdom) |
+| `npm run lint` | Prettier write across the repo |
+
+Path alias `@/` maps to `src/` (see `vite.config.js` and `jsconfig.json`).
