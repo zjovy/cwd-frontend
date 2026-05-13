@@ -1,0 +1,38 @@
+---
+sidebar_position: 4
+---
+
+# Deployment
+
+## Frontend deployment options
+
+- **Local**: `npm run dev`
+- **Preview/static**: `npm run build` then `npm run preview`
+- **Production hosting**: Vercel/Netlify/S3+CDN (team choice)
+
+## Required runtime environment
+
+- `VITE_BACKEND_URL` pointing to the active backend API
+- Firebase web app keys (`VITE_FIREBASE_*`)
+
+## Build and release checklist
+
+1. Validate `VITE_BACKEND_URL` for the target environment.
+2. Run tests and build:
+
+```bash
+npm run test
+npm run build
+```
+
+3. Smoke-test login, dashboard, donors, donations, and admin route access.
+4. Confirm CORS in backend allows the deployed frontend domain.
+
+## Docs deployment
+
+From `cwd-frontend`:
+
+```bash
+npm run docs:build
+npm run docs:serve
+```

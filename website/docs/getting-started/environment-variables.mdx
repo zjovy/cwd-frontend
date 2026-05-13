@@ -1,0 +1,43 @@
+---
+sidebar_position: 3
+---
+
+# Environment variables
+
+Vite exposes only variables prefixed with **`VITE_`** to client code. Define them in **`.env`** at the repository root (copy from `.env.example`).
+
+## Backend
+
+| Variable | Description |
+|----------|-------------|
+| `VITE_BACKEND_URL` | Base URL of the REST API **without a trailing slash**, e.g. `http://localhost:5050`. Used by `src/api/client.js` (`buildUrl`) and some direct `fetch` calls. |
+
+If unset, `buildUrl` still concatenates paths; most environments should set this explicitly.
+
+## Firebase (Web app)
+
+These map directly to `firebaseConfig` in `src/firebase-config.js`:
+
+| Variable | Typical source |
+|----------|----------------|
+| `VITE_FIREBASE_API_KEY` | Firebase Console → Project settings → Your apps |
+| `VITE_FIREBASE_AUTH_DOMAIN` | e.g. `your-project.firebaseapp.com` |
+| `VITE_FIREBASE_PROJECT_ID` | Project ID |
+| `VITE_FIREBASE_STORAGE_BUCKET` | Storage bucket hostname |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | Cloud Messaging sender ID |
+| `VITE_FIREBASE_APP_ID` | App ID |
+| `VITE_FIREBASE_MEASUREMENT_ID` | Optional; Google Analytics **G-** ID |
+
+## Firebase Console checklist
+
+- Enable **Authentication** methods you use (e.g. Email/Password, Google).
+- Under **Authorized domains**, add your dev and production hostnames (e.g. `localhost`, production domain).
+
+## Security notes
+
+- **Never commit `.env`** — it is gitignored.
+- These keys are **client-visible** in the built bundle. Firebase Web API keys are not secret in the same way as server keys; protect resources with Firebase Security Rules and your backend authorization.
+
+## Related
+
+- [Authentication](../architecture/authentication) — how tokens and cookies are used after login.  
