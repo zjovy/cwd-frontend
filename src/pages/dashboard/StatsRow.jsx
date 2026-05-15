@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 
 import StatCard from '@/common/components/atoms/StatCard';
 import dashboardService from '@/services/dashboardService';
@@ -35,18 +35,36 @@ function getPeriodLabel(preset, activeRange) {
   return formatRangeLabel(activeRange.start, activeRange.end);
 }
 
+function statsReducer(state, action) {
+  switch (action.type) {
+    case 'fetch':
+      return { stats: null, loading: true, error: null };
+    case 'success':
+      return { stats: action.stats, loading: false, error: null };
+    case 'error':
+      return { stats: null, loading: false, error: action.error };
+    default:
+      return state;
+  }
+}
+
 function FilteredStats({ activeRange, preset, refreshKey }) {
-  const [stats, setStats] = useState(null);
+  const [{ stats, loading, error }, dispatch] = useReducer(statsReducer, {
+    stats: null,
+    loading: true,
+    error: null,
+  });
 
   useEffect(() => {
-    const controller = new AbortController();
     const { start, end } = activeRange;
+    const controller = new AbortController();
+    dispatch({ type: 'fetch' });
     donationService
-      .getAll(
+      .getAllForRange(
         { startDate: toISODate(start), endDate: toISODate(end) },
         controller.signal
       )
-      .then(({ donations }) => {
+      .then((donations) => {
         const inRange = donations.filter((d) => {
           if (!d.donation_date) return false;
           const dt = new Date(d.donation_date);
@@ -57,11 +75,11 @@ function FilteredStats({ activeRange, preset, refreshKey }) {
           (sum, d) => sum + (Number(d.amount) || 0),
           0
         );
-        setStats({ total, count: inRange.length });
+        dispatch({ type: 'success', stats: { total, count: inRange.length } });
       })
       .catch((err) => {
         if (err.name !== 'AbortError')
-          console.error('Failed to fetch range stats:', err);
+          dispatch({ type: 'error', error: err.message });
       });
     return () => controller.abort();
   }, [activeRange, refreshKey]);
@@ -72,9 +90,13 @@ function FilteredStats({ activeRange, preset, refreshKey }) {
     <div style={rowStyle}>
       <StatCard
         label={label}
-        value={stats ? formatAmount(stats.total) : '—'}
+        value={error ? 'Error' : stats ? formatAmount(stats.total) : '—'}
         sub={
-          stats ? `${stats.count} donation${stats.count !== 1 ? 's' : ''}` : '—'
+          error
+            ? error
+            : loading
+              ? 'Loading…'
+              : `${stats.count} donation${stats.count !== 1 ? 's' : ''}`
         }
         icon={CalendarDays}
       />

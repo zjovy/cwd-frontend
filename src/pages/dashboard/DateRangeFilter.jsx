@@ -102,6 +102,16 @@ export default function DateRangeFilter({
 }) {
   return (
     <div style={styles.wrap}>
+      <div
+        style={{
+          fontSize: '12px',
+          color: '#9ca3af',
+          marginBottom: '6px',
+          fontWeight: '500',
+        }}
+      >
+        Filter by past date range
+      </div>
       <div style={styles.presetRow}>
         {PRESETS.map((p) => (
           <button

@@ -9,6 +9,8 @@ import donationService from '@/services/donationService';
 import { Plus } from 'lucide-react';
 import PropTypes from 'prop-types';
 
+import { parseLocalDate } from './chartUtils';
+
 const headerRow = {
   display: 'flex',
   justifyContent: 'space-between',
@@ -82,19 +84,19 @@ export default function RecentDonations({ onMutate }) {
         const data = await donationService.getAll(params, signal);
         let list = data.donations;
         if (dateStart) {
-          const startMs = new Date(dateStart).setHours(0, 0, 0, 0);
+          const startDt = parseLocalDate(dateStart);
           list = list.filter((d) => {
             const dt = new Date(d.donation_date);
             dt.setHours(12, 0, 0, 0);
-            return dt.getTime() >= startMs;
+            return dt >= startDt;
           });
         }
         if (dateEnd) {
-          const endMs = new Date(dateEnd).setHours(23, 59, 59, 999);
+          const endDt = parseLocalDate(dateEnd, true);
           list = list.filter((d) => {
             const dt = new Date(d.donation_date);
             dt.setHours(12, 0, 0, 0);
-            return dt.getTime() <= endMs;
+            return dt <= endDt;
           });
         }
         setDonations(list);

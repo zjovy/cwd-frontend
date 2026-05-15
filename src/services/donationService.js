@@ -48,6 +48,22 @@ const donationService = {
       method: 'DELETE',
     });
   },
+
+  async getAllForRange({ startDate, endDate }, signal) {
+    const LIMIT = 1000;
+    let page = 1;
+    const all = [];
+    while (true) {
+      const { donations, total } = await this.getAll(
+        { startDate, endDate, limit: LIMIT, page },
+        signal
+      );
+      all.push(...donations);
+      if (all.length >= total || donations.length === 0) break;
+      page++;
+    }
+    return all;
+  },
 };
 
 export default donationService;

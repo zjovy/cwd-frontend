@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer } from 'react';
 
 import Card from '@/common/components/atoms/Card';
 import SectionTitle from '@/common/components/atoms/SectionTitle';
@@ -8,6 +8,8 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Line,
+  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -63,44 +65,58 @@ CustomTooltip.propTypes = {
 
 CustomTooltip.defaultProps = { active: false, payload: [], label: '' };
 
+function chartReducer(state, action) {
+  switch (action.type) {
+    case 'fetch':
+      return { data: [], loading: true, error: null };
+    case 'success':
+      return { data: action.data, loading: false, error: null };
+    case 'error':
+      return { data: [], loading: false, error: action.error };
+    default:
+      return state;
+  }
+}
+
 export default function FilteredChart({
   activeRange,
   bucketOverride,
   refreshKey,
 }) {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [{ data, loading, error }, dispatch] = useReducer(chartReducer, {
+    data: [],
+    loading: true,
+    error: null,
+  });
 
-  const { start, end } = activeRange;
-  const rangeDays = (end - start) / 86400000;
+  const rangeDays = (activeRange.end - activeRange.start) / 86400000;
   const bucket = getEffectiveBucket(rangeDays, bucketOverride);
-  const rangeLabel = formatRangeLabel(start, end);
+  const rangeLabel = formatRangeLabel(activeRange.start, activeRange.end);
 
   useEffect(() => {
+    const { start, end } = activeRange;
     const controller = new AbortController();
-    setLoading(true);
-    setError(null);
+    dispatch({ type: 'fetch' });
     donationService
-      .getAll(
+      .getAllForRange(
         { startDate: toISODate(start), endDate: toISODate(end) },
         controller.signal
       )
-      .then(({ donations }) => {
+      .then((donations) => {
         const inRange = donations.filter((d) => {
           if (!d.donation_date) return false;
           const dt = new Date(d.donation_date);
           dt.setHours(12, 0, 0, 0);
           return dt >= start && dt <= end;
         });
-        setData(aggregate(inRange, bucket, start, end));
-        setLoading(false);
+        dispatch({
+          type: 'success',
+          data: aggregate(inRange, bucket, start, end),
+        });
       })
       .catch((err) => {
-        if (err.name !== 'AbortError') {
-          setError(err.message);
-          setLoading(false);
-        }
+        if (err.name !== 'AbortError')
+          dispatch({ type: 'error', error: err.message });
       });
     return () => controller.abort();
   }, [activeRange, bucket, refreshKey]);
@@ -125,32 +141,92 @@ export default function FilteredChart({
       ) : loading ? (
         <div style={{ height: 200 }} />
       ) : (
-        <ResponsiveContainer width='100%' height={200}>
-          <BarChart
-            data={data}
-            margin={{ top: 4, right: 4, left: -20, bottom: 0 }}
-            barSize={28}
-          >
-            <CartesianGrid
-              strokeDasharray='3 3'
-              stroke='#f0f0ee'
-              vertical={false}
-            />
-            <XAxis
-              dataKey='label'
-              tick={{ fontSize: 12, fill: '#9ca3af' }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis
-              tick={{ fontSize: 12, fill: '#9ca3af' }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f5f5f4' }} />
-            <Bar dataKey='amount' fill='#3b82f6' radius={[4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+        <div style={{ display: 'flex', gap: '20px' }}>
+          <div style={{ flex: 1 }}>
+            <div
+              style={{
+                fontSize: '12px',
+                color: '#9ca3af',
+                marginBottom: '6px',
+                fontWeight: '500',
+              }}
+            >
+              Trend
+            </div>
+            <ResponsiveContainer width='100%' height={200}>
+              <LineChart
+                data={data}
+                margin={{ top: 4, right: 4, left: -20, bottom: 0 }}
+              >
+                <CartesianGrid
+                  strokeDasharray='3 3'
+                  stroke='#f0f0ee'
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey='label'
+                  tick={{ fontSize: 12, fill: '#9ca3af' }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  tick={{ fontSize: 12, fill: '#9ca3af' }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Line
+                  type='monotone'
+                  dataKey='amount'
+                  stroke='#3b82f6'
+                  strokeWidth={2.5}
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          <div style={{ flex: 1 }}>
+            <div
+              style={{
+                fontSize: '12px',
+                color: '#9ca3af',
+                marginBottom: '6px',
+                fontWeight: '500',
+              }}
+            >
+              By Period
+            </div>
+            <ResponsiveContainer width='100%' height={200}>
+              <BarChart
+                data={data}
+                margin={{ top: 4, right: 4, left: -20, bottom: 0 }}
+                barSize={28}
+              >
+                <CartesianGrid
+                  strokeDasharray='3 3'
+                  stroke='#f0f0ee'
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey='label'
+                  tick={{ fontSize: 12, fill: '#9ca3af' }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  tick={{ fontSize: 12, fill: '#9ca3af' }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip
+                  content={<CustomTooltip />}
+                  cursor={{ fill: '#f5f5f4' }}
+                />
+                <Bar dataKey='amount' fill='#3b82f6' radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
       )}
     </Card>
   );

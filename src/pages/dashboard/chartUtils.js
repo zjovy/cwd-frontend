@@ -1,3 +1,10 @@
+export function parseLocalDate(str, endOfDay = false) {
+  const [y, m, d] = str.split('-').map(Number);
+  return endOfDay
+    ? new Date(y, m - 1, d, 23, 59, 59, 999)
+    : new Date(y, m - 1, d, 0, 0, 0, 0);
+}
+
 export function toISODate(date) {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, '0');
