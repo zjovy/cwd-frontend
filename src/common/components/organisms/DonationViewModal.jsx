@@ -15,7 +15,7 @@ import donationService from '@/services/donationService';
 import { Send } from 'lucide-react';
 import PropTypes from 'prop-types';
 
-import EmailPreviewModal from './EmailPreviewModal';
+import EmailPreviewModal from '@/pages/donations/EmailPreviewModal';
 
 /* ── styles ─────────────────────────────────────── */
 

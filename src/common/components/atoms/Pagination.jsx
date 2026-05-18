@@ -31,9 +31,9 @@ const Btn = styled.button`
   align-items: center;
   justify-content: center;
 
-  &:focus,
   &:focus-visible {
-    outline: none;
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
   }
 
   ${({ $active }) =>

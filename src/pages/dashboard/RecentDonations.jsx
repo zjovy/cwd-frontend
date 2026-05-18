@@ -5,7 +5,7 @@ import SectionTitle from '@/common/components/atoms/SectionTitle';
 import DonationTable from '@/common/components/organisms/DonationTable';
 import donationService from '@/services/donationService';
 
-import DonationViewModal from '../donations/DonationViewModal';
+import DonationViewModal from '@/common/components/organisms/DonationViewModal';
 
 export default function RecentDonations() {
   const [donations, setDonations] = useState([]);
