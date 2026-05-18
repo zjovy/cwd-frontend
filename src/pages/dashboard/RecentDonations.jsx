@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
+import PropTypes from 'prop-types';
+
 import Card from '@/common/components/atoms/Card';
 import SectionTitle from '@/common/components/atoms/SectionTitle';
 import DeleteConfirmModal from '@/common/components/organisms/DeleteConfirmModal';
@@ -29,7 +31,7 @@ const addBtn = {
   cursor: 'pointer',
 };
 
-export default function RecentDonations() {
+export default function RecentDonations({ refreshKey }) {
   const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -50,7 +52,7 @@ export default function RecentDonations() {
     } finally {
       if (!signal?.aborted) setLoading(false);
     }
-  }, []);
+  }, [refreshKey]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -133,3 +135,7 @@ export default function RecentDonations() {
     </>
   );
 }
+
+RecentDonations.propTypes = {
+  refreshKey: PropTypes.number.isRequired,
+};
