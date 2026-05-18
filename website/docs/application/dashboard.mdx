@@ -1,0 +1,42 @@
+---
+sidebar_position: 1
+---
+
+# Dashboard
+
+**Routes:** `/` and `/dashboard` (same page component)  
+**File:** `src/pages/dashboard/index.jsx`
+
+## Purpose
+
+Landing area after login: greeting, summary statistics, charts, and recent donation activity for **C&W Foundation** donor activity (copy is defined in the page).
+
+## UI sections
+
+| Section | Component file | Role |
+|---------|----------------|------|
+| Top bar | inline in `index.jsx` | Title, subtitle, **Refresh Stripe** button (UI present alongside stats) |
+| Stats row | `src/pages/dashboard/StatsRow.jsx` | Key metrics from backend summary |
+| Charts | `src/pages/dashboard/ChartsRow.jsx` | Trend / time-series visualizations (**Recharts**) |
+| Recent donations | `src/pages/dashboard/RecentDonations.jsx` | Latest records list |
+
+## Data layer
+
+**Service:** `src/services/dashboardService.js`
+
+| Method | HTTP | Endpoint constant |
+|--------|------|-------------------|
+| `getSummary` | GET | `ENDPOINTS.DASHBOARD_SUMMARY` → `/dashboard/summary` |
+| `getTrend` | GET | `ENDPOINTS.DASHBOARD_TREND` → `/dashboard/trend` |
+| `getLast6Months` | GET | `ENDPOINTS.DASHBOARD_LAST6` → `/dashboard/last6months` |
+
+All use `request(buildUrl(...))` from the shared API client with optional **`AbortSignal`** for cancellation.
+
+## User context
+
+The page reads **`useUser()`** for `firstname` (fallback label **“there”**) in the welcome subtitle.
+
+## Related
+
+- [API client](../architecture/api-client)  
+- [Backend endpoints](../reference/backend-endpoints)  

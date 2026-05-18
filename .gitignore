@@ -25,4 +25,7 @@ dist-ssr
 *.sln
 *.sw?
 
+# Docusaurus (website/)
+website/.docusaurus
+website/build
 .firebase/

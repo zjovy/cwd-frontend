@@ -1,0 +1,58 @@
+---
+sidebar_position: 2
+---
+
+# Donors
+
+**Route:** `/donors`  
+**Main file:** `src/pages/donors/index.jsx`
+
+## Purpose
+
+Searchable, paginated **donor directory** with selection and modal flows for creating or managing donor records.
+
+## Features
+
+- **Filters** — `DonorsFilterBar.jsx` updates `search` (and resets page).  
+- **Table** — `src/common/components/organisms/DonorsTable.jsx` lists donors with actions.  
+- **Pagination** — `PAGE_SIZE` is **25** (`src/utils/pagination.js`).  
+- **Selection** — Row selection stored in a `Set` for bulk-oriented UX (implementation in page).  
+- **Modal** — `DonorModal` / related components for create-edit flows as wired in the page.
+
+## Data hook
+
+**`useDonors`** (`src/hooks/useDonors.js`):
+
+- Passes **`search`** and **`page`** into `donorService.getAll`.  
+- **Debounces** requests by **300 ms** and cancels in-flight calls with **`AbortController`** when filters or page change.  
+- Exposes **`donors`**, **`total`**, **`totalPages`**, **`loading`**, **`error`**, **`onPageResetRef`** so the page can reset to page 1 after mutations.
+
+## Service API
+
+**`donorService`** (`src/services/donorService.js`):
+
+| Method | HTTP | Path |
+|--------|------|------|
+| `getAll(params, signal)` | GET | `/donors?…` query string from non-empty params |
+| `getById(id, signal)` | GET | `/donors/:id` |
+| `create(data)` | POST | `/donors` |
+| `update(id, data)` | PUT | `/donors/:id` |
+| `delete(id)` | DELETE | `/donors/:id` |
+| `upsertByEmail(data)` | PATCH | `/donors/upsert-by-email` |
+
+Payloads are built via **`buildDonorRequestBody`**; responses pass through **`transformDonor`** / **`transformDonorList`** in `src/api/transformers.js`.
+
+## Donor detail page
+
+**Route:** `/donors/:id`  
+**File:** `src/pages/donors/Details.jsx`
+
+- Loads donor + donation history via **`useDonorDetails`**.  
+- **Contact** and **donation history** cards (`ContactInfoCard`, `DonationHistoryCard`).  
+- **Stats row** (`DonorStatsRow`), **tags** (e.g. “Monthly Donor”, “Major Donor”) derived from history in the page.  
+- **Edit** opens **`DonorEditModal`**.
+
+## Related
+
+- [Backend endpoints](../reference/backend-endpoints)  
+- [Authentication](../architecture/authentication)  
