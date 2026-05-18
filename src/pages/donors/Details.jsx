@@ -3,14 +3,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import Button from '@/common/components/atoms/CommonButton';
 import useDonorDetails from '@/hooks/useDonorDetails';
-import donationService from '@/services/donationService';
 import { ArrowLeft } from 'lucide-react';
 
 import ContactInfoCard from './ContactInfoCard';
 import DonationHistoryCard from './DonationHistoryCard';
 import DonorEditModal from './DonorEditModal';
 import DonorStatsRow from './DonorStatsRow';
-import DonationViewModal from '@/pages/donations/DonationViewModal';
 
 const styles = {
   main: {
@@ -79,9 +77,8 @@ function earliestDonationDate(history) {
 export default function DonorDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { donor, history, loading, error, updateDonor, refetch } = useDonorDetails(id);
+  const { donor, history, loading, error, updateDonor } = useDonorDetails(id);
   const [editOpen, setEditOpen] = useState(false);
-  const [viewingDonation, setViewingDonation] = useState(null);
 
   const tags = useMemo(() => deriveTags(donor, history), [donor, history]);
   const memberSince = useMemo(() => earliestDonationDate(history), [history]);
@@ -114,16 +111,8 @@ export default function DonorDetailsPage() {
     );
   }
 
-  const handleSaveDonation = async (donationId, data) => {
-    await donationService.update(donationId, data);
-    await refetch();
-    setViewingDonation(null);
-  };
-
-  const handleDeleteDonation = async (donationId) => {
-    await donationService.delete(donationId);
-    setViewingDonation(null);
-    await refetch();
+  const handleDonationRowClick = (donation) => {
+    navigate(`/donations/${donation.id}`);
   };
 
   return (
@@ -163,7 +152,7 @@ export default function DonorDetailsPage() {
         donations={history}
         loading={loading}
         error={error}
-        onRowClick={setViewingDonation}
+        onRowClick={handleDonationRowClick}
       />
 
       <DonorEditModal
@@ -171,14 +160,6 @@ export default function DonorDetailsPage() {
         onClose={() => setEditOpen(false)}
         onSubmit={updateDonor}
         donor={donor}
-      />
-
-      <DonationViewModal
-        open={Boolean(viewingDonation)}
-        onClose={() => setViewingDonation(null)}
-        donation={viewingDonation}
-        onSave={handleSaveDonation}
-        onDelete={handleDeleteDonation}
       />
     </main>
   );

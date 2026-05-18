@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import Card from '@/common/components/atoms/Card';
 import SectionTitle from '@/common/components/atoms/SectionTitle';
@@ -30,6 +31,7 @@ const addBtn = {
 };
 
 export default function RecentDonations() {
+  const navigate = useNavigate();
   const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -112,6 +114,7 @@ export default function RecentDonations() {
           selected={selected}
           onSelectChange={handleSelectChange}
           onSelectAll={handleSelectAll}
+          onRowClick={(d) => navigate(`/donations/${d.id}`)}
           onEdit={openEdit}
           onDelete={(d) => setDeleting(d)}
         />
