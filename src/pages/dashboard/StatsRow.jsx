@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react';
 
+import { ArrowUpRight, DollarSign, TrendingUp, Users } from 'lucide-react';
+import PropTypes from 'prop-types';
+
 import StatCard from '@/common/components/atoms/StatCard';
 import dashboardService from '@/services/dashboardService';
 import { formatAmount } from '@/utils/format';
-import { ArrowUpRight, DollarSign, TrendingUp, Users } from 'lucide-react';
 
 const rowStyle = {
   display: 'flex',
   gap: '16px',
 };
 
-export default function StatsRow() {
+export default function StatsRow({ refreshKey }) {
   const [summary, setSummary] = useState(null);
 
   useEffect(() => {
@@ -23,7 +25,7 @@ export default function StatsRow() {
           console.error('Failed to fetch dashboard summary:', err);
       });
     return () => controller.abort();
-  }, []);
+  }, [refreshKey]);
 
   const growthRate = summary?.growth_rate;
   const growthValue =
@@ -68,3 +70,7 @@ export default function StatsRow() {
     </div>
   );
 }
+
+StatsRow.propTypes = {
+  refreshKey: PropTypes.number.isRequired,
+};
