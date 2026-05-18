@@ -62,7 +62,7 @@ export default function DonationViewModal({
           console.error('[DonationViewModal] detail fetch failed:', err);
       });
     return () => controller.abort();
-  }, [open, donation]);
+  }, [open, donation?.id]);
 
   if (!open) return null;
 
@@ -152,6 +152,7 @@ export default function DonationViewModal({
           <DonationReceiptSection
             email={form.email}
             emailMsg={emailMsg}
+            isError={emailMsg?.startsWith('Failed')}
             onSendEmail={handleSendEmail}
             status={form.receipt_status}
           />

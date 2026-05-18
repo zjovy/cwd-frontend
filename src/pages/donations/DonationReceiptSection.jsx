@@ -33,8 +33,8 @@ const recipientBlock = {
   flex: 1,
 };
 
-const statusMessageStyle = (message) => ({
-  ...(message.startsWith('Failed') ? errorStyle : successStyle),
+const statusMessageStyle = (isError) => ({
+  ...(isError ? errorStyle : successStyle),
   display: 'block',
   marginTop: '10px',
 });
@@ -42,6 +42,7 @@ const statusMessageStyle = (message) => ({
 export default function DonationReceiptSection({
   email,
   emailMsg,
+  isError,
   onSendEmail,
   status,
 }) {
@@ -62,7 +63,7 @@ export default function DonationReceiptSection({
         </button>
       </div>
 
-      {emailMsg && <span style={statusMessageStyle(emailMsg)}>{emailMsg}</span>}
+      {emailMsg && <span style={statusMessageStyle(isError)}>{emailMsg}</span>}
     </div>
   );
 }
@@ -70,10 +71,12 @@ export default function DonationReceiptSection({
 DonationReceiptSection.propTypes = {
   email: PropTypes.string.isRequired,
   emailMsg: PropTypes.string,
+  isError: PropTypes.bool,
   onSendEmail: PropTypes.func.isRequired,
   status: PropTypes.string.isRequired,
 };
 
 DonationReceiptSection.defaultProps = {
   emailMsg: null,
+  isError: false,
 };

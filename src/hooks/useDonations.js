@@ -69,7 +69,7 @@ export default function useDonations(filters = {}) {
     await fetchDonations(filtersRef.current);
   };
 
-  const refetchCurrentPage = async () => {
+  const refetchDonations = async () => {
     await fetchDonations(filtersRef.current);
   };
 
@@ -89,6 +89,6 @@ export default function useDonations(filters = {}) {
     createDonation,
     updateDonation,
     deleteDonation,
-    refetchCurrentPage,
+    refetchDonations,
   };
 }

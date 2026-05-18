@@ -83,12 +83,6 @@ export const fieldGroup = {
   marginBottom: '12px',
 };
 
-export const fieldGroupLast = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '4px',
-};
-
 export const labelStyle = {
   fontSize: '12px',
   fontWeight: '500',
@@ -104,12 +98,6 @@ export const inputStyle = {
   width: '100%',
   boxSizing: 'border-box',
   background: '#fff',
-};
-
-export const readonlyInputStyle = {
-  ...inputStyle,
-  background: '#f3f4f6',
-  color: '#6b7280',
 };
 
 export const selectStyle = {
