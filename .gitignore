@@ -28,5 +28,4 @@ dist-ssr
 # Docusaurus (website/)
 website/.docusaurus
 website/build
-
 .firebase/
