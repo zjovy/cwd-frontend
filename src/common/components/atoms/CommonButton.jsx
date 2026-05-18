@@ -7,6 +7,7 @@
     - variant (string): The variant of the button.
     - onClick (function): The function to call when the button is clicked.
     - title (string): The title of the button.
+    - disabled (bool): Disables the button when true.
 */
 import React from 'react';
 
@@ -45,9 +46,17 @@ const variants = {
   },
 };
 
-export default function Button({ children, variant, onClick, title }) {
+export default function Button({ children, variant, onClick, title, disabled }) {
   return (
-    <button style={variants[variant]} onClick={onClick} title={title}>
+    <button
+      style={{
+        ...variants[variant],
+        ...(disabled && { opacity: 0.5, cursor: 'not-allowed' }),
+      }}
+      onClick={onClick}
+      title={title}
+      disabled={disabled}
+    >
       {children}
     </button>
   );
@@ -58,10 +67,12 @@ Button.propTypes = {
   variant: PropTypes.oneOf(['outline', 'ghost']),
   onClick: PropTypes.func,
   title: PropTypes.string,
+  disabled: PropTypes.bool,
 };
 
 Button.defaultProps = {
   variant: 'outline',
   onClick: undefined,
   title: undefined,
+  disabled: false,
 };
