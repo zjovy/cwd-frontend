@@ -1,9 +1,13 @@
+import { useState } from 'react';
+
+import { RefreshCw } from 'lucide-react';
+
 import Button from '@/common/components/atoms/CommonButton';
 import { useUser } from '@/common/contexts/UserContext';
+import dashboardService from '@/services/dashboardService';
 import ChartsRow from '@/pages/dashboard/ChartsRow';
 import RecentDonations from '@/pages/dashboard/RecentDonations';
 import StatsRow from '@/pages/dashboard/StatsRow';
-import { RefreshCw } from 'lucide-react';
 
 const styles = {
   main: {
@@ -29,11 +33,34 @@ const styles = {
     fontSize: '14px',
     color: '#6b7280',
   },
+  syncError: {
+    fontSize: '12px',
+    color: '#dc2626',
+    marginTop: '6px',
+    textAlign: 'right',
+  },
 };
 
 export default function DashboardPage() {
   const { user } = useUser();
   const firstName = user?.firstname || 'there';
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [syncing, setSyncing] = useState(false);
+  const [syncError, setSyncError] = useState(null);
+
+  const handleSyncStripe = async () => {
+    setSyncing(true);
+    setSyncError(null);
+    try {
+      await dashboardService.syncStripe();
+      setRefreshKey((k) => k + 1);
+    } catch (err) {
+      setSyncError('Sync failed — try again');
+      console.error('Stripe sync error:', err);
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   return (
     <main style={styles.main}>
@@ -44,15 +71,22 @@ export default function DashboardPage() {
             {`Welcome back ${firstName}! Here's an overview of your C&W Foundation donor activity.`}
           </div>
         </div>
-        <Button variant='outline'>
-          <RefreshCw size={14} strokeWidth={2} />
-          Refresh Stripe
-        </Button>
+        <div>
+          <Button variant='outline' onClick={handleSyncStripe} disabled={syncing}>
+            <RefreshCw
+              size={14}
+              strokeWidth={2}
+              style={syncing ? { animation: 'spin 1s linear infinite' } : undefined}
+            />
+            {syncing ? 'Syncing…' : 'Refresh Stripe'}
+          </Button>
+          {syncError && <div style={styles.syncError}>{syncError}</div>}
+        </div>
       </div>
 
-      <StatsRow />
-      <ChartsRow />
-      <RecentDonations />
+      <StatsRow refreshKey={refreshKey} />
+      <ChartsRow refreshKey={refreshKey} />
+      <RecentDonations refreshKey={refreshKey} />
     </main>
   );
 }
