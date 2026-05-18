@@ -69,7 +69,11 @@ CustomTooltip.defaultProps = {
   label: '',
 };
 
-export default function ChartsRow() {
+ChartsRow.propTypes = {
+  refreshKey: PropTypes.number.isRequired,
+};
+
+export default function ChartsRow({ refreshKey }) {
   const [trendData, setTrendData] = useState([]);
   const [monthlyData, setMonthlyData] = useState([]);
   const [error, setError] = useState(null);
@@ -97,7 +101,7 @@ export default function ChartsRow() {
     fetchCharts();
 
     return () => controller.abort();
-  }, []);
+  }, [refreshKey]);
 
   return (
     <div style={rowStyle}>
