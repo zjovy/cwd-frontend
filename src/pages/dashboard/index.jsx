@@ -49,15 +49,18 @@ export default function DashboardPage() {
   const [syncError, setSyncError] = useState(null);
 
   const handleSyncStripe = async () => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30_000);
     setSyncing(true);
     setSyncError(null);
     try {
-      await dashboardService.syncStripe();
+      await dashboardService.syncStripe(controller.signal);
       setRefreshKey((k) => k + 1);
     } catch (err) {
       setSyncError('Sync failed — try again');
       console.error('Stripe sync error:', err);
     } finally {
+      clearTimeout(timeoutId);
       setSyncing(false);
     }
   };
@@ -76,6 +79,7 @@ export default function DashboardPage() {
             <RefreshCw
               size={14}
               strokeWidth={2}
+              aria-hidden="true"
               style={syncing ? { animation: 'spin 1s linear infinite' } : undefined}
             />
             {syncing ? 'Syncing…' : 'Refresh Stripe'}
