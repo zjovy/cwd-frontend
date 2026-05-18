@@ -21,4 +21,22 @@ describe('dashboardService.syncStripe', () => {
     );
     expect(result).toEqual({ inserted: 2, skipped: 0, errors: [] });
   });
+
+  it('passes signal to request when provided', async () => {
+    client.request.mockResolvedValue({ inserted: 0, skipped: 0, errors: [] });
+    const controller = new AbortController();
+
+    await dashboardService.syncStripe(controller.signal);
+
+    expect(client.request).toHaveBeenCalledWith(
+      `http://localhost:5050${ENDPOINTS.SYNC_STRIPE}`,
+      { method: 'POST', signal: controller.signal }
+    );
+  });
+
+  it('rejects when request throws', async () => {
+    client.request.mockRejectedValue(new Error('network error'));
+
+    await expect(dashboardService.syncStripe()).rejects.toThrow('network error');
+  });
 });

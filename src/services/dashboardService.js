@@ -14,8 +14,8 @@ const dashboardService = {
     return request(buildUrl(ENDPOINTS.DASHBOARD_SUMMARY), { signal });
   },
 
-  syncStripe() {
-    return request(buildUrl(ENDPOINTS.SYNC_STRIPE), { method: 'POST' });
+  syncStripe(signal) {
+    return request(buildUrl(ENDPOINTS.SYNC_STRIPE), { method: 'POST', signal });
   },
 };
 
