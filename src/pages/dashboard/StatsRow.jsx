@@ -2,7 +2,6 @@ import { useEffect, useReducer, useState } from 'react';
 
 import StatCard from '@/common/components/atoms/StatCard';
 import dashboardService from '@/services/dashboardService';
-import donationService from '@/services/donationService';
 import { formatAmount } from '@/utils/format';
 import {
   ArrowUpRight,
@@ -59,23 +58,13 @@ function FilteredStats({ activeRange, preset, refreshKey }) {
     const { start, end } = activeRange;
     const controller = new AbortController();
     dispatch({ type: 'fetch' });
-    donationService
-      .getAllForRange(
-        { startDate: toISODate(start), endDate: toISODate(end) },
-        controller.signal
-      )
-      .then((donations) => {
-        const inRange = donations.filter((d) => {
-          if (!d.donation_date) return false;
-          const dt = new Date(d.donation_date);
-          dt.setHours(12, 0, 0, 0);
-          return dt >= start && dt <= end;
+    dashboardService
+      .getRangeSummary(toISODate(start), toISODate(end), controller.signal)
+      .then((data) => {
+        dispatch({
+          type: 'success',
+          stats: { total: data.total_amount, count: data.donation_count },
         });
-        const total = inRange.reduce(
-          (sum, d) => sum + (Number(d.amount) || 0),
-          0
-        );
-        dispatch({ type: 'success', stats: { total, count: inRange.length } });
       })
       .catch((err) => {
         if (err.name !== 'AbortError')

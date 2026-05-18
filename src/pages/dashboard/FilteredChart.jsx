@@ -2,7 +2,7 @@ import { useEffect, useReducer } from 'react';
 
 import Card from '@/common/components/atoms/Card';
 import SectionTitle from '@/common/components/atoms/SectionTitle';
-import donationService from '@/services/donationService';
+import dashboardService from '@/services/dashboardService';
 import PropTypes from 'prop-types';
 import {
   Bar,
@@ -16,12 +16,7 @@ import {
   YAxis,
 } from 'recharts';
 
-import {
-  aggregate,
-  formatRangeLabel,
-  getEffectiveBucket,
-  toISODate,
-} from './chartUtils';
+import { formatRangeLabel, getEffectiveBucket, toISODate } from './chartUtils';
 
 const tooltipStyle = {
   background: '#fff',
@@ -97,22 +92,15 @@ export default function FilteredChart({
     const { start, end } = activeRange;
     const controller = new AbortController();
     dispatch({ type: 'fetch' });
-    donationService
-      .getAllForRange(
-        { startDate: toISODate(start), endDate: toISODate(end) },
+    dashboardService
+      .getRangeTrend(
+        toISODate(start),
+        toISODate(end),
+        bucket,
         controller.signal
       )
-      .then((donations) => {
-        const inRange = donations.filter((d) => {
-          if (!d.donation_date) return false;
-          const dt = new Date(d.donation_date);
-          dt.setHours(12, 0, 0, 0);
-          return dt >= start && dt <= end;
-        });
-        dispatch({
-          type: 'success',
-          data: aggregate(inRange, bucket, start, end),
-        });
+      .then((data) => {
+        dispatch({ type: 'success', data });
       })
       .catch((err) => {
         if (err.name !== 'AbortError')

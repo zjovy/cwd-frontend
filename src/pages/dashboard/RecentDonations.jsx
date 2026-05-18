@@ -86,16 +86,14 @@ export default function RecentDonations({ onMutate }) {
         if (dateStart) {
           const startDt = parseLocalDate(dateStart);
           list = list.filter((d) => {
-            const dt = new Date(d.donation_date);
-            dt.setHours(12, 0, 0, 0);
+            const dt = parseLocalDate(String(d.donation_date).slice(0, 10));
             return dt >= startDt;
           });
         }
         if (dateEnd) {
           const endDt = parseLocalDate(dateEnd, true);
           list = list.filter((d) => {
-            const dt = new Date(d.donation_date);
-            dt.setHours(12, 0, 0, 0);
+            const dt = parseLocalDate(String(d.donation_date).slice(0, 10));
             return dt <= endDt;
           });
         }
