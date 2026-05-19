@@ -82,15 +82,17 @@ export default function DashboardPage() {
     const timeoutId = setTimeout(() => controller.abort(), 30_000);
     setSyncing(true);
     try {
-      const result = await dashboardService.syncStripe(controller.signal);
-      if (result.errors && result.errors.length > 0) {
+      const {
+        inserted = 0,
+        skipped: _skipped = 0,
+        errors = [],
+      } = (await dashboardService.syncStripe(controller.signal)) ?? {};
+      if (errors.length > 0) {
         toast.error(
           <div>
-            <strong>
-              Partial sync — {result.errors.length} payment(s) failed
-            </strong>
+            <strong>Partial sync — {errors.length} payment(s) failed</strong>
             <ul style={styles.toastList}>
-              {result.errors.map((e) => (
+              {errors.map((e) => (
                 <li key={e.stripe_id}>
                   <span style={styles.toastCode}>{e.stripe_id}</span> —{' '}
                   {e.message}
@@ -100,18 +102,18 @@ export default function DashboardPage() {
             <p style={styles.toastPrompt}>
               Please add these donations manually in the Donations tab.
             </p>
-            {result.inserted > 0 && (
+            {inserted > 0 && (
               <p style={styles.toastPrompt}>
-                {result.inserted} payment(s) synced successfully.
+                {inserted} payment(s) synced successfully.
               </p>
             )}
           </div>,
           { duration: Infinity }
         );
       } else {
-        toast.success(`Synced ${result.inserted} payment(s)`);
+        toast.success(`Synced ${inserted} payment(s)`);
       }
-      if (result.inserted > 0) {
+      if (inserted > 0) {
         setRefreshKey((k) => k + 1);
       }
       await fetchLastSync();
