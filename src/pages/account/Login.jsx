@@ -448,7 +448,7 @@ export default function Login() {
                     id='email'
                     type='text'
                     name='email'
-                    placeholder='j@example.com'
+                    placeholder='craigjones@example.com'
                     value={formState.email}
                     onChange={handleChange}
                     required

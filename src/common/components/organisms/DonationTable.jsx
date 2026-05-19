@@ -61,9 +61,13 @@ export default function DonationTable({
   onEdit,
   onDelete,
 }) {
+  const showCheckboxes = Boolean(onSelectChange && onSelectAll);
   const allChecked =
-    donations.length > 0 && donations.every((d) => selected.has(d.id));
-  const someChecked = donations.some((d) => selected.has(d.id));
+    showCheckboxes &&
+    donations.length > 0 &&
+    donations.every((d) => selected.has(d.id));
+  const someChecked =
+    showCheckboxes && donations.some((d) => selected.has(d.id));
   const showActions = Boolean(onEdit || onDelete);
 
   const selectAllRef = useRef(null);
@@ -77,20 +81,23 @@ export default function DonationTable({
   if (error)
     return <div style={{ ...statusMsg, color: '#dc2626' }}>Error: {error}</div>;
 
-  const colSpan = COLUMNS.length + 1 + (showActions ? 1 : 0);
+  const colSpan =
+    COLUMNS.length + (showCheckboxes ? 1 : 0) + (showActions ? 1 : 0);
 
   return (
     <table style={tableStyle}>
       <thead>
         <tr>
-          <th style={checkboxTh}>
-            <input
-              type='checkbox'
-              ref={selectAllRef}
-              checked={allChecked}
-              onChange={(e) => onSelectAll(e.target.checked)}
-            />
-          </th>
+          {showCheckboxes && (
+            <th style={checkboxTh}>
+              <input
+                type='checkbox'
+                ref={selectAllRef}
+                checked={allChecked}
+                onChange={(e) => onSelectAll(e.target.checked)}
+              />
+            </th>
+          )}
           {COLUMNS.map((h) => (
             <th key={h} style={thStyle}>
               {h}
@@ -113,13 +120,15 @@ export default function DonationTable({
               style={{ cursor: onRowClick ? 'pointer' : 'default' }}
               onClick={onRowClick ? () => onRowClick(d) : undefined}
             >
-              <td style={checkboxTd} onClick={(e) => e.stopPropagation()}>
-                <input
-                  type='checkbox'
-                  checked={selected.has(d.id)}
-                  onChange={() => onSelectChange(d.id)}
-                />
-              </td>
+              {showCheckboxes && (
+                <td style={checkboxTd} onClick={(e) => e.stopPropagation()}>
+                  <input
+                    type='checkbox'
+                    checked={selected.has(d.id)}
+                    onChange={() => onSelectChange(d.id)}
+                  />
+                </td>
+              )}
               <td style={{ ...tdStyle, fontWeight: '500', color: '#1a1a1a' }}>
                 {d.donor_id ? (
                   <Link
@@ -171,9 +180,9 @@ DonationTable.propTypes = {
   donations: PropTypes.array.isRequired,
   loading: PropTypes.bool.isRequired,
   error: PropTypes.string,
-  selected: PropTypes.instanceOf(Set).isRequired,
-  onSelectChange: PropTypes.func.isRequired,
-  onSelectAll: PropTypes.func.isRequired,
+  selected: PropTypes.instanceOf(Set),
+  onSelectChange: PropTypes.func,
+  onSelectAll: PropTypes.func,
   onRowClick: PropTypes.func,
   onEdit: PropTypes.func,
   onDelete: PropTypes.func,

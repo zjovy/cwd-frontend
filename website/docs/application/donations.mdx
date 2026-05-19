@@ -1,0 +1,57 @@
+---
+sidebar_position: 3
+---
+
+# Donations
+
+**Route:** `/donations`  
+**Main file:** `src/pages/donations/index.jsx`
+
+## Purpose
+
+Full **donation ledger**: filter, paginate, create, edit, delete, and inspect individual donations. Row click opens **`DonationViewModal`**, which can launch **`EmailPreviewModal`** for receipt / email preview flows.
+
+## Filters
+
+Initial state (`INITIAL_FILTERS`):
+
+- **`search`** — text search  
+- **`status`** — filter by status where supported by API  
+- **`minAmount`**, **`maxAmount`** — numeric range filters  
+
+Changing filters resets **page** to 1 (same pattern as donors).
+
+## Table and modals
+
+- **`DonationTable`** — `src/common/components/organisms/DonationTable.jsx`  
+- **`DonationModal`** — create / edit  
+- **`DonationViewModal`** — read-only detail view  
+- **`DonationsFilterBar`** — filter controls  
+
+## Data hook
+
+**`useDonations`** (`src/hooks/useDonations.js`):
+
+- Fetches with **`search`**, **`status`**, **`minAmount`**, **`maxAmount`**, **`page`**.  
+- **Debounced 300 ms** + **`AbortController`**.  
+- Mutations: **`createDonation`**, **`updateDonation`**, **`deleteDonation`** — each calls `donationService` then **refetches** (delete/create reset to page 1 via **`refetchAtPage1`**).
+
+## Service API
+
+**`donationService`** (`src/services/donationService.js`):
+
+| Method | HTTP | Path |
+|--------|------|------|
+| `getAll(params, signal)` | GET | `/donations?…` |
+| `getById(id, signal)` | GET | `/donations/:id` |
+| `create(data)` | POST | `/donations` |
+| `update(id, data)` | PUT | `/donations/:id` |
+| `delete(id)` | DELETE | `/donations/:id` |
+| `sendReceipt(id, body)` | POST | Intended for receipt email — implementation should use `buildUrl` + `/donations` segment (align with backend) |
+
+Request/response shapes use **`buildDonationCreateBody`**, **`buildDonationUpdateBody`**, **`transformDonation`**, **`transformDonationList`**.
+
+## Related
+
+- [Dashboard](./dashboard) — recent donations widget  
+- [Backend endpoints](../reference/backend-endpoints)  

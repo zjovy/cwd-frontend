@@ -1,0 +1,29 @@
+---
+sidebar_position: 5
+---
+
+# Account pages (login & signup)
+
+These routes use **`PublicOnlyRoute`**: authenticated users are redirected to **`/`**.
+
+| Route | File | Purpose |
+|-------|------|---------|
+| `/login` | `src/pages/account/Login.jsx` | Email/password and Google sign-in |
+| `/signup` | `src/pages/account/SignUp.jsx` | New account registration |
+| `/forgot-password` | `src/pages/account/RequestPasswordReset.jsx` | Triggers Firebase password reset email |
+
+## Related routes (not public-only)
+
+| Route | File | Purpose |
+|-------|------|---------|
+| `/auth/callback` | `src/pages/account/AuthCallback.jsx` | Completes redirect-based OAuth; POSTs `idToken` to **`/auth/token`**, then navigates home or login |
+| `/auth/reset-password` | `src/pages/account/ResetPassword.jsx` | Landing page for Firebase password reset link |
+
+## Layout
+
+**`NavLayout`** hides **NavBar** branding quirks on `/login`, `/signup`, `/forgot-password` per pathname checks; **`Sidebar`** is hidden on those paths and on **`/no-access`**.
+
+## Related
+
+- [Authentication](../architecture/authentication)  
+- [Routing and layout](../architecture/routing-and-layout)  

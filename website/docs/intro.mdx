@@ -1,0 +1,78 @@
+---
+sidebar_position: 1
+---
+
+# Introduction
+
+Welcome to the **C&W Market Foundation Donor Management System** documentation.
+
+This site is the technical guide for the project, including setup instructions, architecture details, deployment notes, and current handoff progress.
+
+## Overview
+
+The goal of this project is to provide a reliable donor-management platform for C&W Market Foundation, with clear operational workflows for donations, donors, and role-based administration.
+
+Current and planned capabilities include:
+
+- Donor management and profile detail workflows
+- Donation tracking and dashboard reporting
+- Role-based access control for admins and members
+- Authentication-backed account flows (signup/login/reset)
+- Email-related donor and donation actions
+- Better operational visibility through dashboard trends and summaries
+
+Foundational capabilities currently in the system include:
+
+- Authenticated user access
+- Role separation and route guards
+- Donor information storage and editing
+- Donation records and filtering
+- Dashboard summary/trend reporting
+- Admin user role management
+
+Project status and delivery insights are tracked in [Handoff Documentation](./handoff/overview).
+
+## Tech Stack
+
+### Frontend
+
+- React 19 for UI
+- React Router v7 for client-side routing
+- Vite for local development and production builds
+- styled-components for component-scoped styling
+- Firebase Auth for authentication
+- Recharts for dashboard chart visualizations
+
+### Backend
+
+- Node.js + Express for API server runtime
+- MySQL (local/AWS flow) and PostgreSQL-compatible support paths
+- Firebase Admin for token verification and role-aware auth flows
+- Express middleware layers for auth/admin/approval controls
+
+### Development Tools
+
+- Git for version control
+- VS Code/Cursor as recommended editor workflow
+- ESLint + Prettier for consistency and formatting
+- Docker Compose for local database setup (backend)
+
+## Quick Start
+
+```bash
+# Frontend
+cd cwd-frontend
+npm install
+npm run dev
+
+# Backend
+cd ../cwd-backend
+npm install
+npm run dev
+
+# Documentation site (from cwd-frontend)
+cd ../cwd-frontend
+npm run docs:dev
+```
+
+For environment variables and service startup details, see [Getting Started](./getting-started), [Authentication](./authentication), and [Backend / Deployment](./backend/deployment).

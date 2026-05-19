@@ -76,7 +76,11 @@ export default function Sidebar({ activePage, onNavigate }) {
   return (
     <aside style={styles.sidebar}>
       <div style={styles.logo}>
-        <span style={styles.logoText}>Donor Management</span>
+        <img
+          src='/logo.png'
+          alt='C&W Market'
+          style={{ height: '52px', width: 'auto', display: 'block' }}
+        />
       </div>
       <nav style={styles.nav}>
         {navItems.map(({ label, icon, id }) => (
