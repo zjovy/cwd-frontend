@@ -1,6 +1,5 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
-
 import { formatRelativeTime } from '@/utils/format';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 describe('formatRelativeTime', () => {
   afterEach(() => {
@@ -19,10 +18,10 @@ describe('formatRelativeTime', () => {
     expect(formatRelativeTime('2026-05-18T12:00:00Z')).toBe('5 minutes ago');
   });
 
-  it('returns "1 minutes ago" at exactly 60 seconds', () => {
+  it('returns singular "1 minute ago" at exactly 60 seconds', () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-05-18T12:01:00Z'));
-    expect(formatRelativeTime('2026-05-18T12:00:00Z')).toBe('1 minutes ago');
+    expect(formatRelativeTime('2026-05-18T12:00:00Z')).toBe('1 minute ago');
   });
 
   it('returns hours for 1-23 hours elapsed', () => {

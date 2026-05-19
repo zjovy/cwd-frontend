@@ -13,7 +13,10 @@ export function formatAmount(amount) {
 export function formatRelativeTime(date) {
   const elapsed = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
   if (elapsed < 60) return 'Just now';
-  if (elapsed < 3600) return `${Math.floor(elapsed / 60)} minutes ago`;
-  if (elapsed < 86400) return `${Math.floor(elapsed / 3600)} hours ago`;
-  return `${Math.floor(elapsed / 86400)} days ago`;
+  const mins = Math.floor(elapsed / 60);
+  if (elapsed < 3600) return `${mins} ${mins === 1 ? 'minute' : 'minutes'} ago`;
+  const hours = Math.floor(elapsed / 3600);
+  if (elapsed < 86400) return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
+  const days = Math.floor(elapsed / 86400);
+  return `${days} ${days === 1 ? 'day' : 'days'} ago`;
 }
