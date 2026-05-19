@@ -8,6 +8,7 @@ import StatsRow from '@/pages/dashboard/StatsRow';
 import dashboardService from '@/services/dashboardService';
 import { formatRelativeTime } from '@/utils/format';
 import { RefreshCw } from 'lucide-react';
+import { toast } from 'sonner';
 
 const styles = {
   main: {
@@ -33,17 +34,25 @@ const styles = {
     fontSize: '14px',
     color: '#6b7280',
   },
-  syncError: {
-    fontSize: '12px',
-    color: '#dc2626',
-    marginTop: '6px',
-    textAlign: 'right',
-  },
   lastSynced: {
     fontSize: '12px',
     color: '#6b7280',
     marginTop: '4px',
     textAlign: 'right',
+  },
+  toastList: {
+    margin: '6px 0 4px',
+    paddingLeft: '16px',
+    fontSize: '12px',
+  },
+  toastCode: {
+    fontFamily: 'monospace',
+    fontSize: '11px',
+  },
+  toastPrompt: {
+    margin: '8px 0 0',
+    fontSize: '12px',
+    opacity: 0.8,
   },
 };
 
@@ -52,7 +61,6 @@ export default function DashboardPage() {
   const firstName = user?.firstname || 'there';
   const [refreshKey, setRefreshKey] = useState(0);
   const [syncing, setSyncing] = useState(false);
-  const [syncError, setSyncError] = useState(null);
   const [lastSyncedAt, setLastSyncedAt] = useState(null);
 
   const fetchLastSync = async () => {
@@ -73,13 +81,42 @@ export default function DashboardPage() {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30_000);
     setSyncing(true);
-    setSyncError(null);
     try {
-      await dashboardService.syncStripe(controller.signal);
-      setRefreshKey((k) => k + 1);
+      const result = await dashboardService.syncStripe(controller.signal);
+      if (result.errors && result.errors.length > 0) {
+        toast.error(
+          <div>
+            <strong>
+              Partial sync — {result.errors.length} payment(s) failed
+            </strong>
+            <ul style={styles.toastList}>
+              {result.errors.map((e) => (
+                <li key={e.stripe_id}>
+                  <span style={styles.toastCode}>{e.stripe_id}</span> —{' '}
+                  {e.message}
+                </li>
+              ))}
+            </ul>
+            <p style={styles.toastPrompt}>
+              Please add these donations manually in the Donations tab.
+            </p>
+            {result.inserted > 0 && (
+              <p style={styles.toastPrompt}>
+                {result.inserted} payment(s) synced successfully.
+              </p>
+            )}
+          </div>,
+          { duration: Infinity }
+        );
+      } else {
+        toast.success(`Synced ${result.inserted} payment(s)`);
+      }
+      if (result.inserted > 0) {
+        setRefreshKey((k) => k + 1);
+      }
       await fetchLastSync();
     } catch (err) {
-      setSyncError('Sync failed — try again');
+      toast.error('Sync failed — try again');
       console.error('Stripe sync error:', err);
     } finally {
       clearTimeout(timeoutId);
@@ -112,7 +149,6 @@ export default function DashboardPage() {
             />
             {syncing ? 'Syncing…' : 'Refresh Stripe'}
           </Button>
-          {syncError && <div style={styles.syncError}>{syncError}</div>}
           {lastSyncedAt && (
             <div style={styles.lastSynced}>
               Last synced {formatRelativeTime(lastSyncedAt)}
