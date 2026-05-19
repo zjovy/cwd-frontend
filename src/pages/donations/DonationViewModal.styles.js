@@ -142,8 +142,8 @@ export const statusBadgeStyle = (status) => ({
   padding: '4px 10px',
   textTransform: 'capitalize',
   ...(status === 'sent'
-    ? { background: '#dcfce7', color: '#166534' }
-    : { background: '#ffedd5', color: '#9a3412' }),
+    ? { background: '#F0FDF4', color: '#15803D' }
+    : { background: '#FFF4E5', color: '#B25000' }),
 });
 
 export const cancelBtn = {
