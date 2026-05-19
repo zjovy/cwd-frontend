@@ -9,16 +9,20 @@ export function formatDonationAmount(amount) {
 }
 
 export function buildReceiptMessage(donation) {
+  const name = donation.first_name || 'Donor';
   return [
-    `Dear ${donation.first_name} ${donation.last_name},`,
+    `Dear ${name},`,
     '',
-    `The C&W Market Foundation has received your generous gift of $${formatDonationAmount(
-      donation.amount
-    )} to support our annual efforts. Your contribution makes a meaningful difference in the work we do for our community.`,
+    `The C&W Market Foundation has received your generous gift of $${formatDonationAmount(donation.amount)} to support our annual efforts.`,
     '',
-    'Thank you for your generosity and continued support.',
+    'All of us at the C&W Market Foundation appreciate our donors. We are very grateful for your contribution!',
     '',
-    'Sincerely,',
-    'The C&W Market Foundation',
+    'With gratitude,',
+    '',
+    'Clarence and Wendy Weaver',
+    'Co-Founders',
+    '',
+    'Sydni Craig',
+    'Board President',
   ].join('\n');
 }

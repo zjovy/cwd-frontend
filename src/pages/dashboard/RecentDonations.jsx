@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Card from '@/common/components/atoms/Card';
 import SectionTitle from '@/common/components/atoms/SectionTitle';
 import DonationTable from '@/common/components/organisms/DonationTable';
-import DonationViewModal from '@/common/components/organisms/DonationViewModal';
+import DonationViewModal from '@/pages/donations/DonationViewModal';
 import donationService from '@/services/donationService';
 import PropTypes from 'prop-types';
 
@@ -165,6 +165,7 @@ export default function RecentDonations({ onMutate }) {
         donation={viewing}
         onSave={handleUpdate}
         onDelete={handleDelete}
+        onReceiptSent={fetchRecent}
       />
     </>
   );

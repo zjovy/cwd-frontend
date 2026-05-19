@@ -143,7 +143,9 @@ export const statusBadgeStyle = (status) => ({
   textTransform: 'capitalize',
   ...(status === 'sent'
     ? { background: '#F0FDF4', color: '#15803D' }
-    : { background: '#FFF4E5', color: '#B25000' }),
+    : status === 'expired'
+      ? { background: '#F3F4F6', color: '#6B7280' }
+      : { background: '#FFF4E5', color: '#B25000' }),
 });
 
 export const cancelBtn = {

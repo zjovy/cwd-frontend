@@ -8,7 +8,7 @@ import useDonations from '@/hooks/useDonations';
 import { PAGE_SIZE } from '@/utils/pagination';
 import { Plus } from 'lucide-react';
 
-import DonationViewModal from '@/common/components/organisms/DonationViewModal';
+import DonationViewModal from './DonationViewModal';
 import DonationsFilterBar from './DonationsFilterBar';
 
 /* ── styles ─────────────────────────────────────────── */

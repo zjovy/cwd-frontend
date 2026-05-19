@@ -6,11 +6,11 @@ import { RECEIPT_SUBJECT, buildReceiptMessage } from '@/utils/receiptTemplate';
 import { X } from 'lucide-react';
 import PropTypes from 'prop-types';
 
-import DonationDeleteSection from '@/pages/donations/DonationDeleteSection';
-import DonationDonorInfoSection from '@/pages/donations/DonationDonorInfoSection';
-import DonationModalFooter from '@/pages/donations/DonationModalFooter';
-import DonationPaymentSection from '@/pages/donations/DonationPaymentSection';
-import DonationReceiptSection from '@/pages/donations/DonationReceiptSection';
+import DonationDeleteSection from './DonationDeleteSection';
+import DonationDonorInfoSection from './DonationDonorInfoSection';
+import DonationModalFooter from './DonationModalFooter';
+import DonationPaymentSection from './DonationPaymentSection';
+import DonationReceiptSection from './DonationReceiptSection';
 import {
   closeBtn,
   errorStyle,
@@ -18,12 +18,12 @@ import {
   modal,
   overlay,
   titleStyle,
-} from '@/pages/donations/DonationViewModal.styles';
-import EmailPreviewModal from '@/pages/donations/EmailPreviewModal';
+} from './DonationViewModal.styles';
+import EmailPreviewModal from './EmailPreviewModal';
 import {
   EMPTY_DONATION_VIEW_FORM,
   fromDonationRow,
-} from '@/pages/donations/donationViewForm';
+} from './donationViewForm';
 
 export default function DonationViewModal({
   open,
