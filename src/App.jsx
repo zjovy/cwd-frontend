@@ -19,6 +19,7 @@ import DonorsPage from '@/pages/donors';
 import DonorDetailsPage from '@/pages/donors/Details';
 import NoAccess from '@/pages/no-access/NoAccess';
 import NotFound from '@/pages/not-found/NotFound';
+import { Toaster } from 'sonner';
 
 import './App.css';
 
@@ -52,6 +53,7 @@ export default function App() {
             <Route path='*' element={<NotFound />} />
           </Route>
         </Routes>
+        <Toaster position='bottom-right' />
       </BrowserRouter>
     </UserProvider>
   );
