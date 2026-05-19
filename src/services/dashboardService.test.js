@@ -1,8 +1,7 @@
-import { describe, expect, it, vi } from 'vitest';
-
 import * as client from '@/api/client';
 import { ENDPOINTS } from '@/api/endpoints';
 import dashboardService from '@/services/dashboardService';
+import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/api/client', () => ({
   buildUrl: (endpoint) => `http://localhost:5050${endpoint}`,
@@ -37,7 +36,9 @@ describe('dashboardService.syncStripe', () => {
   it('rejects when request throws', async () => {
     client.request.mockRejectedValue(new Error('network error'));
 
-    await expect(dashboardService.syncStripe()).rejects.toThrow('network error');
+    await expect(dashboardService.syncStripe()).rejects.toThrow(
+      'network error'
+    );
   });
 });
 
@@ -69,6 +70,8 @@ describe('dashboardService.getLastSync', () => {
   it('rejects when request throws', async () => {
     client.request.mockRejectedValue(new Error('network error'));
 
-    await expect(dashboardService.getLastSync()).rejects.toThrow('network error');
+    await expect(dashboardService.getLastSync()).rejects.toThrow(
+      'network error'
+    );
   });
 });

@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import PropTypes from 'prop-types';
-
 import Card from '@/common/components/atoms/Card';
 import SectionTitle from '@/common/components/atoms/SectionTitle';
 import DeleteConfirmModal from '@/common/components/organisms/DeleteConfirmModal';
@@ -9,6 +7,7 @@ import DonationModal from '@/common/components/organisms/DonationModal';
 import DonationTable from '@/common/components/organisms/DonationTable';
 import donationService from '@/services/donationService';
 import { Plus } from 'lucide-react';
+import PropTypes from 'prop-types';
 
 const headerRow = {
   display: 'flex',
@@ -40,19 +39,22 @@ export default function RecentDonations({ refreshKey }) {
   const [editing, setEditing] = useState(null);
   const [deleting, setDeleting] = useState(null);
 
-  const fetchRecent = useCallback(async (signal) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await donationService.getAll({ limit: 5 }, signal);
-      setDonations(data.donations);
-      setSelected(new Set());
-    } catch (err) {
-      if (err.name !== 'AbortError') setError(err.message);
-    } finally {
-      if (!signal?.aborted) setLoading(false);
-    }
-  }, [refreshKey]);
+  const fetchRecent = useCallback(
+    async (signal) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await donationService.getAll({ limit: 5 }, signal);
+        setDonations(data.donations);
+        setSelected(new Set());
+      } catch (err) {
+        if (err.name !== 'AbortError') setError(err.message);
+      } finally {
+        if (!signal?.aborted) setLoading(false);
+      }
+    },
+    [refreshKey]
+  );
 
   useEffect(() => {
     const controller = new AbortController();

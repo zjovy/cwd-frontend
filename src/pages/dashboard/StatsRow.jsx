@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 
-import { ArrowUpRight, DollarSign, TrendingUp, Users } from 'lucide-react';
-import PropTypes from 'prop-types';
-
 import StatCard from '@/common/components/atoms/StatCard';
 import dashboardService from '@/services/dashboardService';
 import { formatAmount } from '@/utils/format';
+import { ArrowUpRight, DollarSign, TrendingUp, Users } from 'lucide-react';
+import PropTypes from 'prop-types';
 
 const rowStyle = {
   display: 'flex',

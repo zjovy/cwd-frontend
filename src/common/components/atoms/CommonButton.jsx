@@ -46,7 +46,13 @@ const variants = {
   },
 };
 
-export default function Button({ children, variant, onClick, title, disabled }) {
+export default function Button({
+  children,
+  variant,
+  onClick,
+  title,
+  disabled,
+}) {
   return (
     <button
       style={{
