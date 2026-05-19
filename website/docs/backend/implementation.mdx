@@ -1,0 +1,32 @@
+---
+sidebar_position: 2
+---
+
+# Implementation
+
+## Request flow
+
+1. Express receives request (`src/server.js`).
+2. Route-level middleware runs (`authMiddleware`, `adminMiddleware`, `requireApprovalMiddleware`).
+3. Controller validates/normalizes request.
+4. Repository delegates to database provider.
+5. JSON response or standardized error is returned.
+
+## Auth and access model
+
+- Firebase token verification happens in `authMiddleware`.
+- Admin-only behavior is protected by `adminMiddleware`.
+- Approved-user checks for data routes are enforced by `requireApprovalMiddleware`.
+
+## Main API groups
+
+- **Auth**: signup/login/token/me/users/role management
+- **Dashboard**: summary, trend, last-6-months stats
+- **Donations**: CRUD + send receipt endpoint
+- **Donors**: CRUD + thank-you email/template endpoints
+
+## Data backends
+
+- MySQL provider for local Docker / AWS RDS
+- PostgreSQL provider for Supabase-based deployments
+- Repository layer hides provider differences from controllers

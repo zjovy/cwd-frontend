@@ -1,0 +1,25 @@
+---
+sidebar_position: 3
+---
+
+# Features
+
+## Core product features
+
+- **Dashboard**: summary cards, donation trends, recent donations
+- **Donors**: browse, search, update donor records
+- **Donations**: list/filter/view and donation-level operations
+- **Admin**: role review and user access management
+- **Account**: login, signup, password reset, OAuth callback
+
+## Data/UX behavior
+
+- Shared API client centralizes headers, auth, and error handling
+- Domain hooks encapsulate loading/error/data state per module
+- Role-based UI hides privileged routes/actions from non-admin users
+
+## Integration points
+
+- Firebase for authentication
+- Express backend for business data and permissions
+- Optional email flows (receipt / thank-you) handled by backend endpoints

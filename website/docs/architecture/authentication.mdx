@@ -1,0 +1,51 @@
+---
+sidebar_position: 3
+---
+
+# Authentication
+
+## Firebase + backend model
+
+1. **Firebase Authentication** handles credentials (email/password, Google popup, etc.).  
+2. The **backend** stores organization-specific fields (name, role) and may set an **HTTP-only session cookie** via `/auth/token`.  
+3. **`UserContext`** (`src/common/contexts/UserContext.jsx`) merges Firebase user state with backend profile data.
+
+## Bootstrap sequence (`UserProvider`)
+
+On `onAuthStateChanged`:
+
+1. Get Firebase **ID token** (`getIdToken()`).  
+2. **POST** `{ idToken }` to **`/auth/token`** with `credentials: 'include'` — refreshes session cookie on every auth restore (not only fresh logins).  
+3. **GET** **`/auth/me`** with `Authorization: Bearer <idToken>`.  
+4. If OK, merge JSON into the user object (`{ ...firebaseUser, ...backendUserData }`).  
+5. If `/auth/me` fails, fall back to the raw Firebase user only.
+
+## Google sign-in
+
+`googleAuth()` signs in with Google popup, then POSTs the ID token to `/auth/token` the same way. **`AuthCallback`** (`src/pages/account/AuthCallback.jsx`) handles **`getRedirectResult`** for redirect-based flows: it POSTs to `${VITE_BACKEND_URL}/auth/token` and navigates home or back to login on error.
+
+## Roles and access
+
+Backend-provided **`role`** drives routing:
+
+| `role` | Experience |
+|--------|------------|
+| `pending` | Redirect to **`/no-access`** from `PrivateRoute` |
+| `member` (or other non-admin) | Standard app; **Admin** sidebar hidden |
+| `admin` | Can open **`/admin`** |
+
+Exact role strings must match what `AdminRoute` and `Sidebar` expect (`admin`, `pending`, etc.).
+
+## API requests
+
+**`src/api/client.js`**:
+
+- **`authHeaders()`** — Adds `Content-Type: application/json` and **`Authorization: Bearer <token>`** when `auth.currentUser` exists.  
+- **`request()`** — Uses `authHeaders()`, **`credentials: 'include'`** for cookie-backed sessions, parses JSON on success, throws on non-OK with message from `error` / `message` body fields.
+
+Logout calls Firebase **`signOut`**; next navigation follows `PublicOnlyRoute` / `PrivateRoute` rules.
+
+## Related
+
+- [Environment variables](../getting-started/environment-variables)  
+- [Backend endpoints](../reference/backend-endpoints)  

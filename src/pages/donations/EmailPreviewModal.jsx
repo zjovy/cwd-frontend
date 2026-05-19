@@ -170,7 +170,7 @@ export default function EmailPreviewModal({
             Cancel
           </button>
           <button type='button' style={sendBtn} onClick={handleConfirm}>
-            <Send size={13} /> Open in Mail
+            <Send size={13} color='white' /> Open in Mail
           </button>
         </div>
       </div>

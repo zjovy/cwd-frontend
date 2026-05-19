@@ -1,0 +1,57 @@
+---
+sidebar_position: 1
+---
+
+# Backend endpoints (frontend usage)
+
+These paths are defined in **`src/api/endpoints.js`**. All requests go to **`VITE_BACKEND_URL`** unless noted.
+
+:::note
+
+Method verbs below reflect **frontend service usage**. Your backend must implement matching HTTP semantics and auth.
+
+:::
+
+## Donations
+
+| Constant | Path pattern |
+|----------|----------------|
+| `ENDPOINTS.DONATIONS` | `/donations` |
+| `ENDPOINTS.DONATION_BY_ID(id)` | `/donations/:id` |
+
+## Donors
+
+| Constant | Path pattern |
+|----------|----------------|
+| `ENDPOINTS.DONORS` | `/donors` |
+| `ENDPOINTS.DONOR_BY_ID(id)` | `/donors/:id` |
+| `ENDPOINTS.DONOR_UPSERT_BY_EMAIL` | `/donors/upsert-by-email` |
+
+## Dashboard
+
+| Constant | Path pattern |
+|----------|----------------|
+| `ENDPOINTS.DASHBOARD_SUMMARY` | `/dashboard/summary` |
+| `ENDPOINTS.DASHBOARD_TREND` | `/dashboard/trend` |
+| `ENDPOINTS.DASHBOARD_LAST6` | `/dashboard/last6months` |
+
+## Auth / users
+
+| Constant | Path pattern |
+|----------|----------------|
+| `ENDPOINTS.AUTH_SIGNUP` | `/auth/signup` |
+| `ENDPOINTS.AUTH_TOKEN` | `/auth/token` |
+| `ENDPOINTS.AUTH_ME` | `/auth/me` |
+| `ENDPOINTS.AUTH_USERS` | `/auth/users` |
+| `ENDPOINTS.AUTH_SET_ROLE(uid)` | `/auth/users/:uid/role` |
+
+## Auth flows
+
+- **`POST /auth/token`** — Body `{ idToken }` (Firebase). Called with **`credentials: 'include'`** from `UserContext` and `googleAuth`.  
+- **`GET /auth/me`** — **`Authorization: Bearer <idToken>`** — merges profile into client user state.
+
+## Direct `fetch` (non-`ENDPOINTS`)
+
+**`AuthCallback`** builds `POST` to **`${VITE_BACKEND_URL}/auth/token`** as a string — keep backend URL consistent with `buildUrl` behavior (no double slashes).
+
+Query strings for list endpoints are built from plain objects in **`donorService.getAll`** / **`donationService.getAll`** (omit null/empty values).

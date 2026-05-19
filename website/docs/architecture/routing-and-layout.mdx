@@ -1,0 +1,53 @@
+---
+sidebar_position: 2
+---
+
+# Routing and layout
+
+Route definitions live in **`src/App.jsx`**. Everything sits under **`NavLayout`** (`path="/"`), which provides the top **NavBar**, optional **Sidebar**, and an `<Outlet />` for page content.
+
+## Route table
+
+| Path | Guard | Page / behavior |
+|------|--------|------------------|
+| `/`, `/dashboard` | Private | Dashboard (`src/pages/dashboard/index.jsx`) |
+| `/donations` | Private | Donations list (`src/pages/donations/index.jsx`) |
+| `/donors` | Private | Donors list (`src/pages/donors/index.jsx`) |
+| `/donors/:id` | Private | Donor detail (`src/pages/donors/Details.jsx`) |
+| `/admin` | **Admin only** (`AdminRoute`) | Admin users (`src/pages/admin/index.jsx`) |
+| `/no-access` | None | Pending users (`src/pages/no-access/NoAccess.jsx`) |
+| `/login` | Public only (logged-out) | Login |
+| `/signup` | Public only | Sign up |
+| `/forgot-password` | Public only | Request password reset |
+| `/auth/callback` | None | OAuth redirect completion (`AuthCallback.jsx`) |
+| `/auth/reset-password` | None | Password reset form |
+| `*` | — | Not found |
+
+## Route guards
+
+Implemented in **`src/common/components/routes/ProtectedRoutes.jsx`**:
+
+- **`PrivateRoute`** — If not authenticated → `/login`. If authenticated but `user.role === 'pending'` → `/no-access`. Otherwise renders nested routes.  
+- **`AdminRoute`** — Requires `user.role === 'admin'`; otherwise redirects to `/` or `/login`.  
+- **`PublicOnlyRoute`** — Logged-in users are redirected to `/` so login/signup are not shown when already authenticated.
+
+## Layout behavior
+
+**`NavLayout`** (`src/common/layouts/NavLayout.jsx`):
+
+- **NavBar** hidden on auth pages (`/login`, `/signup`, `/forgot-password`).  
+- **Sidebar** hidden on auth pages and `/no-access`.  
+- **`activePage`** is derived from `location.pathname` (first segment) for sidebar highlighting; root `/` is treated as `dashboard`.
+
+**`Sidebar`** (`src/common/components/organisms/Sidebar.jsx`):
+
+- Items: Dashboard → `dashboard`, Donations → `donations`, Donors → `donors`, Admin → `admin`.  
+- **Admin** is omitted unless `user.role === 'admin'`.  
+- Footer shows **UserProfile** with logout.
+
+**`MainLayout`** exists in `src/common/layouts/MainLayout.jsx` but is **not** wired in `App.jsx` for these routes; navigation uses `NavLayout` + `Sidebar`.
+
+## Related
+
+- [Authentication](./authentication)  
+- [Application: Dashboard](../application/dashboard)  

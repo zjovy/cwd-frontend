@@ -8,7 +8,7 @@ import useDonations from '@/hooks/useDonations';
 import { PAGE_SIZE } from '@/utils/pagination';
 import { Plus } from 'lucide-react';
 
-import DonationViewModal from './DonationViewModal';
+import DonationViewModal from '@/common/components/organisms/DonationViewModal';
 import DonationsFilterBar from './DonationsFilterBar';
 
 /* ── styles ─────────────────────────────────────────── */
@@ -132,7 +132,7 @@ export default function DonationsPage() {
           </div>
         </div>
         <button style={styles.addBtn} onClick={openCreate}>
-          <Plus size={14} /> Add Donation
+          <Plus size={14} color='white' /> Add Donation
         </button>
       </div>
 

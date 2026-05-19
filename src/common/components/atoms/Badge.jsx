@@ -9,23 +9,30 @@
 import PropTypes from 'prop-types';
 
 const colorMap = {
-  sent: { background: '#00A63E', color: '#fff' },
-  pending: { background: '#FF8040', color: '#fff' },
-  expired: { background: '#9ca3af', color: '#fff' },
+  sent: { background: '#F0FDF4', color: '#15803D' },
+  pending: { background: '#FFF4E5', color: '#B25000' },
+  expired: { background: '#F3F4F6', color: '#6B7280' },
 };
 
 const badgeStyle = (status) => ({
   display: 'inline-flex',
   alignItems: 'center',
-  padding: '3px 10px',
-  borderRadius: '8px',
-  fontSize: '12px',
+
+  padding: '2px 8px',
+  borderRadius: '4px',
+  fontSize: '11px',
   fontWeight: '500',
-  ...(colorMap[status] || { background: '#e5e7eb', color: '#374151' }),
+  letterSpacing: '0.02em',
+  ...(colorMap[status] || { background: '#F3F4F6', color: '#374151' }),
 });
 
+const label = (status) =>
+  status.charAt(0).toUpperCase() + status.slice(1);
+
 export default function Badge({ status }) {
-  return <span style={badgeStyle(status)}>{status}</span>;
+  return (
+    <span style={badgeStyle(status)}>{label(status)}</span>
+  );
 }
 
 Badge.propTypes = {

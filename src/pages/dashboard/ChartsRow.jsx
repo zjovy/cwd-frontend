@@ -1,197 +1,35 @@
-import { useEffect, useState } from 'react';
-
-import Card from '@/common/components/atoms/Card';
-import SectionTitle from '@/common/components/atoms/SectionTitle';
-import dashboardService from '@/services/dashboardService';
 import PropTypes from 'prop-types';
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
 
-const rowStyle = {
-  display: 'flex',
-  gap: '20px',
-  marginTop: '20px',
-};
+import DefaultCharts from './DefaultCharts';
+import FilteredChart from './FilteredChart';
 
-const tooltipStyle = {
-  background: '#fff',
-  border: '1px solid #e5e7eb',
-  borderRadius: '8px',
-  padding: '8px 12px',
-  fontSize: '13px',
-  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-};
-
-const tooltipLabelStyle = {
-  color: '#6b7280',
-  fontWeight: '500',
-  marginBottom: '2px',
-};
-
-const tooltipValueStyle = {
-  color: '#1a1a1a',
-  fontWeight: '700',
-  fontSize: '14px',
-};
-
-function CustomTooltip({ active, payload, label }) {
-  if (active && payload?.length && payload[0].value != null) {
-    return (
-      <div style={tooltipStyle}>
-        <div style={tooltipLabelStyle}>{label}</div>
-        <div style={tooltipValueStyle}>
-          ${Number(payload[0].value).toLocaleString()}
-        </div>
-      </div>
-    );
-  }
-  return null;
-}
-
-CustomTooltip.propTypes = {
-  active: PropTypes.bool,
-  payload: PropTypes.array,
-  label: PropTypes.string,
-};
-
-CustomTooltip.defaultProps = {
-  active: false,
-  payload: [],
-  label: '',
-};
-
-ChartsRow.propTypes = {
-  refreshKey: PropTypes.number.isRequired,
-};
-
-export default function ChartsRow({ refreshKey }) {
-  const [trendData, setTrendData] = useState([]);
-  const [monthlyData, setMonthlyData] = useState([]);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const fetchCharts = async () => {
-      try {
-        const [trend, monthly] = await Promise.all([
-          dashboardService.getTrend(controller.signal),
-          dashboardService.getLast6Months(controller.signal),
-        ]);
-        setTrendData(Array.isArray(trend) ? trend : []);
-        setMonthlyData(Array.isArray(monthly) ? monthly : []);
-        setError(null);
-      } catch (err) {
-        if (err.name !== 'AbortError') {
-          console.error('Failed to fetch chart data:', err);
-          setError(err.message);
-        }
-      }
-    };
-
-    fetchCharts();
-
-    return () => controller.abort();
-  }, [refreshKey]);
-
+export default function ChartsRow({ refreshKey, activeRange, bucketOverride }) {
   return (
-    <div style={rowStyle}>
-      <Card style={{ flex: 1, padding: '22px 22px 16px' }}>
-        <SectionTitle>Donation Trend</SectionTitle>
-        {error ? (
-          <div
-            style={{ color: '#dc2626', padding: '20px', textAlign: 'center' }}
-          >
-            Failed to load chart data: {error}
-          </div>
-        ) : (
-          <ResponsiveContainer width='100%' height={200}>
-            <LineChart
-              data={trendData}
-              margin={{ top: 4, right: 4, left: -20, bottom: 0 }}
-            >
-              <CartesianGrid
-                strokeDasharray='3 3'
-                stroke='#f0f0ee'
-                vertical={false}
-              />
-              <XAxis
-                dataKey='year'
-                tick={{ fontSize: 12, fill: '#9ca3af' }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tick={{ fontSize: 12, fill: '#9ca3af' }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip
-                content={<CustomTooltip />}
-                cursor={{ stroke: '#e8e8e6', strokeWidth: 1 }}
-              />
-              <Line
-                type='monotone'
-                dataKey='amount'
-                stroke='#3b82f6'
-                strokeWidth={2.5}
-                dot={false}
-                activeDot={{ r: 5 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        )}
-      </Card>
-
-      <Card style={{ flex: 1, padding: '22px 22px 16px' }}>
-        <SectionTitle>Last 6 Months</SectionTitle>
-        {error ? (
-          <div
-            style={{ color: '#dc2626', padding: '20px', textAlign: 'center' }}
-          >
-            Failed to load chart data: {error}
-          </div>
-        ) : (
-          <ResponsiveContainer width='100%' height={200}>
-            <BarChart
-              data={monthlyData}
-              margin={{ top: 4, right: 4, left: -20, bottom: 0 }}
-              barSize={28}
-            >
-              <CartesianGrid
-                strokeDasharray='3 3'
-                stroke='#f0f0ee'
-                vertical={false}
-              />
-              <XAxis
-                dataKey='month'
-                tick={{ fontSize: 12, fill: '#9ca3af' }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tick={{ fontSize: 12, fill: '#9ca3af' }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip
-                content={<CustomTooltip />}
-                cursor={{ fill: '#f5f5f4' }}
-              />
-              <Bar dataKey='amount' fill='#3b82f6' radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        )}
-      </Card>
+    <div style={{ marginTop: '20px' }}>
+      {activeRange ? (
+        <FilteredChart
+          activeRange={activeRange}
+          bucketOverride={bucketOverride}
+          refreshKey={refreshKey}
+        />
+      ) : (
+        <DefaultCharts refreshKey={refreshKey} />
+      )}
     </div>
   );
 }
+
+ChartsRow.propTypes = {
+  refreshKey: PropTypes.number,
+  activeRange: PropTypes.shape({
+    start: PropTypes.instanceOf(Date).isRequired,
+    end: PropTypes.instanceOf(Date).isRequired,
+  }),
+  bucketOverride: PropTypes.string,
+};
+
+ChartsRow.defaultProps = {
+  refreshKey: 0,
+  activeRange: null,
+  bucketOverride: 'auto',
+};

@@ -6,49 +6,59 @@
     onPageChange – (newPage) => void
 */
 import PropTypes from 'prop-types';
+import styled, { css } from 'styled-components';
 
-const styles = {
-  container: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '4px',
-    marginTop: '16px',
-  },
-  btn: {
-    minWidth: '34px',
-    height: '34px',
-    padding: '0 10px',
-    border: '1px solid #e5e7eb',
-    borderRadius: '8px',
-    background: '#fff',
-    fontSize: '13px',
-    fontWeight: '500',
-    color: '#374151',
-    cursor: 'pointer',
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  btnActive: {
-    background: '#2563eb',
-    borderColor: '#2563eb',
-    color: '#fff',
-  },
-  btnDisabled: {
-    opacity: 0.4,
-    cursor: 'not-allowed',
-  },
-  ellipsis: {
-    minWidth: '34px',
-    height: '34px',
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '13px',
-    color: '#9ca3af',
-  },
-};
+const Container = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 16px;
+`;
+
+const Btn = styled.button`
+  min-width: 34px;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+  }
+
+  ${({ $active }) =>
+    $active &&
+    css`
+      background: #2563eb;
+      border-color: #2563eb;
+      color: #fff;
+    `}
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+`;
+
+const Ellipsis = styled.span`
+  min-width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: #9ca3af;
+`;
 
 function getPageNumbers(page, totalPages) {
   if (totalPages <= 7) {
@@ -82,51 +92,38 @@ export default function Pagination({ page, totalPages, onPageChange }) {
   const pages = getPageNumbers(page, safeTotal);
 
   return (
-    <div style={styles.container}>
-      <button
-        style={{
-          ...styles.btn,
-          ...(page === 1 ? styles.btnDisabled : {}),
-        }}
+    <Container>
+      <Btn
         type='button'
         onClick={() => onPageChange(page - 1)}
         disabled={page === 1}
       >
         ←
-      </button>
+      </Btn>
 
       {pages.map((p, i) =>
         p === '…' ? (
-          <span key={`ellipsis-${i}`} style={styles.ellipsis}>
-            …
-          </span>
+          <Ellipsis key={`ellipsis-${i}`}>…</Ellipsis>
         ) : (
-          <button
+          <Btn
             key={p}
             type='button'
-            style={{
-              ...styles.btn,
-              ...(p === page ? styles.btnActive : {}),
-            }}
+            $active={p === page}
             onClick={() => onPageChange(p)}
           >
             {p}
-          </button>
+          </Btn>
         )
       )}
 
-      <button
-        style={{
-          ...styles.btn,
-          ...(page === safeTotal ? styles.btnDisabled : {}),
-        }}
+      <Btn
         type='button'
         onClick={() => onPageChange(page + 1)}
         disabled={page === safeTotal}
       >
         →
-      </button>
-    </div>
+      </Btn>
+    </Container>
   );
 }
 
