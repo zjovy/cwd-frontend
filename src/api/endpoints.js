@@ -13,4 +13,5 @@ export const ENDPOINTS = {
   AUTH_USERS: '/auth/users',
   AUTH_SET_ROLE: (uid) => `/auth/users/${uid}/role`,
   SYNC_STRIPE: '/sync/stripe/trigger',
+  SYNC_STRIPE_LAST: '/sync/stripe/last',
 };

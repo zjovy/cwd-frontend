@@ -17,6 +17,10 @@ const dashboardService = {
   syncStripe(signal) {
     return request(buildUrl(ENDPOINTS.SYNC_STRIPE), { method: 'POST', signal });
   },
+
+  getLastSync(signal) {
+    return request(buildUrl(ENDPOINTS.SYNC_STRIPE_LAST), { signal });
+  },
 };
 
 export default dashboardService;

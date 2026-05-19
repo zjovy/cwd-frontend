@@ -40,3 +40,35 @@ describe('dashboardService.syncStripe', () => {
     await expect(dashboardService.syncStripe()).rejects.toThrow('network error');
   });
 });
+
+describe('dashboardService.getLastSync', () => {
+  it('calls GET /sync/stripe/last', async () => {
+    client.request.mockResolvedValue({ synced_at: '2026-05-18T00:00:00.000Z' });
+
+    const result = await dashboardService.getLastSync();
+
+    expect(client.request).toHaveBeenCalledWith(
+      `http://localhost:5050${ENDPOINTS.SYNC_STRIPE_LAST}`,
+      { signal: undefined }
+    );
+    expect(result).toEqual({ synced_at: '2026-05-18T00:00:00.000Z' });
+  });
+
+  it('passes signal to request when provided', async () => {
+    client.request.mockResolvedValue({ synced_at: null });
+    const controller = new AbortController();
+
+    await dashboardService.getLastSync(controller.signal);
+
+    expect(client.request).toHaveBeenCalledWith(
+      `http://localhost:5050${ENDPOINTS.SYNC_STRIPE_LAST}`,
+      { signal: controller.signal }
+    );
+  });
+
+  it('rejects when request throws', async () => {
+    client.request.mockRejectedValue(new Error('network error'));
+
+    await expect(dashboardService.getLastSync()).rejects.toThrow('network error');
+  });
+});
