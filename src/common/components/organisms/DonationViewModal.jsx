@@ -10,11 +10,12 @@
 */
 import { useEffect, useState } from 'react';
 
+import { useUser } from '@/common/contexts/UserContext';
 import donationService from '@/services/donationService';
 import { Send } from 'lucide-react';
 import PropTypes from 'prop-types';
 
-import EmailPreviewModal from './EmailPreviewModal';
+import EmailPreviewModal from '@/pages/donations/EmailPreviewModal';
 
 /* ── styles ─────────────────────────────────────── */
 
@@ -114,14 +115,6 @@ const selectStyle = {
   cursor: 'pointer',
 };
 
-const footerRow = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  marginTop: '22px',
-  gap: '10px',
-};
-
 const btnBase = {
   padding: '8px 18px',
   borderRadius: '8px',
@@ -135,7 +128,9 @@ const sendBtn = {
   ...btnBase,
   display: 'inline-flex',
   alignItems: 'center',
+  justifyContent: 'center',
   gap: '6px',
+  width: '144px',
   background: '#f0fdf4',
   color: '#16a34a',
   border: '1px solid #bbf7d0',
@@ -155,6 +150,7 @@ const saveBtn = {
 
 const deleteBtn = {
   ...btnBase,
+  minWidth: '130px',
   background: '#fef2f2',
   color: '#dc2626',
   border: '1px solid #fecaca',
@@ -213,6 +209,9 @@ export default function DonationViewModal({
   onSave,
   onDelete,
 }) {
+  const { user } = useUser();
+  const isAdmin = user?.role === 'admin';
+
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -445,10 +444,18 @@ export default function DonationViewModal({
             </div>
           </div>
 
-          <div style={footerRow}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: '22px',
+              gap: '10px',
+            }}
+          >
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <button type='button' style={sendBtn} onClick={handleSendEmail}>
-                <Send size={13} /> Send Email
+                <Send size={13} color='#16a34a' /> Send Email
               </button>
               {emailMsg && (
                 <span
@@ -470,47 +477,49 @@ export default function DonationViewModal({
             </div>
           </div>
 
-          <div
-            style={{
-              borderTop: '1px solid #f0f0ee',
-              marginTop: '18px',
-              paddingTop: '16px',
-            }}
-          >
-            {confirmDelete ? (
-              <div
-                style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
-              >
-                <span style={{ fontSize: '13px', color: '#374151' }}>
-                  Delete this donation?
-                </span>
+          {isAdmin && (
+            <div
+              style={{
+                borderTop: '1px solid #f0f0ee',
+                marginTop: '18px',
+                paddingTop: '16px',
+              }}
+            >
+              {confirmDelete ? (
+                <div
+                  style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
+                >
+                  <span style={{ fontSize: '13px', color: '#374151' }}>
+                    Delete this donation?
+                  </span>
+                  <button
+                    type='button'
+                    style={cancelBtn}
+                    onClick={() => setConfirmDelete(false)}
+                    disabled={deleting}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type='button'
+                    style={deleteConfirmBtn}
+                    onClick={handleConfirmDelete}
+                    disabled={deleting}
+                  >
+                    {deleting ? 'Deleting…' : 'Yes, Delete'}
+                  </button>
+                </div>
+              ) : (
                 <button
                   type='button'
-                  style={cancelBtn}
-                  onClick={() => setConfirmDelete(false)}
-                  disabled={deleting}
+                  style={deleteBtn}
+                  onClick={() => setConfirmDelete(true)}
                 >
-                  Cancel
+                  Delete Donation
                 </button>
-                <button
-                  type='button'
-                  style={deleteConfirmBtn}
-                  onClick={handleConfirmDelete}
-                  disabled={deleting}
-                >
-                  {deleting ? 'Deleting…' : 'Yes, Delete'}
-                </button>
-              </div>
-            ) : (
-              <button
-                type='button'
-                style={deleteBtn}
-                onClick={() => setConfirmDelete(true)}
-              >
-                Delete Donation
-              </button>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </form>
       </div>
     </>
