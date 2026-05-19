@@ -1,13 +1,13 @@
-import { useState } from 'react';
-
-import { RefreshCw } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 import Button from '@/common/components/atoms/CommonButton';
 import { useUser } from '@/common/contexts/UserContext';
-import dashboardService from '@/services/dashboardService';
 import ChartsRow from '@/pages/dashboard/ChartsRow';
 import RecentDonations from '@/pages/dashboard/RecentDonations';
 import StatsRow from '@/pages/dashboard/StatsRow';
+import dashboardService from '@/services/dashboardService';
+import { formatRelativeTime } from '@/utils/format';
+import { RefreshCw } from 'lucide-react';
 
 const styles = {
   main: {
@@ -39,6 +39,12 @@ const styles = {
     marginTop: '6px',
     textAlign: 'right',
   },
+  lastSynced: {
+    fontSize: '12px',
+    color: '#6b7280',
+    marginTop: '4px',
+    textAlign: 'right',
+  },
 };
 
 export default function DashboardPage() {
@@ -47,6 +53,21 @@ export default function DashboardPage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [syncing, setSyncing] = useState(false);
   const [syncError, setSyncError] = useState(null);
+  const [lastSyncedAt, setLastSyncedAt] = useState(null);
+
+  const fetchLastSync = async () => {
+    try {
+      const { synced_at } = await dashboardService.getLastSync();
+      setLastSyncedAt(synced_at);
+    } catch {
+      // informational only — fail silently
+    }
+  };
+
+  useEffect(() => {
+    fetchLastSync();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSyncStripe = async () => {
     const controller = new AbortController();
@@ -56,6 +77,7 @@ export default function DashboardPage() {
     try {
       await dashboardService.syncStripe(controller.signal);
       setRefreshKey((k) => k + 1);
+      await fetchLastSync();
     } catch (err) {
       setSyncError('Sync failed — try again');
       console.error('Stripe sync error:', err);
@@ -75,16 +97,27 @@ export default function DashboardPage() {
           </div>
         </div>
         <div>
-          <Button variant='outline' onClick={handleSyncStripe} disabled={syncing}>
+          <Button
+            variant='outline'
+            onClick={handleSyncStripe}
+            disabled={syncing}
+          >
             <RefreshCw
               size={14}
               strokeWidth={2}
-              aria-hidden="true"
-              style={syncing ? { animation: 'spin 1s linear infinite' } : undefined}
+              aria-hidden='true'
+              style={
+                syncing ? { animation: 'spin 1s linear infinite' } : undefined
+              }
             />
             {syncing ? 'Syncing…' : 'Refresh Stripe'}
           </Button>
           {syncError && <div style={styles.syncError}>{syncError}</div>}
+          {lastSyncedAt && (
+            <div style={styles.lastSynced}>
+              Last synced {formatRelativeTime(lastSyncedAt)}
+            </div>
+          )}
         </div>
       </div>
 
