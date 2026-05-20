@@ -8,7 +8,7 @@ import useDonations from '@/hooks/useDonations';
 import { PAGE_SIZE } from '@/utils/pagination';
 import { Plus } from 'lucide-react';
 
-import DonationViewModal from '@/common/components/organisms/DonationViewModal';
+import DonationViewModal from './DonationViewModal';
 import DonationsFilterBar from './DonationsFilterBar';
 
 /* ── styles ─────────────────────────────────────────── */
@@ -78,6 +78,7 @@ export default function DonationsPage() {
     createDonation,
     updateDonation,
     deleteDonation,
+    refetchDonations,
   } = useDonations({ ...filters, page });
 
   // Give the hook a way to reset the page to 1 after create/delete
@@ -174,6 +175,7 @@ export default function DonationsPage() {
         donation={viewing}
         onSave={updateDonation}
         onDelete={handleDelete}
+        onReceiptSent={refetchDonations}
       />
     </main>
   );

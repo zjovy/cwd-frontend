@@ -50,7 +50,7 @@ const donationService = {
   },
 
   sendReceipt(id, body) {
-    return request(`${BASE_URL}/${id}/send-receipt`, {
+    return request(buildUrl(ENDPOINTS.DONATION_SEND_RECEIPT(id)), {
       method: 'POST',
       body: JSON.stringify({ body }),
     });
