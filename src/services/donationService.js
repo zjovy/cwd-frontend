@@ -55,6 +55,13 @@ const donationService = {
       body: JSON.stringify({ body }),
     });
   },
+
+  sendReceipts({ ids, allUnsent, filters, body } = {}) {
+    return request(buildUrl(ENDPOINTS.DONATIONS_SEND_RECEIPTS), {
+      method: 'POST',
+      body: JSON.stringify({ ids, allUnsent, filters, body }),
+    });
+  },
 };
 
 export default donationService;
