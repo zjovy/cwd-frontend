@@ -66,7 +66,7 @@ export default function RequestPasswordReset() {
       await requestPasswordReset(email);
       setSuccess(true);
     } catch (err) {
-      setError(err.message);
+      setError(mapResetErrorCodeToMessage(err.code));
     } finally {
       setIsLoading(false);
     }

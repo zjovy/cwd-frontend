@@ -35,6 +35,8 @@ function mapAuthCodeToMessage(authCode) {
       return 'Please enter a valid email address.';
     case 'auth/invalid-credential':
       return 'Email or password is incorrect. Please try again.';
+    case 'auth/popup-closed-by-user':
+      return 'Sign-in popup was closed. Please try again.';
     default:
       return 'An unexpected error occurred. Please try again.';
   }
@@ -174,7 +176,7 @@ export default function Login() {
     try {
       await googleAuth();
     } catch (error) {
-      setError(error.message);
+      setError(mapAuthCodeToMessage(error.code));
     }
   };
 
@@ -206,7 +208,7 @@ export default function Login() {
                   <Label htmlFor='email'>Email</Label>
                   <StyledInput
                     id='email'
-                    type='text'
+                    type='email'
                     name='email'
                     placeholder='j@example.com'
                     value={formState.email}

@@ -87,16 +87,6 @@ const RequirementsList = styled.ul`
   }
 `;
 
-const SuccessMsg = styled.div`
-  color: #1f2937;
-  padding: 14px;
-  border-radius: 8px;
-  background-color: #ecfdf5;
-  border: 1.5px solid #d1fae5;
-  font-size: 14px;
-  line-height: 1.5;
-`;
-
 const checkPasswordStrength = (password) => {
   const score =
     (password.length >= 8 ? 1 : 0) +
@@ -223,7 +213,7 @@ export default function ResetPassword() {
 
             {error && <ErrorMsg>{error}</ErrorMsg>}
 
-            {!error || oobCode ? (
+            {oobCode && (
               <form onSubmit={handleSubmit}>
                 <FieldGroup>
                   <Field>
@@ -305,8 +295,6 @@ export default function ResetPassword() {
                   {isLoading ? 'Updating...' : 'Update Password'}
                 </SubmitBtn>
               </form>
-            ) : (
-              <SuccessMsg>Password reset successfully!</SuccessMsg>
             )}
           </FormCard>
         </RightPanel>
