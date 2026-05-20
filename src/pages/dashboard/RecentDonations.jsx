@@ -42,7 +42,6 @@ export default function RecentDonations({ onMutate }) {
   const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selected, setSelected] = useState(new Set());
   const [viewing, setViewing] = useState(null);
   const [dateStart, setDateStart] = useState('');
   const [dateEnd, setDateEnd] = useState('');
@@ -73,7 +72,6 @@ export default function RecentDonations({ onMutate }) {
           });
         }
         setDonations(list);
-        setSelected(new Set());
       } catch (err) {
         if (err.name !== 'AbortError') setError(err.message);
       } finally {
@@ -88,19 +86,6 @@ export default function RecentDonations({ onMutate }) {
     fetchRecent(controller.signal);
     return () => controller.abort();
   }, [fetchRecent]);
-
-  const handleSelectChange = (id) => {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
-  const handleSelectAll = (selectAll) => {
-    setSelected(selectAll ? new Set(donations.map((d) => d.id)) : new Set());
-  };
 
   const handleUpdate = async (id, data) => {
     await donationService.update(id, data);
@@ -152,9 +137,6 @@ export default function RecentDonations({ onMutate }) {
           donations={donations}
           loading={loading}
           error={error}
-          selected={selected}
-          onSelectChange={handleSelectChange}
-          onSelectAll={handleSelectAll}
           onRowClick={(d) => setViewing(d)}
         />
       </Card>

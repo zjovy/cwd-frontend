@@ -20,10 +20,7 @@ import {
   titleStyle,
 } from './DonationViewModal.styles';
 import EmailPreviewModal from './EmailPreviewModal';
-import {
-  EMPTY_DONATION_VIEW_FORM,
-  fromDonationRow,
-} from './donationViewForm';
+import { EMPTY_DONATION_VIEW_FORM, fromDonationRow } from './donationViewForm';
 
 export default function DonationViewModal({
   open,
@@ -42,6 +39,7 @@ export default function DonationViewModal({
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState(null);
   const [emailMsg, setEmailMsg] = useState(null);
+  const [isEmailError, setIsEmailError] = useState(false);
   const [emailPreview, setEmailPreview] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
@@ -50,6 +48,7 @@ export default function DonationViewModal({
     setForm(fromDonationRow(donation));
     setError(null);
     setEmailMsg(null);
+    setIsEmailError(false);
     setConfirmDelete(false);
     setDeleting(false);
     setSending(false);
@@ -107,12 +106,14 @@ export default function DonationViewModal({
 
   const handleSendEmail = () => {
     setEmailMsg(null);
+    setIsEmailError(false);
     setEmailPreview(true);
   };
 
   const handleConfirmSend = async (body) => {
     setSending(true);
     setEmailMsg(null);
+    setIsEmailError(false);
     setError(null);
     try {
       await donationService.sendReceipt(donation.id, body);
@@ -121,7 +122,9 @@ export default function DonationViewModal({
       setEmailPreview(false);
       setEmailMsg(`Receipt sent to ${form.email}`);
     } catch (err) {
-      setEmailMsg(`Failed to send receipt: ${err.message}`);
+      console.error('[DonationViewModal] send receipt failed:', err);
+      setIsEmailError(true);
+      setEmailMsg('Failed to send receipt. Please try again.');
     } finally {
       setSending(false);
     }
@@ -138,12 +141,13 @@ export default function DonationViewModal({
         onClose={() => setEmailPreview(false)}
         onConfirm={handleConfirmSend}
       />
-      <div style={overlay}>
+      <div style={overlay} onClick={onClose}>
         <form
           aria-modal='true'
           role='dialog'
           style={modal}
           onSubmit={handleSave}
+          onClick={(e) => e.stopPropagation()}
         >
           <div style={headerRow}>
             <div style={titleStyle}>Donation Details</div>
@@ -159,7 +163,7 @@ export default function DonationViewModal({
           <DonationReceiptSection
             email={form.email}
             emailMsg={emailMsg}
-            isError={emailMsg?.startsWith('Failed')}
+            isError={isEmailError}
             onSendEmail={handleSendEmail}
             status={form.receipt_status}
           />

@@ -100,11 +100,6 @@ export const inputStyle = {
   background: '#fff',
 };
 
-export const selectStyle = {
-  ...inputStyle,
-  cursor: 'pointer',
-};
-
 export const footerRow = {
   display: 'flex',
   alignItems: 'center',

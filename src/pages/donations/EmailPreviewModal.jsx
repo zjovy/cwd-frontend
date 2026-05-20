@@ -36,8 +36,13 @@ export default function EmailPreviewModal({
   };
 
   return (
-    <div style={overlay}>
-      <div aria-modal='true' role='dialog' style={modal}>
+    <div style={overlay} onClick={onClose}>
+      <div
+        aria-modal='true'
+        role='dialog'
+        style={modal}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div style={headerRow}>
           <div style={titleStyle}>Preview Email</div>
           <button type='button' style={closeBtn} onClick={onClose}>
