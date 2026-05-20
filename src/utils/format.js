@@ -1,8 +1,14 @@
 export function formatDate(dateStr) {
+  // The backend stores donation_date as a DATE (YYYY-MM-DD) in the
+  // foundation's local timezone (America/Chicago). `new Date("2026-05-19")`
+  // parses as UTC midnight; toLocaleDateString in the browser's local TZ
+  // (e.g., Central) then shifts to the previous day. Format as UTC so the
+  // date renders exactly as stored.
   return new Date(dateStr).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
+    timeZone: 'UTC',
   });
 }
 
