@@ -116,7 +116,10 @@ export default function DashboardPage() {
 
   const handleSyncStripe = async () => {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30_000);
+    // 5 min — Stripe sync can take a while when pulling full history (e.g. first
+    // run after a truncate). Backend-side processing governs the real deadline;
+    // this just prevents the request from hanging indefinitely on network issues.
+    const timeoutId = setTimeout(() => controller.abort(), 5 * 60 * 1000);
     setSyncing(true);
     try {
       const {
