@@ -263,7 +263,7 @@ export default function DonationViewModal({
         donation_date: form.donation_date,
         receipt_status: form.receipt_status,
       });
-      onClose();
+      if (closeOnSave) onClose();
     } catch (err) {
       setError(err.message);
     } finally {
@@ -326,7 +326,7 @@ export default function DonationViewModal({
         onClose={() => setEmailPreview(false)}
         onConfirm={handleConfirmSend}
       />
-      <div style={overlayStyle} onClick={onClose}>
+      <div style={overlayStyle} onClick={showOverlay ? onClose : undefined}>
         <form
           style={modal}
           onClick={(e) => e.stopPropagation()}
