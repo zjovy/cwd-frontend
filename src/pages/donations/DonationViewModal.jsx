@@ -212,6 +212,8 @@ export default function DonationViewModal({
   donation,
   onSave,
   onDelete,
+  showOverlay = true,
+  closeOnSave = true,
 }) {
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
@@ -307,6 +309,13 @@ export default function DonationViewModal({
     setEmailMsg(`Opened mail client for ${form.email}`);
   };
 
+  const overlayStyle = showOverlay
+    ? overlay
+    : {
+        ...overlay,
+        background: 'rgba(0,0,0,0.16)',
+      };
+
   return (
     <>
       <EmailPreviewModal
@@ -317,7 +326,7 @@ export default function DonationViewModal({
         onClose={() => setEmailPreview(false)}
         onConfirm={handleConfirmSend}
       />
-      <div style={overlay} onClick={onClose}>
+      <div style={overlayStyle} onClick={onClose}>
         <form
           style={modal}
           onClick={(e) => e.stopPropagation()}
@@ -523,4 +532,6 @@ DonationViewModal.propTypes = {
   donation: PropTypes.object,
   onSave: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
+  showOverlay: PropTypes.bool,
+  closeOnSave: PropTypes.bool,
 };

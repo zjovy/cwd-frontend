@@ -62,11 +62,12 @@ export default function DonationDetailsPage() {
     <main style={styles.main}>
       <DonationViewModal
         open={true}
-        onClose={() => navigate(-1)}
+        onClose={() => navigate('/dashboard', { replace: true })}
         donation={donation}
         onSave={handleSaveDonation}
         onDelete={handleDeleteDonation}
         showOverlay={false}
+        closeOnSave={false}
       />
     </main>
   );
