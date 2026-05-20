@@ -1,0 +1,46 @@
+---
+sidebar_position: 4
+---
+
+# Admin (user management)
+
+**Route:** `/admin`  
+**Guard:** **`AdminRoute`** — only **`user.role === 'admin'`**  
+**Main file:** `src/pages/admin/index.jsx`
+
+## Purpose
+
+Administrators review **pending** signups and manage roles for accounts synced with Firebase + backend.
+
+## UI
+
+- Header: **User Management** title and description.  
+- **`UsersTable`** — lists users with actions (role changes, etc.).  
+- Users are grouped in the page logic into **requesting** (`role === 'pending'`), **active** (`member`), and **admins** — exact labels appear in the JSX.
+
+## Data hook
+
+**`useUsers`** (`src/hooks/useUsers.js`):
+
+- **`adminService.getUsers()`** on mount.  
+- **`setRole(uid, role)`** — PATCH role then updates local state with returned user when provided.  
+- Exposes **`loading`**, **`error`**, **`actionError`**, **`refetch`**.
+
+## Service API
+
+**`adminService`** (`src/services/adminService.js`):
+
+| Method | HTTP | Path |
+|--------|------|------|
+| `getUsers` | GET | `/auth/users` |
+| `setRole(uid, role)` | PATCH | `/auth/users/:uid/role` body `{ role }` |
+| `signup(data)` | POST | `/auth/signup` — admin-driven signup flow when used |
+
+## Sidebar visibility
+
+**`Sidebar`** only renders the **Admin** nav item when **`user.role === 'admin`** (`src/common/components/organisms/Sidebar.jsx`).
+
+## Related
+
+- [Routing and layout](../architecture/routing-and-layout)  
+- [Authentication](../architecture/authentication)  

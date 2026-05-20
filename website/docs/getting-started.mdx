@@ -1,0 +1,46 @@
+---
+sidebar_position: 2
+---
+
+# Getting Started
+
+This section helps you run the frontend, backend, and docs site together in local development.
+
+## Prerequisites
+
+- Node.js 20+
+- npm
+- Git
+- Firebase project credentials for auth
+- Backend `.env` and frontend `.env` configured from each `.env.example`
+
+## Local development flow
+
+1. Start backend API (`cwd-backend`) on `http://localhost:5050`.
+2. Start frontend SPA (`cwd-frontend`) on `http://localhost:5173` (or 5174).
+3. Start docs site in `cwd-frontend/website` using `npm run start`.
+
+## Recommended command order
+
+```bash
+# Terminal 1
+cd cwd-backend
+npm install
+npm run dev
+
+# Terminal 2
+cd cwd-frontend
+npm install
+npm run dev
+
+# Terminal 3
+cd cwd-frontend
+npm run docs:dev
+```
+
+## Environment checklist
+
+- Frontend: `VITE_BACKEND_URL`, Firebase `VITE_FIREBASE_*`
+- Backend: Firebase service key, DB configuration, CORS frontend URLs
+
+When auth fails, verify that backend CORS allows your local frontend URL and both services point to the same Firebase project.

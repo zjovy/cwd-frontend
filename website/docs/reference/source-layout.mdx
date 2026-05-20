@@ -1,0 +1,55 @@
+---
+sidebar_position: 2
+---
+
+# Source layout
+
+Abbreviated map of **`src/`** — useful when navigating the codebase.
+
+```
+src/
+├── api/
+│   ├── client.js          # buildUrl, authHeaders, request()
+│   ├── endpoints.js       # Path constants
+│   └── transformers.js    # API ↔ UI shapes
+├── assets/icons/
+├── common/
+│   ├── components/        # atoms, molecules, organisms, form, navigation, routes
+│   ├── contexts/
+│   │   └── UserContext.jsx
+│   └── layouts/           # NavLayout, MainLayout
+├── firebase-config.js
+├── hooks/                 # useDonors, useDonations, useDonorDetails, useUsers, …
+├── pages/
+│   ├── account/           # Login, SignUp, password reset, AuthCallback
+│   ├── admin/
+│   ├── dashboard/
+│   ├── donations/
+│   ├── donors/
+│   ├── no-access/
+│   └── not-found/
+├── services/              # donorService, donationService, dashboardService, adminService
+├── utils/                 # pagination, format, validators, …
+├── App.jsx
+├── main.jsx
+└── …
+```
+
+## Entry points
+
+| File | Role |
+|------|------|
+| `main.jsx` | React root mount |
+| `App.jsx` | `UserProvider`, `BrowserRouter`, route table |
+
+## Import alias
+
+**`@/`** → **`src/`** (configured in `vite.config.js`, `jsconfig.json`).
+
+## Tests
+
+Vitest setup references **`./src/test/setup.js`** in `vite.config.js` under `test.environment` **jsdom**.
+
+## Documentation site
+
+The Docusaurus project is **not** under `src/`; it lives in **`website/`** at the repo root.

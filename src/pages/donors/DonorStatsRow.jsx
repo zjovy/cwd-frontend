@@ -15,6 +15,7 @@ function formatMemberSince(date) {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
+    timeZone: 'UTC',
   });
 }
 

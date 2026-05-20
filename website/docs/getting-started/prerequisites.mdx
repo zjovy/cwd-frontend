@@ -1,0 +1,28 @@
+---
+sidebar_position: 1
+---
+
+# Prerequisites
+
+## Required
+
+- **Node.js** — **20.x or newer** (matches `website/package.json` engines and modern Vite). Check with `node -v`.
+- **npm** — Comes with Node; this repo uses `package-lock.json`.
+- **Git** — To clone and update the repository.
+
+## External services
+
+The SPA does not run in isolation. For full functionality you need:
+
+1. **Firebase project** — For email/password and Google sign-in. You will copy Web app config into `.env` as `VITE_FIREBASE_*` variables (see [Environment variables](./environment-variables)).
+2. **Backend API** — A server implementing the REST routes under `VITE_BACKEND_URL` (see [Backend endpoints](../reference/backend-endpoints)). The frontend expects JSON responses and sets cookies / `Authorization` headers as described in [Authentication](../architecture/authentication).
+
+## Optional
+
+- **Browser devtools** — Network tab is essential when debugging `/auth/token`, `/auth/me`, and data APIs.
+- **Same-machine backend** — Typical local URL is `http://localhost:5050`, matching the example in `.env.example`.
+
+## Related reading
+
+- [Installation](./installation)  
+- [Running locally](./running-locally)  

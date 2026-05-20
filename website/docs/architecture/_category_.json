@@ -1,0 +1,8 @@
+{
+  "label": "Architecture",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "How the SPA is structured: stack, routes, auth, and HTTP layer."
+  }
+}

@@ -78,6 +78,7 @@ export default function DonationsPage() {
     createDonation,
     updateDonation,
     deleteDonation,
+    refetchDonations,
   } = useDonations({ ...filters, page });
 
   // Give the hook a way to reset the page to 1 after create/delete
@@ -132,7 +133,7 @@ export default function DonationsPage() {
           </div>
         </div>
         <button style={styles.addBtn} onClick={openCreate}>
-          <Plus size={14} /> Add Donation
+          <Plus size={14} color='white' /> Add Donation
         </button>
       </div>
 
@@ -174,6 +175,7 @@ export default function DonationsPage() {
         donation={viewing}
         onSave={updateDonation}
         onDelete={handleDelete}
+        onReceiptSent={refetchDonations}
       />
     </main>
   );

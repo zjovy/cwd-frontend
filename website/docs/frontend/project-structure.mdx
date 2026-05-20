@@ -1,0 +1,219 @@
+---
+sidebar_position: 1
+---
+
+# Project Structure
+
+The frontend follows a modular React architecture designed for maintainability: shared UI and layout logic live in `common/`, domain pages live in `pages/`, and API/domain state logic is split into `api/`, `services/`, and `hooks/`.
+
+## Directory Overview
+
+```text
+cwd-frontend/
+├── public/                     # Static assets served directly
+├── src/                        # Main application source
+│   ├── api/                    # HTTP client primitives and endpoint constants
+│   ├── assets/                 # Icons and front-end static resources
+│   ├── common/                 # Shared components/contexts/layouts
+│   ├── hooks/                  # Domain-level hooks (donors/donations/users)
+│   ├── pages/                  # Route page implementations
+│   ├── services/               # API domain service layer
+│   └── utils/                  # Shared utility helpers
+└── website/                    # Docusaurus docs site
+```
+
+## Root Files (all tracked)
+
+- `.env.example`: Frontend environment template.
+- `.gitattributes`: Git attribute settings.
+- `.gitignore`: Ignore rules.
+- `.prettierignore`: Prettier ignore rules.
+- `.prettierrc`: Prettier formatting config.
+- `.vscode/extensions.json`: Recommended VSCode extensions.
+- `.vscode/settings.json`: Workspace editor settings.
+- `CLAUDE.md`: Agent/collaboration guidance.
+- `README.md`: Frontend onboarding and usage.
+- `eslint.config.js`: Lint config.
+- `index.html`: Vite HTML entry shell.
+- `jsconfig.json`: JS path alias/intellisense config.
+- `package-lock.json`: Locked dependency versions.
+- `package.json`: Scripts + dependency manifest.
+- `vite.config.js`: Vite config + alias + test settings.
+
+## Public Assets
+
+- `public/favricon.svg`: Favicon asset (note current spelling in repo is `favricon`).
+- `public/logo.png`: App logo.
+- `public/vite.svg`: Default Vite icon.
+
+## Source (`src/`) File-by-File
+
+### App Entry and Global Styles
+
+- `src/main.jsx`: React app mount entry.
+- `src/App.jsx`: Route tree and guard composition.
+- `src/index.css`: Global baseline styles.
+- `src/App.css`: App-level styles.
+- `src/firebase-config.js`: Firebase initialization.
+
+### API Layer
+
+- `src/api/client.js`: Request wrapper, auth headers, error handling.
+- `src/api/endpoints.js`: Backend endpoint constants/builders.
+- `src/api/transformers.js`: API data shape transformation helpers.
+
+### Assets
+
+- `src/assets/icons/eye.svg`: Visible password icon.
+- `src/assets/icons/eyeclosed.svg`: Hidden password icon.
+- `src/assets/icons/icons.js`: Central icon exports/mapping.
+
+### Common Shared Layer
+
+#### `src/common/components/atoms/`
+
+- `Avatar.jsx`: User/avatar display atom.
+- `Badge.jsx`: Status/label badge atom.
+- `Card.jsx`: Card container atom.
+- `CommonButton.jsx`: Shared button component.
+- `GoogleButton.jsx`: Google auth action button.
+- `NavItem.jsx`: Single nav item atom.
+- `Pagination.jsx`: Pagination controls.
+- `RequiredStar.jsx`: Required-field indicator.
+- `SectionTitle.jsx`: Section title atom.
+- `StatCard.jsx`: Dashboard stat card atom.
+- `Text.jsx`: Standardized text wrapper.
+- `tableStyles.js`: Shared table style config/helpers.
+
+#### `src/common/components/form/`
+
+- `Form.js`: Generic form wrapper.
+- `Input.jsx`: Reusable input field.
+- `SubmitButton.jsx`: Form submit button.
+- `styles.js`: Shared form styles.
+
+#### `src/common/components/molecules/`
+
+- `ActionsMenu.jsx`: Contextual action menu.
+- `UserProfile.jsx`: User profile summary component.
+
+#### `src/common/components/navigation/`
+
+- `LogoutModal.jsx`: Logout confirmation modal.
+- `NavBar.jsx`: Top navigation bar.
+
+#### `src/common/components/organisms/`
+
+- `DeleteConfirmModal.jsx`: Generic delete confirmation modal.
+- `DonationModal.jsx`: Donation create/edit modal.
+- `DonationTable.jsx`: Donation list table.
+- `DonorModal.jsx`: Donor create/edit modal.
+- `DonorsTable.jsx`: Donor list table.
+- `Sidebar.jsx`: Main side navigation.
+
+#### Other component groups
+
+- `src/common/components/routes/ProtectedRoutes.jsx`: `PrivateRoute`/`AdminRoute`/`PublicOnlyRoute`.
+- `src/common/components/users/UsersList.jsx`: User list rendering for admin flow.
+
+#### Context, Hooks, Layouts
+
+- `src/common/contexts/UserContext.jsx`: Auth lifecycle and user state source of truth.
+- `src/common/hooks/useHook.js`: Shared custom hook utility.
+- `src/common/layouts/MainLayout.jsx`: Main content layout container.
+- `src/common/layouts/NavLayout.jsx`: Navigation shell layout.
+
+### Domain Hooks
+
+- `src/hooks/useDonations.js`: Donations data operations hook.
+- `src/hooks/useDonorDetails.js`: Donor detail state hook.
+- `src/hooks/useDonors.js`: Donor list/query hook.
+- `src/hooks/useUsers.js`: Admin users/role management hook.
+
+### Route Pages
+
+#### `src/pages/account/`
+
+- `AuthCallback.jsx`: OAuth redirect callback handling.
+- `EmailVerification.jsx`: Email verification flow UI.
+- `Login.jsx`: Login page.
+- `RequestPasswordReset.jsx`: Forgot password request page.
+- `ResetPassword.jsx`: Reset password page.
+- `SignUp.jsx`: Signup page.
+- `styles.js`: Account page shared styles.
+
+#### `src/pages/admin/`
+
+- `UsersTable.jsx`: Admin users table.
+- `index.jsx`: Admin route page entry.
+
+#### `src/pages/dashboard/`
+
+- `ChartsRow.jsx`: Dashboard chart section.
+- `DeleteConfirmModal.jsx`: Dashboard-local delete confirmation.
+- `DonationModal.jsx`: Dashboard-local donation modal.
+- `RecentDonations.jsx`: Recent donations section.
+- `StatsRow.jsx`: KPI/stat cards row.
+- `index.jsx`: Dashboard page entry.
+
+#### `src/pages/donations/`
+
+- `DonationViewModal.jsx`: Donation detail modal.
+- `DonationsFilterBar.jsx`: Donation search/filter controls.
+- `EmailPreviewModal.jsx`: Donation email preview modal.
+- `index.jsx`: Donations page entry.
+
+#### `src/pages/donors/`
+
+- `ContactInfoCard.jsx`: Donor contact card.
+- `Details.jsx`: Donor details page.
+- `DonationHistoryCard.jsx`: Donor donation history card.
+- `DonorEditModal.jsx`: Donor edit modal.
+- `DonorStatsRow.jsx`: Donor stats row.
+- `DonorsFilterBar.jsx`: Donor search/filter controls.
+- `index.jsx`: Donors page entry.
+
+#### Remaining pages
+
+- `src/pages/home/Home.jsx`: Home page component.
+- `src/pages/no-access/NoAccess.jsx`: Pending/no-permission page.
+- `src/pages/not-found/NotFound.jsx`: 404 page.
+
+### Services
+
+- `src/services/adminService.js`: Admin-related API calls.
+- `src/services/dashboardService.js`: Dashboard API calls.
+- `src/services/donationService.js`: Donation API calls.
+- `src/services/donorService.js`: Donor API calls.
+
+### Utilities
+
+- `src/utils/chartData.js`: Chart data helpers.
+- `src/utils/constants.js`: Shared constants.
+- `src/utils/crypto.js`: Crypto-related helpers.
+- `src/utils/format.js`: Data/text formatting helpers.
+- `src/utils/pagination.js`: Pagination logic helpers.
+- `src/utils/validators.js`: Input/data validation helpers.
+
+## Dependencies
+
+Key runtime dependencies used in this frontend:
+
+- `react`, `react-dom`: UI framework/runtime.
+- `react-router`, `react-router-dom`: Routing.
+- `styled-components`: Component-level styling.
+- `firebase`: Authentication and identity integration.
+- `recharts`: Dashboard charts.
+- `lucide-react`: Icon library.
+
+## Tools Utilized
+
+- `vite`: Dev server and build pipeline.
+- `vitest` + Testing Library: Unit/component testing.
+- `eslint`: Code quality checks.
+- `prettier`: Formatting.
+
+## Notes
+
+- The list is based on tracked repository files.
+- `node_modules`, build outputs, and untracked local files are intentionally excluded.
