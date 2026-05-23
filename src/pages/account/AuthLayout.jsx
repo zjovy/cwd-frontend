@@ -295,3 +295,90 @@ export const ErrorMsg = styled.div`
   line-height: 1.5;
   margin-bottom: 24px;
 `;
+
+export const Divider = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #f0f0ee;
+  }
+
+  span {
+    font-size: 12px;
+    color: #c4c4c0;
+  }
+`;
+
+export const GoogleBtn = styled.button`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  background: #ffffff;
+  border: 1.5px solid #e8e8e6;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  color: #374151;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+
+  &:hover:not(:disabled) {
+    border-color: #d1d5db;
+    background: #fafaf9;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+`;
+
+export const SuccessMsg = styled.div`
+  color: #1f2937;
+  padding: 14px;
+  border-radius: 8px;
+  background-color: #ecfdf5;
+  border: 1.5px solid #d1fae5;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 24px;
+`;
+
+export function mapAuthCodeToMessage(code) {
+  switch (code) {
+    case 'auth/invalid-email':
+      return 'Please enter a valid email address.';
+    case 'auth/invalid-credential':
+      return 'Email or password is incorrect. Please try again.';
+    case 'auth/popup-closed-by-user':
+      return 'Sign-in popup was closed. Please try again.';
+    default:
+      return 'An unexpected error occurred. Please try again.';
+  }
+}
+
+export function mapResetErrorCodeToMessage(code) {
+  switch (code) {
+    case 'auth/invalid-email':
+      return 'Please enter a valid email address.';
+    case 'auth/user-not-found':
+      return 'No account found with that email address.';
+    case 'auth/too-many-requests':
+      return 'Too many attempts. Please wait before trying again.';
+    default:
+      return 'An unexpected error occurred. Please try again.';
+  }
+}
