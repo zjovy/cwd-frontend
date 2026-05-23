@@ -28,8 +28,6 @@ export default function DonationViewModal({
   donation,
   onSave,
   onDelete,
-  showOverlay = true,
-  closeOnSave = true,
   onReceiptSent,
 }) {
   const { user } = useUser();
@@ -87,7 +85,7 @@ export default function DonationViewModal({
         donation_date: form.donation_date,
         receipt_status: form.receipt_status,
       });
-      if (closeOnSave) onClose();
+      onClose();
     } catch (err) {
       setError(err.message);
     } finally {
@@ -132,13 +130,6 @@ export default function DonationViewModal({
     }
   };
 
-  const overlayStyle = showOverlay
-    ? overlay
-    : {
-        ...overlay,
-        background: 'rgba(0,0,0,0.16)',
-      };
-
   return (
     <>
       <EmailPreviewModal
@@ -150,7 +141,7 @@ export default function DonationViewModal({
         onClose={() => setEmailPreview(false)}
         onConfirm={handleConfirmSend}
       />
-      <div style={overlayStyle} onClick={showOverlay ? onClose : undefined}>
+      <div style={overlay} onClick={onClose}>
         <form
           aria-modal='true'
           role='dialog'
@@ -198,8 +189,6 @@ DonationViewModal.propTypes = {
   donation: PropTypes.object,
   onSave: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
-  showOverlay: PropTypes.bool,
-  closeOnSave: PropTypes.bool,
   onReceiptSent: PropTypes.func,
 };
 
