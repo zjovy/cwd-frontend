@@ -30,57 +30,10 @@ import {
   EyeBtn,
   SubmitBtn,
   ErrorMsg,
+  Divider,
+  GoogleBtn,
+  mapAuthCodeToMessage,
 } from '@/pages/account/AuthLayout';
-
-const Divider = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 18px 0;
-
-  &::before,
-  &::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: #f0f0ee;
-  }
-
-  span {
-    font-size: 12px;
-    color: #c4c4c0;
-  }
-`;
-
-const GoogleBtn = styled.button`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px;
-  background: #ffffff;
-  border: 1.5px solid #e8e8e6;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  font-family: inherit;
-  color: #374151;
-  cursor: pointer;
-  transition:
-    border-color 0.15s,
-    background 0.15s;
-
-  &:hover:not(:disabled) {
-    border-color: #d1d5db;
-    background: #fafaf9;
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-`;
 
 const SignInLink = styled(Link)`
   display: block;
@@ -119,7 +72,7 @@ export default function SignUp() {
     try {
       await googleAuth();
     } catch (error) {
-      setError(error.message);
+      setError(mapAuthCodeToMessage(error.code));
     }
   };
 
@@ -242,6 +195,7 @@ export default function SignUp() {
                     />
                     <EyeBtn
                       type='button'
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
                       onClick={() => setShowPassword((p) => !p)}
                       tabIndex={-1}
                     >
