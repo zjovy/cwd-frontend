@@ -1,0 +1,39 @@
+---
+sidebar_position: 3
+---
+
+# Authentication
+
+Sokana CRM uses a hybrid auth model:
+
+- **Firebase Auth** for identity (email/password + Google)
+- **Backend auth endpoints** for application profile and role control
+
+## Login lifecycle
+
+1. User signs in through Firebase.
+2. Frontend obtains an ID token from Firebase.
+3. Frontend calls `POST /auth/token` to sync session state.
+4. Frontend calls `GET /auth/me` to fetch app profile + role.
+5. Route guards (`PrivateRoute`, `AdminRoute`) allow or restrict pages.
+
+## Role behavior
+
+- `pending`: redirected to `/no-access`
+- `member`: standard product access
+- `admin`: includes admin page and admin actions
+
+## Backend endpoints used in auth flow
+
+- `POST /auth/signup`
+- `POST /auth/login`
+- `POST /auth/token`
+- `GET /auth/me`
+- `GET /auth/users` (admin only)
+- `PATCH /auth/users/:uid/role` (admin only)
+
+## Debugging checklist
+
+- Confirm frontend sends `Authorization: Bearer <idToken>`
+- Confirm backend CORS includes local frontend origin
+- Confirm Firebase service account key matches the same project as frontend config

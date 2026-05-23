@@ -40,9 +40,10 @@ export function transformDonor(raw) {
 // Add computed donorFullName + donorEmail to a raw donation row (from joined donor fields).
 export function transformDonation(raw) {
   if (!raw) return raw;
+  const name = `${raw.first_name ?? ''} ${raw.last_name ?? ''}`.trim();
   return {
     ...raw,
-    donorFullName: `${raw.first_name ?? ''} ${raw.last_name ?? ''}`.trim(),
+    donorFullName: name || 'Anonymous',
     donorEmail: raw.email ?? '',
   };
 }

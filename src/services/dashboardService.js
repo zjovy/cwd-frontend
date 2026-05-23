@@ -13,6 +13,28 @@ const dashboardService = {
   getSummary(signal) {
     return request(buildUrl(ENDPOINTS.DASHBOARD_SUMMARY), { signal });
   },
+
+  syncStripe(signal) {
+    return request(buildUrl(ENDPOINTS.SYNC_STRIPE), { method: 'POST', signal });
+  },
+
+  getLastSync(signal) {
+    return request(buildUrl(ENDPOINTS.SYNC_STRIPE_LAST), { signal });
+  },
+
+  getRangeSummary(startDate, endDate, signal) {
+    const q = new URLSearchParams({ startDate, endDate }).toString();
+    return request(buildUrl(`${ENDPOINTS.DASHBOARD_RANGE_SUMMARY}?${q}`), {
+      signal,
+    });
+  },
+
+  getRangeTrend(startDate, endDate, bucket, signal) {
+    const q = new URLSearchParams({ startDate, endDate, bucket }).toString();
+    return request(buildUrl(`${ENDPOINTS.DASHBOARD_RANGE_TREND}?${q}`), {
+      signal,
+    });
+  },
 };
 
 export default dashboardService;

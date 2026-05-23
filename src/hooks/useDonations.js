@@ -69,6 +69,10 @@ export default function useDonations(filters = {}) {
     await fetchDonations(filtersRef.current);
   };
 
+  const refetchDonations = async () => {
+    await fetchDonations(filtersRef.current);
+  };
+
   const deleteDonation = async (id) => {
     await donationService.delete(id);
     // Delete changes total count — go back to page 1 to avoid empty page
@@ -85,5 +89,6 @@ export default function useDonations(filters = {}) {
     createDonation,
     updateDonation,
     deleteDonation,
+    refetchDonations,
   };
 }

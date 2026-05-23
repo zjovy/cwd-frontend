@@ -1,6 +1,5 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
-import NavBar from '@/common/components/navigation/NavBar';
 import Sidebar from '@/common/components/organisms/Sidebar';
 import styled from 'styled-components';
 
@@ -32,7 +31,7 @@ export default function NavLayout() {
 
   return (
     <Layout>
-      {!isAuthPage && <NavBar />}
+      {!isAuthPage}
       <Body>
         {!hideSidebar && (
           <Sidebar activePage={activePage} onNavigate={handleNavigate} />
