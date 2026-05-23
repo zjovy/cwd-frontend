@@ -23,6 +23,7 @@ import {
   StyledInput,
   SubmitBtn,
   ErrorMsg,
+  mapResetErrorCodeToMessage,
 } from '@/pages/account/AuthLayout';
 
 const BackLink = styled(Link)`
