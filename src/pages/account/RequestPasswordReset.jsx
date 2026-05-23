@@ -1,55 +1,30 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import styled from 'styled-components';
 
 import { useUser } from '@/common/contexts/UserContext';
 import {
+  AuthNavLink,
+  ErrorMsg,
+  Field,
+  FieldGroup,
   FontImport,
-  PageWrapper,
-  LeftPanel,
-  PanelRing,
-  PanelAccentBar,
-  HeroText,
-  HeroTitle,
-  HeroSubtitle,
-  RightPanel,
   FormCard,
   FormHeader,
-  FormTitle,
   FormSubtitle,
-  FieldGroup,
-  Field,
+  FormTitle,
+  HeroSubtitle,
+  HeroText,
+  HeroTitle,
   Label,
+  LeftPanel,
+  PageWrapper,
+  PanelAccentBar,
+  PanelRing,
+  RightPanel,
   StyledInput,
   SubmitBtn,
-  ErrorMsg,
+  SuccessMsg,
   mapResetErrorCodeToMessage,
 } from '@/pages/account/AuthLayout';
-
-const BackLink = styled(Link)`
-  display: block;
-  text-align: center;
-  margin-top: 16px;
-  font-size: 14px;
-  color: #6b7280;
-  text-decoration: none;
-  transition: color 0.15s;
-
-  &:hover {
-    color: #3b82f6;
-  }
-`;
-
-const SuccessMessage = styled.div`
-  color: #1f2937;
-  padding: 14px;
-  border-radius: 8px;
-  background-color: #ecfdf5;
-  border: 1.5px solid #d1fae5;
-  font-size: 14px;
-  line-height: 1.5;
-  margin-bottom: 24px;
-`;
 
 export default function RequestPasswordReset() {
   const [email, setEmail] = useState('');
@@ -119,18 +94,17 @@ export default function RequestPasswordReset() {
                   </SubmitBtn>
                 </form>
 
-                <BackLink to='/login'>Back to Login</BackLink>
+                <AuthNavLink to='/login'>Back to Login</AuthNavLink>
               </>
             ) : (
               <>
-                <SuccessMessage>
+                <SuccessMsg>
                   ✓ Password reset instructions have been sent to your email.
-                  Please check your inbox and follow the link. If you
-                  don&apos;t see it within a few minutes, check your spam
-                  folder.
-                </SuccessMessage>
+                  Please check your inbox and follow the link. If you don&apos;t
+                  see it within a few minutes, check your spam folder.
+                </SuccessMsg>
 
-                <BackLink to='/login'>Back to Login</BackLink>
+                <AuthNavLink to='/login'>Back to Login</AuthNavLink>
               </>
             )}
           </FormCard>

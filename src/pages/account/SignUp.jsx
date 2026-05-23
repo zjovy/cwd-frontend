@@ -1,53 +1,39 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { signInWithCustomToken } from 'firebase/auth';
-import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
-import { auth } from '@/firebase-config';
 import { useUser } from '@/common/contexts/UserContext';
-import adminService from '@/services/adminService';
-import { Eye, EyeOff } from 'lucide-react';
+import { auth } from '@/firebase-config';
 import {
+  AuthNavLink,
+  Divider,
+  ErrorMsg,
+  EyeBtn,
+  Field,
+  FieldGroup,
   FontImport,
-  PageWrapper,
-  LeftPanel,
-  PanelRing,
-  PanelAccentBar,
-  HeroText,
-  HeroTitle,
-  HeroSubtitle,
-  RightPanel,
   FormCard,
   FormHeader,
-  FormTitle,
   FormSubtitle,
-  FieldGroup,
-  Field,
-  Label,
-  StyledInput,
-  PasswordWrapper,
-  PasswordInput,
-  EyeBtn,
-  SubmitBtn,
-  ErrorMsg,
-  Divider,
+  FormTitle,
   GoogleBtn,
+  HeroSubtitle,
+  HeroText,
+  HeroTitle,
+  Label,
+  LeftPanel,
+  PageWrapper,
+  PanelAccentBar,
+  PanelRing,
+  PasswordInput,
+  PasswordWrapper,
+  RightPanel,
+  StyledInput,
+  SubmitBtn,
   mapAuthCodeToMessage,
 } from '@/pages/account/AuthLayout';
-
-const SignInLink = styled(Link)`
-  display: block;
-  text-align: center;
-  margin-top: 16px;
-  font-size: 14px;
-  color: #6b7280;
-  text-decoration: none;
-  transition: color 0.15s;
-
-  &:hover {
-    color: #3b82f6;
-  }
-`;
+import adminService from '@/services/adminService';
+import { signInWithCustomToken } from 'firebase/auth';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -114,7 +100,7 @@ export default function SignUp() {
       }
     } catch (error) {
       console.error('Signup error:', error);
-      setError(error.message || 'Failed to create account. Please try again.');
+      setError(mapAuthCodeToMessage(error.code));
     } finally {
       setIsLoading(false);
     }
@@ -195,15 +181,13 @@ export default function SignUp() {
                     />
                     <EyeBtn
                       type='button'
-                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      aria-label={
+                        showPassword ? 'Hide password' : 'Show password'
+                      }
                       onClick={() => setShowPassword((p) => !p)}
                       tabIndex={-1}
                     >
-                      {showPassword ? (
-                        <EyeOff size={15} />
-                      ) : (
-                        <Eye size={15} />
-                      )}
+                      {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                     </EyeBtn>
                   </PasswordWrapper>
                 </Field>
@@ -244,7 +228,9 @@ export default function SignUp() {
               Continue with Google
             </GoogleBtn>
 
-            <SignInLink to='/login'>Already have an account? Sign in</SignInLink>
+            <AuthNavLink to='/login'>
+              Already have an account? Sign in
+            </AuthNavLink>
           </FormCard>
         </RightPanel>
       </PageWrapper>

@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 import styled, { createGlobalStyle } from 'styled-components';
 
 export const FontImport = createGlobalStyle`
@@ -355,6 +357,20 @@ export const SuccessMsg = styled.div`
   font-size: 14px;
   line-height: 1.5;
   margin-bottom: 24px;
+`;
+
+export const AuthNavLink = styled(Link)`
+  display: block;
+  text-align: center;
+  margin-top: 16px;
+  font-size: 14px;
+  color: #6b7280;
+  text-decoration: none;
+  transition: color 0.15s;
+
+  &:hover {
+    color: #3b82f6;
+  }
 `;
 
 export function mapAuthCodeToMessage(code) {

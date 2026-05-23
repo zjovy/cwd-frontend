@@ -2,32 +2,32 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { auth } from '@/firebase-config';
+import {
+  ErrorMsg,
+  EyeBtn,
+  Field,
+  FieldGroup,
+  FontImport,
+  FormCard,
+  FormHeader,
+  FormSubtitle,
+  FormTitle,
+  HeroSubtitle,
+  HeroText,
+  HeroTitle,
+  Label,
+  LeftPanel,
+  PageWrapper,
+  PanelAccentBar,
+  PanelRing,
+  PasswordInput,
+  PasswordWrapper,
+  RightPanel,
+  SubmitBtn,
+} from '@/pages/account/AuthLayout';
 import { confirmPasswordReset } from 'firebase/auth';
 import { Eye, EyeOff } from 'lucide-react';
 import styled from 'styled-components';
-import {
-  FontImport,
-  PageWrapper,
-  LeftPanel,
-  PanelRing,
-  PanelAccentBar,
-  HeroText,
-  HeroTitle,
-  HeroSubtitle,
-  RightPanel,
-  FormCard,
-  FormHeader,
-  FormTitle,
-  FormSubtitle,
-  FieldGroup,
-  Field,
-  Label,
-  PasswordWrapper,
-  PasswordInput,
-  EyeBtn,
-  SubmitBtn,
-  ErrorMsg,
-} from '@/pages/account/AuthLayout';
 
 const PasswordStrength = styled.div`
   height: 4px;
@@ -179,7 +179,7 @@ export default function ResetPassword() {
           'Reset link is invalid or already used. Please request a new one.'
         );
       } else {
-        setError(err.message || 'Failed to reset password. Please try again.');
+        setError('Failed to reset password. Please try again.');
       }
     } finally {
       setIsLoading(false);
@@ -229,7 +229,9 @@ export default function ResetPassword() {
                       />
                       <EyeBtn
                         type='button'
-                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                        aria-label={
+                          showPassword ? 'Hide password' : 'Show password'
+                        }
                         onClick={() => setShowPassword((p) => !p)}
                         tabIndex={-1}
                       >
@@ -244,19 +246,47 @@ export default function ResetPassword() {
                       <>
                         <PasswordStrength $strength={strength} />
                         <RequirementsList>
-                          <li className={unmet.includes('At least 8 characters') ? 'unmet' : ''}>
+                          <li
+                            className={
+                              unmet.includes('At least 8 characters')
+                                ? 'unmet'
+                                : ''
+                            }
+                          >
                             At least 8 characters
                           </li>
-                          <li className={unmet.includes('One uppercase letter') ? 'unmet' : ''}>
+                          <li
+                            className={
+                              unmet.includes('One uppercase letter')
+                                ? 'unmet'
+                                : ''
+                            }
+                          >
                             One uppercase letter
                           </li>
-                          <li className={unmet.includes('One lowercase letter') ? 'unmet' : ''}>
+                          <li
+                            className={
+                              unmet.includes('One lowercase letter')
+                                ? 'unmet'
+                                : ''
+                            }
+                          >
                             One lowercase letter
                           </li>
-                          <li className={unmet.includes('One number') ? 'unmet' : ''}>
+                          <li
+                            className={
+                              unmet.includes('One number') ? 'unmet' : ''
+                            }
+                          >
                             One number
                           </li>
-                          <li className={unmet.includes('One special character') ? 'unmet' : ''}>
+                          <li
+                            className={
+                              unmet.includes('One special character')
+                                ? 'unmet'
+                                : ''
+                            }
+                          >
                             One special character (!@#$%^&*)
                           </li>
                         </RequirementsList>
@@ -277,7 +307,11 @@ export default function ResetPassword() {
                       />
                       <EyeBtn
                         type='button'
-                        aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                        aria-label={
+                          showConfirmPassword
+                            ? 'Hide confirm password'
+                            : 'Show confirm password'
+                        }
                         onClick={() => setShowConfirmPassword((p) => !p)}
                         tabIndex={-1}
                       >
