@@ -3,8 +3,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import Button from '@/common/components/atoms/CommonButton';
 import useDonorDetails from '@/hooks/useDonorDetails';
+import donationService from '@/services/donationService';
 import { ArrowLeft } from 'lucide-react';
 
+import DonationViewModal from '@/common/components/organisms/DonationViewModal';
 import ContactInfoCard from './ContactInfoCard';
 import DonationHistoryCard from './DonationHistoryCard';
 import DonorEditModal from './DonorEditModal';
@@ -77,8 +79,9 @@ function earliestDonationDate(history) {
 export default function DonorDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { donor, history, loading, error, updateDonor } = useDonorDetails(id);
+  const { donor, history, loading, error, updateDonor, refetch } = useDonorDetails(id);
   const [editOpen, setEditOpen] = useState(false);
+  const [viewing, setViewing] = useState(null);
 
   const tags = useMemo(() => deriveTags(donor, history), [donor, history]);
   const memberSince = useMemo(() => earliestDonationDate(history), [history]);
@@ -110,6 +113,17 @@ export default function DonorDetailsPage() {
       </main>
     );
   }
+
+  const handleUpdateDonation = async (donationId, data) => {
+    await donationService.update(donationId, data);
+    await refetch();
+  };
+
+  const handleDeleteDonation = async (donationId) => {
+    await donationService.delete(donationId);
+    setViewing(null);
+    await refetch();
+  };
 
   return (
     <main style={styles.main}>
@@ -148,6 +162,7 @@ export default function DonorDetailsPage() {
         donations={history}
         loading={loading}
         error={error}
+        onRowClick={(d) => setViewing(d)}
       />
 
       <DonorEditModal
@@ -155,6 +170,15 @@ export default function DonorDetailsPage() {
         onClose={() => setEditOpen(false)}
         onSubmit={updateDonor}
         donor={donor}
+      />
+
+      <DonationViewModal
+        open={Boolean(viewing)}
+        onClose={() => setViewing(null)}
+        donation={viewing}
+        onSave={handleUpdateDonation}
+        onDelete={handleDeleteDonation}
+        onReceiptSent={refetch}
       />
     </main>
   );
