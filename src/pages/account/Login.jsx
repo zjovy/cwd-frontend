@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 import { useUser } from '@/common/contexts/UserContext';
 import { Eye, EyeOff } from 'lucide-react';
@@ -27,20 +27,11 @@ import {
   EyeBtn,
   SubmitBtn,
   ErrorMsg,
+  Divider,
+  GoogleBtn,
+  SuccessMsg,
+  mapAuthCodeToMessage,
 } from '@/pages/account/AuthLayout';
-
-function mapAuthCodeToMessage(authCode) {
-  switch (authCode) {
-    case 'auth/invalid-email':
-      return 'Please enter a valid email address.';
-    case 'auth/invalid-credential':
-      return 'Email or password is incorrect. Please try again.';
-    case 'auth/popup-closed-by-user':
-      return 'Sign-in popup was closed. Please try again.';
-    default:
-      return 'An unexpected error occurred. Please try again.';
-  }
-}
 
 const FieldFooter = styled.div`
   display: flex;
@@ -55,56 +46,6 @@ const ForgotLink = styled(Link)`
 
   &:hover {
     color: #3b82f6;
-  }
-`;
-
-const Divider = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 18px 0;
-
-  &::before,
-  &::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: #f0f0ee;
-  }
-
-  span {
-    font-size: 12px;
-    color: #c4c4c0;
-  }
-`;
-
-const GoogleBtn = styled.button`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px;
-  background: #ffffff;
-  border: 1.5px solid #e8e8e6;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  font-family: inherit;
-  color: #374151;
-  cursor: pointer;
-  transition:
-    border-color 0.15s,
-    background 0.15s;
-
-  &:hover:not(:disabled) {
-    border-color: #d1d5db;
-    background: #fafaf9;
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
   }
 `;
 
@@ -142,6 +83,8 @@ const SignUpBtn = styled.button`
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const successMessage = location.state?.message ?? null;
   const { login, googleAuth } = useUser();
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -200,6 +143,7 @@ export default function Login() {
               <FormSubtitle>Sign in to your account to continue</FormSubtitle>
             </FormHeader>
 
+            {successMessage && <SuccessMsg>{successMessage}</SuccessMsg>}
             {error && <ErrorMsg>{error}</ErrorMsg>}
 
             <form onSubmit={handleSubmit}>
@@ -231,6 +175,7 @@ export default function Login() {
                     />
                     <EyeBtn
                       type='button'
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
                       onClick={() => setShowPassword((p) => !p)}
                       tabIndex={-1}
                     >
