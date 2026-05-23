@@ -76,7 +76,7 @@ const RequirementsList = styled.ul`
       content: '✓';
       position: absolute;
       left: 0;
-      color: ${({ $allMet }) => ($allMet ? '#10b981' : '#d1d5db')};
+      color: #10b981;
       font-weight: bold;
     }
 
@@ -229,6 +229,7 @@ export default function ResetPassword() {
                       />
                       <EyeBtn
                         type='button'
+                        aria-label={showPassword ? 'Hide password' : 'Show password'}
                         onClick={() => setShowPassword((p) => !p)}
                         tabIndex={-1}
                       >
@@ -242,25 +243,23 @@ export default function ResetPassword() {
                     {password && (
                       <>
                         <PasswordStrength $strength={strength} />
-                        {unmet.length > 0 && (
-                          <RequirementsList $allMet={unmet.length === 0}>
-                            <li className={unmet.includes('At least 8 characters') ? 'unmet' : ''}>
-                              At least 8 characters
-                            </li>
-                            <li className={unmet.includes('One uppercase letter') ? 'unmet' : ''}>
-                              One uppercase letter
-                            </li>
-                            <li className={unmet.includes('One lowercase letter') ? 'unmet' : ''}>
-                              One lowercase letter
-                            </li>
-                            <li className={unmet.includes('One number') ? 'unmet' : ''}>
-                              One number
-                            </li>
-                            <li className={unmet.includes('One special character') ? 'unmet' : ''}>
-                              One special character (!@#$%^&*)
-                            </li>
-                          </RequirementsList>
-                        )}
+                        <RequirementsList>
+                          <li className={unmet.includes('At least 8 characters') ? 'unmet' : ''}>
+                            At least 8 characters
+                          </li>
+                          <li className={unmet.includes('One uppercase letter') ? 'unmet' : ''}>
+                            One uppercase letter
+                          </li>
+                          <li className={unmet.includes('One lowercase letter') ? 'unmet' : ''}>
+                            One lowercase letter
+                          </li>
+                          <li className={unmet.includes('One number') ? 'unmet' : ''}>
+                            One number
+                          </li>
+                          <li className={unmet.includes('One special character') ? 'unmet' : ''}>
+                            One special character (!@#$%^&*)
+                          </li>
+                        </RequirementsList>
                       </>
                     )}
                   </Field>
@@ -278,6 +277,7 @@ export default function ResetPassword() {
                       />
                       <EyeBtn
                         type='button'
+                        aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
                         onClick={() => setShowConfirmPassword((p) => !p)}
                         tabIndex={-1}
                       >
