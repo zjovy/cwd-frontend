@@ -27,7 +27,7 @@ const badgeStyle = (status) => ({
 });
 
 const label = (status) =>
-  status.charAt(0).toUpperCase() + status.slice(1);
+  status ? status.charAt(0).toUpperCase() + status.slice(1) : '—';
 
 export default function Badge({ status }) {
   return (
@@ -36,5 +36,5 @@ export default function Badge({ status }) {
 }
 
 Badge.propTypes = {
-  status: PropTypes.string.isRequired,
+  status: PropTypes.string,
 };

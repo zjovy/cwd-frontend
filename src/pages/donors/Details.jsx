@@ -6,7 +6,7 @@ import useDonorDetails from '@/hooks/useDonorDetails';
 import donationService from '@/services/donationService';
 import { ArrowLeft } from 'lucide-react';
 
-import DonationViewModal from '../donations/DonationViewModal';
+import DonationViewModal from '@/common/components/organisms/DonationViewModal';
 import ContactInfoCard from './ContactInfoCard';
 import DonationHistoryCard from './DonationHistoryCard';
 import DonorEditModal from './DonorEditModal';
