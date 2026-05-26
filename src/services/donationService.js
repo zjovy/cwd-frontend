@@ -62,6 +62,13 @@ const donationService = {
       body: JSON.stringify({ ids, allUnsent, filters, body }),
     });
   },
+
+  markSent(ids) {
+    return request(buildUrl(ENDPOINTS.DONATIONS_MARK_SENT), {
+      method: 'POST',
+      body: JSON.stringify({ ids }),
+    });
+  },
 };
 
 export default donationService;

@@ -4,14 +4,15 @@ import Card from '@/common/components/atoms/Card';
 import Pagination from '@/common/components/atoms/Pagination';
 import DonationModal from '@/common/components/organisms/DonationModal';
 import DonationTable from '@/common/components/organisms/DonationTable';
+import DonationViewModal from '@/common/components/organisms/DonationViewModal';
 import useDonations from '@/hooks/useDonations';
 import donationService from '@/services/donationService';
 import { PAGE_SIZE } from '@/utils/pagination';
 import { RECEIPT_SUBJECT, buildReceiptMessage } from '@/utils/receiptTemplate';
-import { Plus, Send, X } from 'lucide-react';
+import { Check, Plus, Send, X } from 'lucide-react';
+import { toast } from 'sonner';
 
 import BulkSendModal from './BulkSendModal';
-import DonationViewModal from './DonationViewModal';
 import DonationsFilterBar from './DonationsFilterBar';
 
 /* ── styles ─────────────────────────────────────────── */
@@ -193,6 +194,22 @@ export default function DonationsPage() {
     setBulkSending(false);
   };
 
+  const handleMarkSent = async () => {
+    const ids = Array.from(selected);
+    if (ids.length === 0) return;
+    try {
+      const { updated } = await donationService.markSent(ids);
+      toast.success(
+        `Marked ${updated} donation${updated === 1 ? '' : 's'} as sent`
+      );
+      setSelected(new Set());
+      await refetchDonations();
+    } catch (err) {
+      console.error('[DonationsPage] mark sent failed:', err);
+      toast.error('Failed to mark donations as sent. Please try again.');
+    }
+  };
+
   const handleBulkSend = async (editedBody) => {
     setBulkSending(true);
     try {
@@ -208,7 +225,14 @@ export default function DonationsPage() {
       console.error('[DonationsPage] bulk send failed:', err);
       setBulkResult({
         sent: [],
-        failed: [{ id: 0, error: err.message }],
+        failed: [
+          {
+            id: 0,
+            name: 'Bulk send request',
+            email: null,
+            error: err.message || 'Request failed',
+          },
+        ],
         total: 0,
       });
     } finally {
@@ -265,6 +289,9 @@ export default function DonationsPage() {
               }}
             >
               <Send size={13} /> Send Receipts
+            </button>
+            <button style={styles.ghostBtn} onClick={handleMarkSent}>
+              <Check size={13} /> Mark as Sent
             </button>
             <button
               style={styles.clearBtn}

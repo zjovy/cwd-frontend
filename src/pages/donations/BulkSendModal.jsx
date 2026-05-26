@@ -45,6 +45,15 @@ const resultStyle = (isError) => ({
   border: `1px solid ${isError ? '#fecaca' : '#bbf7d0'}`,
 });
 
+const failedListStyle = {
+  marginTop: '8px',
+  paddingLeft: '18px',
+  maxHeight: '120px',
+  overflowY: 'auto',
+  fontSize: '12px',
+  lineHeight: 1.5,
+};
+
 export default function BulkSendModal({
   open,
   recipients,
@@ -123,8 +132,20 @@ export default function BulkSendModal({
         {result && (
           <div style={resultStyle(result.failed.length > 0)}>
             Sent {result.sent.length} of {result.total}.
-            {result.failed.length > 0 &&
-              ` ${result.failed.length} failed — check console for details.`}
+            {result.failed.length > 0 && (
+              <>
+                {' '}
+                {result.failed.length} failed:
+                <ul style={failedListStyle}>
+                  {result.failed.map((f, i) => (
+                    <li key={`${f.id}-${i}`}>
+                      {f.name || `id ${f.id}`}
+                      {f.email ? ` <${f.email}>` : ''} — {f.error}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
           </div>
         )}
 
