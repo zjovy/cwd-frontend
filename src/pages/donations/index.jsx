@@ -8,7 +8,10 @@ import DonationViewModal from '@/common/components/organisms/DonationViewModal';
 import useDonations from '@/hooks/useDonations';
 import donationService from '@/services/donationService';
 import { PAGE_SIZE } from '@/utils/pagination';
-import { RECEIPT_SUBJECT, buildReceiptMessage } from '@/utils/receiptTemplate';
+import {
+  RECEIPT_SUBJECT,
+  buildReceiptMessageTemplate,
+} from '@/utils/receiptTemplate';
 import { Check, Plus, Send, X } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -183,10 +186,7 @@ export default function DonationsPage() {
     [donations, selected]
   );
 
-  const sampleDonation = selectedRecipients[0] || donations[0] || null;
-  const previewBody = sampleDonation
-    ? buildReceiptMessage(sampleDonation)
-    : buildReceiptMessage({ first_name: 'Donor', amount: 0 });
+  const bulkMessageTemplate = buildReceiptMessageTemplate();
 
   const closeBulk = () => {
     setBulkMode(null);
@@ -342,7 +342,7 @@ export default function DonationsPage() {
         recipients={selectedRecipients}
         allUnsent={bulkMode === 'allUnsent'}
         subject={RECEIPT_SUBJECT}
-        defaultBody={previewBody}
+        defaultBody={bulkMessageTemplate}
         sending={bulkSending}
         result={bulkResult}
         onClose={closeBulk}

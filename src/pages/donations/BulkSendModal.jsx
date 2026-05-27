@@ -118,8 +118,8 @@ export default function BulkSendModal({
 
         <div style={fieldGroup}>
           <label htmlFor='bulk-send-message' style={labelStyle}>
-            Message (each donor gets a personalized version unless you edit
-            this)
+            Message ({'{{first_name}}'} and {'{{amount}}'} are filled in per
+            donor when you send)
           </label>
           <textarea
             id='bulk-send-message'
