@@ -1,7 +1,12 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { Send } from 'lucide-react';
 import PropTypes from 'prop-types';
+
+import {
+  editTextToTemplate,
+  templateToEditText,
+} from '@/utils/receiptTemplate';
 
 import {
   cancelBtn,
@@ -14,9 +19,9 @@ import {
   overlay,
   readonlyInput,
   sendBtn,
-  textareaStyle,
   titleStyle,
 } from './EmailPreviewModal.styles';
+import ReceiptMessageEditor from './ReceiptMessageEditor';
 
 const recipientListStyle = {
   fontSize: '13px',
@@ -33,6 +38,25 @@ const summaryStyle = {
   fontSize: '13px',
   color: '#374151',
   lineHeight: 1.5,
+};
+
+const hintStyle = {
+  fontSize: '12px',
+  color: '#6b7280',
+  lineHeight: 1.5,
+  marginBottom: '6px',
+};
+
+const linkBtn = {
+  background: 'none',
+  border: 'none',
+  padding: 0,
+  marginTop: '8px',
+  fontSize: '13px',
+  fontWeight: 500,
+  color: '#2563eb',
+  cursor: 'pointer',
+  textAlign: 'left',
 };
 
 const resultStyle = (isError) => ({
@@ -65,13 +89,21 @@ export default function BulkSendModal({
   onClose,
   onConfirm,
 }) {
-  const [body, setBody] = useState(defaultBody);
+  const defaultEditBody = templateToEditText(defaultBody);
+  const editBodyRef = useRef(defaultEditBody);
+  const [editorKey, setEditorKey] = useState(0);
 
   if (!open) return null;
 
   const handleConfirm = () => {
-    const edited = body && body !== defaultBody ? body : null;
+    const technicalBody = editTextToTemplate(editBodyRef.current);
+    const edited =
+      technicalBody && technicalBody !== defaultBody ? technicalBody : null;
     onConfirm(edited);
+  };
+
+  const handleResetMessage = () => {
+    setEditorKey((key) => key + 1);
   };
 
   const headerLabel = allUnsent
@@ -117,16 +149,21 @@ export default function BulkSendModal({
         </div>
 
         <div style={fieldGroup}>
-          <label htmlFor='bulk-send-message' style={labelStyle}>
-            Message ({'{{first_name}}'} and {'{{amount}}'} are filled in per
-            donor when you send)
-          </label>
-          <textarea
-            id='bulk-send-message'
-            style={textareaStyle}
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
+          <div style={labelStyle}>Message</div>
+          <p style={hintStyle}>
+            Edit the message below. Colored labels are filled in for each donor
+            — select a label and press Delete or Backspace to remove it.
+          </p>
+          <ReceiptMessageEditor
+            key={editorKey}
+            initialValue={defaultEditBody}
+            onChange={(value) => {
+              editBodyRef.current = value;
+            }}
           />
+          <button type='button' style={linkBtn} onClick={handleResetMessage}>
+            Reset to default message
+          </button>
         </div>
 
         {result && (
