@@ -7,7 +7,7 @@
     loading        – bool
     error          – string | null
     selected       – Set<id>  (controlled by parent)
-    onSelectChange – (id) => void   toggles one row
+    onSelectChange – (donation) => void   toggles one row
     onSelectAll    – (bool) => void  select / deselect all visible rows
     onRowClick     – (donation) => void  optional, opens row detail
     onEdit         – (donation) => void  optional, shows ActionsMenu
@@ -125,7 +125,7 @@ export default function DonationTable({
                   <input
                     type='checkbox'
                     checked={selected.has(d.id)}
-                    onChange={() => onSelectChange(d.id)}
+                    onChange={() => onSelectChange(d)}
                   />
                 </td>
               )}

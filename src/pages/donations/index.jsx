@@ -8,10 +8,7 @@ import DonationViewModal from '@/common/components/organisms/DonationViewModal';
 import useDonations from '@/hooks/useDonations';
 import donationService from '@/services/donationService';
 import { PAGE_SIZE } from '@/utils/pagination';
-import {
-  RECEIPT_SUBJECT,
-  buildReceiptMessageTemplate,
-} from '@/utils/receiptTemplate';
+import { RECEIPT_SUBJECT } from '@/utils/receiptTemplate';
 import { Check, Plus, Send, X } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -120,11 +117,16 @@ export default function DonationsPage() {
   const [filters, setFilters] = useState(INITIAL_FILTERS);
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState(new Set());
+  const [selectedMap, setSelectedMap] = useState({});
   const [modalOpen, setModalOpen] = useState(false);
   const [viewing, setViewing] = useState(null);
   const [bulkMode, setBulkMode] = useState(null); // 'selected' | 'allUnsent' | null
   const [bulkSending, setBulkSending] = useState(false);
   const [bulkResult, setBulkResult] = useState(null);
+  const [bulkRecipients, setBulkRecipients] = useState([]);
+  const [bulkRecipientsLoading, setBulkRecipientsLoading] = useState(false);
+  const [bulkTemplate, setBulkTemplate] = useState(null);
+  const [bulkTemplateLoading, setBulkTemplateLoading] = useState(false);
 
   const {
     donations,
@@ -144,6 +146,7 @@ export default function DonationsPage() {
     onPageResetRef.current = () => {
       setPage(1);
       setSelected(new Set());
+      setSelectedMap({});
     };
   });
 
@@ -151,23 +154,63 @@ export default function DonationsPage() {
   const handleFilterChange = (field, value) => {
     setPage(1);
     setFilters((prev) => ({ ...prev, [field]: value }));
+    setSelected(new Set());
+    setSelectedMap({});
   };
 
-  const handleSelectChange = (id) => {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+  const handleSelectChange = (donation) => {
+    const id = donation.id;
+    setSelectedMap((prev) => {
+      const next = { ...prev };
+      const alreadySelected = Boolean(next[id]);
+      if (alreadySelected) {
+        delete next[id];
+        setSelected((prevSelected) => {
+          const s = new Set(prevSelected);
+          s.delete(id);
+          return s;
+        });
+        return next;
+      }
+      next[id] = donation;
+      setSelected((prevSelected) => {
+        const s = new Set(prevSelected);
+        s.add(id);
+        return s;
+      });
       return next;
     });
   };
 
-  const handleSelectAll = (selectAll) =>
-    setSelected(selectAll ? new Set(donations.map((d) => d.id)) : new Set());
+  const handleSelectAll = (selectAll) => {
+    const pageIds = donations.map((d) => d.id);
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (selectAll) {
+        pageIds.forEach((id) => next.add(id));
+      } else {
+        pageIds.forEach((id) => next.delete(id));
+      }
+      return next;
+    });
+    setSelectedMap((prev) => {
+      if (selectAll) {
+        const next = { ...prev };
+        donations.forEach((d) => {
+          next[d.id] = d;
+        });
+        return next;
+      }
+      const next = { ...prev };
+      pageIds.forEach((id) => {
+        delete next[id];
+      });
+      return next;
+    });
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
-    setSelected(new Set());
   };
 
   const openCreate = () => setModalOpen(true);
@@ -181,17 +224,27 @@ export default function DonationsPage() {
     setViewing(null);
   };
 
-  const selectedRecipients = useMemo(
-    () => donations.filter((d) => selected.has(d.id)),
-    [donations, selected]
-  );
+  const selectedRecipients = useMemo(() => Object.values(selectedMap), [selectedMap]);
 
-  const bulkMessageTemplate = buildReceiptMessageTemplate();
+  useEffect(() => {
+    if (bulkTemplate || bulkTemplateLoading) return;
+    setBulkTemplateLoading(true);
+    donationService
+      .getReceiptTemplate()
+      .then((tpl) => setBulkTemplate(tpl))
+      .catch((err) => {
+        console.error('[DonationsPage] load receipt template failed:', err);
+        toast.error('Failed to load receipt template. Please try again.');
+      })
+      .finally(() => setBulkTemplateLoading(false));
+  }, [bulkTemplate, bulkTemplateLoading]);
 
   const closeBulk = () => {
     setBulkMode(null);
     setBulkResult(null);
     setBulkSending(false);
+    setBulkRecipients([]);
+    setBulkRecipientsLoading(false);
   };
 
   const handleMarkSent = async () => {
@@ -203,6 +256,7 @@ export default function DonationsPage() {
         `Marked ${updated} donation${updated === 1 ? '' : 's'} as sent`
       );
       setSelected(new Set());
+      setSelectedMap({});
       await refetchDonations();
     } catch (err) {
       console.error('[DonationsPage] mark sent failed:', err);
@@ -220,6 +274,7 @@ export default function DonationsPage() {
       const result = await donationService.sendReceipts(payload);
       setBulkResult(result);
       setSelected(new Set());
+      setSelectedMap({});
       await refetchDonations();
     } catch (err) {
       console.error('[DonationsPage] bulk send failed:', err);
@@ -241,6 +296,8 @@ export default function DonationsPage() {
   };
 
   const selectedCount = selected.size;
+  const allUnsentMode = bulkMode === 'allUnsent';
+  const recipientsForModal = allUnsentMode ? bulkRecipients : selectedRecipients;
 
   return (
     <main style={styles.main}>
@@ -257,6 +314,21 @@ export default function DonationsPage() {
             onClick={() => {
               setBulkResult(null);
               setBulkMode('allUnsent');
+              setBulkRecipients([]);
+              setBulkRecipientsLoading(true);
+              donationService
+                .getUnsentRecipients(filters)
+                .then((r) => setBulkRecipients(r.recipients || []))
+                .catch((err) => {
+                  console.error(
+                    '[DonationsPage] load unsent recipients failed:',
+                    err
+                  );
+                  toast.error(
+                    'Failed to load unsent recipients. Please try again.'
+                  );
+                })
+                .finally(() => setBulkRecipientsLoading(false));
             }}
           >
             <Send size={13} /> Send All Unsent
@@ -279,6 +351,7 @@ export default function DonationsPage() {
         <div style={styles.bulkBar}>
           <div style={styles.bulkLeft}>
             {selectedCount} donation{selectedCount === 1 ? '' : 's'} selected
+            {' (across pages)'}
           </div>
           <div style={styles.bulkRight}>
             <button
@@ -295,7 +368,10 @@ export default function DonationsPage() {
             </button>
             <button
               style={styles.clearBtn}
-              onClick={() => setSelected(new Set())}
+              onClick={() => {
+                setSelected(new Set());
+                setSelectedMap({});
+              }}
             >
               <X size={14} /> Clear
             </button>
@@ -339,10 +415,12 @@ export default function DonationsPage() {
       <BulkSendModal
         key={bulkMode || 'closed'}
         open={Boolean(bulkMode)}
-        recipients={selectedRecipients}
+        recipients={recipientsForModal}
         allUnsent={bulkMode === 'allUnsent'}
         subject={RECEIPT_SUBJECT}
-        defaultBody={bulkMessageTemplate}
+        defaultBody={bulkTemplate?.body || ''}
+        templateLoading={bulkTemplateLoading}
+        recipientsLoading={allUnsentMode ? bulkRecipientsLoading : false}
         sending={bulkSending}
         result={bulkResult}
         onClose={closeBulk}

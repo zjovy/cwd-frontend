@@ -63,6 +63,17 @@ const donationService = {
     });
   },
 
+  getUnsentRecipients(filters) {
+    return request(buildUrl(ENDPOINTS.DONATIONS_UNSENT_RECIPIENTS), {
+      method: 'POST',
+      body: JSON.stringify({ filters }),
+    });
+  },
+
+  getReceiptTemplate() {
+    return request(buildUrl(ENDPOINTS.DONATIONS_RECEIPT_TEMPLATE));
+  },
+
   markSent(ids) {
     return request(buildUrl(ENDPOINTS.DONATIONS_MARK_SENT), {
       method: 'POST',

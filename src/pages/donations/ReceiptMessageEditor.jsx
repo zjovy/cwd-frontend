@@ -215,10 +215,23 @@ export default function ReceiptMessageEditor({ initialValue, onChange }) {
     syncToParent();
   };
 
+  const insertPlainTextAtSelection = (text) => {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+    const range = selection.getRangeAt(0);
+    range.deleteContents();
+    const node = document.createTextNode(text);
+    range.insertNode(node);
+    range.setStartAfter(node);
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  };
+
   const handlePaste = (event) => {
     event.preventDefault();
     const text = event.clipboardData.getData('text/plain');
-    document.execCommand('insertText', false, text);
+    insertPlainTextAtSelection(text);
     syncToParent();
   };
 
@@ -258,6 +271,7 @@ export default function ReceiptMessageEditor({ initialValue, onChange }) {
       id='bulk-send-message'
       role='textbox'
       aria-multiline='true'
+      aria-label='Message'
       contentEditable
       suppressContentEditableWarning
       style={editorStyle}

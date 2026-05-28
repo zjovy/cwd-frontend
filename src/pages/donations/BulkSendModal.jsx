@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Send } from 'lucide-react';
 import PropTypes from 'prop-types';
@@ -84,6 +84,8 @@ export default function BulkSendModal({
   allUnsent,
   subject,
   defaultBody,
+  templateLoading,
+  recipientsLoading,
   sending,
   result,
   onClose,
@@ -94,6 +96,12 @@ export default function BulkSendModal({
   const [editorKey, setEditorKey] = useState(0);
 
   if (!open) return null;
+
+  useEffect(() => {
+    editBodyRef.current = defaultEditBody;
+    setEditorKey((k) => k + 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultBody]);
 
   const handleConfirm = () => {
     const technicalBody = editTextToTemplate(editBodyRef.current);
@@ -109,6 +117,8 @@ export default function BulkSendModal({
   const headerLabel = allUnsent
     ? 'Send to all unsent (matching filters)'
     : `Send to ${recipients.length} selected donor${recipients.length === 1 ? '' : 's'}`;
+
+  const isBusy = sending || templateLoading || recipientsLoading;
 
   return (
     <div style={overlay} onClick={onClose}>
@@ -127,18 +137,25 @@ export default function BulkSendModal({
 
         <div style={fieldGroup}>
           <div style={labelStyle}>Recipients</div>
-          {allUnsent ? (
+          {allUnsent && (
             <div style={summaryStyle}>
-              Every donation matching your current filters whose receipt has not
-              been sent will receive an email.
+              We’ll send to the <strong>20 most recent</strong> unsent donations
+              matching your current filters.
             </div>
+          )}
+          {recipientsLoading ? (
+            <div style={summaryStyle}>Loading recipients…</div>
           ) : (
             <div style={recipientListStyle}>
-              {recipients.map((r) => (
-                <div key={r.id}>
-                  {r.donorFullName} &lt;{r.donorEmail || 'no email'}&gt;
-                </div>
-              ))}
+              {recipients.length === 0 ? (
+                <div>No recipients found.</div>
+              ) : (
+                recipients.map((r) => (
+                  <div key={r.id}>
+                    {r.donorFullName} &lt;{r.donorEmail || 'no email'}&gt;
+                  </div>
+                ))
+              )}
             </div>
           )}
         </div>
@@ -195,7 +212,7 @@ export default function BulkSendModal({
               type='button'
               style={sendBtn}
               onClick={handleConfirm}
-              disabled={sending}
+              disabled={isBusy || recipients.length === 0}
             >
               <Send size={13} /> {sending ? 'Sending...' : headerLabel}
             </button>
@@ -212,6 +229,8 @@ BulkSendModal.propTypes = {
   allUnsent: PropTypes.bool,
   subject: PropTypes.string.isRequired,
   defaultBody: PropTypes.string.isRequired,
+  templateLoading: PropTypes.bool,
+  recipientsLoading: PropTypes.bool,
   sending: PropTypes.bool,
   result: PropTypes.shape({
     sent: PropTypes.array.isRequired,
@@ -225,6 +244,8 @@ BulkSendModal.propTypes = {
 BulkSendModal.defaultProps = {
   recipients: [],
   allUnsent: false,
+  templateLoading: false,
+  recipientsLoading: false,
   sending: false,
   result: null,
 };
