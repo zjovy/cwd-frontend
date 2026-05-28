@@ -116,7 +116,6 @@ const INITIAL_FILTERS = {
 export default function DonationsPage() {
   const [filters, setFilters] = useState(INITIAL_FILTERS);
   const [page, setPage] = useState(1);
-  const [selected, setSelected] = useState(new Set());
   const [selectedMap, setSelectedMap] = useState({});
   const [modalOpen, setModalOpen] = useState(false);
   const [viewing, setViewing] = useState(null);
@@ -145,7 +144,6 @@ export default function DonationsPage() {
   useEffect(() => {
     onPageResetRef.current = () => {
       setPage(1);
-      setSelected(new Set());
       setSelectedMap({});
     };
   });
@@ -154,45 +152,30 @@ export default function DonationsPage() {
   const handleFilterChange = (field, value) => {
     setPage(1);
     setFilters((prev) => ({ ...prev, [field]: value }));
-    setSelected(new Set());
     setSelectedMap({});
   };
 
-  const handleSelectChange = (donation) => {
-    const id = donation.id;
+  const selected = useMemo(
+    () => new Set(Object.keys(selectedMap).map((k) => Number(k))),
+    [selectedMap]
+  );
+
+  const handleSelectChange = (id) => {
     setSelectedMap((prev) => {
       const next = { ...prev };
-      const alreadySelected = Boolean(next[id]);
-      if (alreadySelected) {
+      if (next[id]) {
         delete next[id];
-        setSelected((prevSelected) => {
-          const s = new Set(prevSelected);
-          s.delete(id);
-          return s;
-        });
         return next;
       }
+      const donation = donations.find((d) => d.id === id);
+      if (!donation) return next;
       next[id] = donation;
-      setSelected((prevSelected) => {
-        const s = new Set(prevSelected);
-        s.add(id);
-        return s;
-      });
       return next;
     });
   };
 
   const handleSelectAll = (selectAll) => {
     const pageIds = donations.map((d) => d.id);
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (selectAll) {
-        pageIds.forEach((id) => next.add(id));
-      } else {
-        pageIds.forEach((id) => next.delete(id));
-      }
-      return next;
-    });
     setSelectedMap((prev) => {
       if (selectAll) {
         const next = { ...prev };
@@ -255,7 +238,6 @@ export default function DonationsPage() {
       toast.success(
         `Marked ${updated} donation${updated === 1 ? '' : 's'} as sent`
       );
-      setSelected(new Set());
       setSelectedMap({});
       await refetchDonations();
     } catch (err) {
@@ -273,7 +255,6 @@ export default function DonationsPage() {
           : { ids: Array.from(selected), body: editedBody };
       const result = await donationService.sendReceipts(payload);
       setBulkResult(result);
-      setSelected(new Set());
       setSelectedMap({});
       await refetchDonations();
     } catch (err) {
@@ -369,7 +350,6 @@ export default function DonationsPage() {
             <button
               style={styles.clearBtn}
               onClick={() => {
-                setSelected(new Set());
                 setSelectedMap({});
               }}
             >
