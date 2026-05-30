@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import Button from '@/common/components/atoms/CommonButton';
+import { usePageStyles } from '@/common/styles/pageStyles';
 import { useUser } from '@/common/contexts/UserContext';
+import { useBreakpoint } from '@/hooks/useMediaQuery';
 import ChartsRow from '@/pages/dashboard/ChartsRow';
 import RecentDonations from '@/pages/dashboard/RecentDonations';
 import StatsRow from '@/pages/dashboard/StatsRow';
@@ -23,34 +25,10 @@ const DAYS_MAP = {
 };
 
 const styles = {
-  main: {
-    flex: 1,
-    padding: '36px 40px',
-    overflowY: 'auto',
-    minHeight: '100vh',
-  },
-  topRow: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    marginBottom: '28px',
-  },
-  title: {
-    fontSize: '26px',
-    fontWeight: '700',
-    letterSpacing: '-0.03em',
-    color: '#1a1a1a',
-    marginBottom: '4px',
-  },
-  subtitle: {
-    fontSize: '14px',
-    color: '#6b7280',
-  },
   lastSynced: {
     fontSize: '12px',
     color: '#6b7280',
     marginTop: '4px',
-    textAlign: 'right',
   },
   toastList: {
     margin: '6px 0 4px',
@@ -69,6 +47,8 @@ const styles = {
 };
 
 export default function DashboardPage() {
+  const pageStyles = usePageStyles();
+  const { isMobile } = useBreakpoint();
   const { user } = useUser();
   const firstName = user?.firstname || 'there';
   const [refreshKey, setRefreshKey] = useState(0);
@@ -181,11 +161,11 @@ export default function DashboardPage() {
   const handleMutate = () => setRefreshKey((k) => k + 1);
 
   return (
-    <main style={styles.main}>
-      <div style={styles.topRow}>
+    <main style={pageStyles.main}>
+      <div style={pageStyles.topRow}>
         <div>
-          <div style={styles.title}>Dashboard</div>
-          <div style={styles.subtitle}>
+          <div style={pageStyles.title}>Dashboard</div>
+          <div style={pageStyles.subtitle}>
             {`Welcome back ${firstName}! Here's an overview of your C&W Foundation donor activity.`}
           </div>
         </div>
@@ -206,7 +186,12 @@ export default function DashboardPage() {
             {syncing ? 'Syncing…' : 'Refresh Stripe'}
           </Button>
           {lastSyncedAt && (
-            <div style={styles.lastSynced}>
+            <div
+              style={{
+                ...styles.lastSynced,
+                textAlign: isMobile ? 'left' : 'right',
+              }}
+            >
               Last synced {formatRelativeTime(lastSyncedAt)}
             </div>
           )}

@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 
 import Card from '@/common/components/atoms/Card';
 import Pagination from '@/common/components/atoms/Pagination';
+import TableScroll from '@/common/components/atoms/TableScroll';
 import DonationModal from '@/common/components/organisms/DonationModal';
 import DonationTable from '@/common/components/organisms/DonationTable';
 import useDonations from '@/hooks/useDonations';
+import { usePageStyles } from '@/common/styles/pageStyles';
 import { PAGE_SIZE } from '@/utils/pagination';
 import { Plus } from 'lucide-react';
 
@@ -14,29 +16,6 @@ import DonationsFilterBar from './DonationsFilterBar';
 /* ── styles ─────────────────────────────────────────── */
 
 const styles = {
-  main: {
-    flex: 1,
-    padding: '36px 40px',
-    overflowY: 'auto',
-    minHeight: '100vh',
-  },
-  topRow: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    marginBottom: '28px',
-  },
-  title: {
-    fontSize: '26px',
-    fontWeight: '700',
-    letterSpacing: '-0.03em',
-    color: '#1a1a1a',
-    marginBottom: '4px',
-  },
-  subtitle: {
-    fontSize: '14px',
-    color: '#6b7280',
-  },
   addBtn: {
     display: 'inline-flex',
     alignItems: 'center',
@@ -62,6 +41,7 @@ const INITIAL_FILTERS = {
 /* ── component ───────────────────────────────────────── */
 
 export default function DonationsPage() {
+  const pageStyles = usePageStyles();
   const [filters, setFilters] = useState(INITIAL_FILTERS);
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState(new Set());
@@ -124,11 +104,11 @@ export default function DonationsPage() {
   };
 
   return (
-    <main style={styles.main}>
-      <div style={styles.topRow}>
+    <main style={pageStyles.main}>
+      <div style={pageStyles.topRow}>
         <div>
-          <div style={styles.title}>Donations</div>
-          <div style={styles.subtitle}>
+          <div style={pageStyles.title}>Donations</div>
+          <div style={pageStyles.subtitle}>
             View and manage all donation records.
           </div>
         </div>
@@ -145,16 +125,18 @@ export default function DonationsPage() {
         total={loading ? null : total}
       />
 
-      <Card style={{ padding: '24px', marginTop: '16px' }}>
-        <DonationTable
-          donations={donations}
-          loading={loading}
-          error={error}
-          selected={selected}
-          onSelectChange={handleSelectChange}
-          onSelectAll={handleSelectAll}
-          onRowClick={(d) => setViewing(d)}
-        />
+      <Card style={{ padding: pageStyles.cardPadding, marginTop: '16px' }}>
+        <TableScroll>
+          <DonationTable
+            donations={donations}
+            loading={loading}
+            error={error}
+            selected={selected}
+            onSelectChange={handleSelectChange}
+            onSelectAll={handleSelectAll}
+            onRowClick={(d) => setViewing(d)}
+          />
+        </TableScroll>
 
         <Pagination
           page={page}

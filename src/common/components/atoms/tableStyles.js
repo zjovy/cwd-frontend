@@ -1,6 +1,7 @@
 export const tableStyle = {
   width: '100%',
   borderCollapse: 'collapse',
+  minWidth: '640px',
 };
 
 export const thStyle = {

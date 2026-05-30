@@ -117,6 +117,8 @@ export default function FilteredChart({
           justifyContent: 'space-between',
           alignItems: 'center',
           marginBottom: '8px',
+          flexWrap: 'wrap',
+          gap: '8px',
         }}
       >
         <SectionTitle>Donation Trend</SectionTitle>
@@ -129,7 +131,7 @@ export default function FilteredChart({
       ) : loading ? (
         <div style={{ height: 200 }} />
       ) : (
-        <div style={{ display: 'flex', gap: '20px' }}>
+        <div className='responsive-chart-row'>
           <div style={{ flex: 1 }}>
             <div
               style={{

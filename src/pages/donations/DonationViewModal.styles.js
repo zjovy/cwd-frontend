@@ -6,6 +6,8 @@ export const overlay = {
   alignItems: 'center',
   justifyContent: 'center',
   zIndex: 1000,
+  padding: '16px',
+  boxSizing: 'border-box',
 };
 
 export const modal = {

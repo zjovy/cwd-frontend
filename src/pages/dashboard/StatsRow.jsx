@@ -14,11 +14,6 @@ import PropTypes from 'prop-types';
 
 import { formatRangeLabel, toISODate } from './chartUtils';
 
-const rowStyle = {
-  display: 'flex',
-  gap: '16px',
-};
-
 const PRESET_LABELS = {
   '1w': 'Past 1 Week',
   '2w': 'Past 2 Weeks',
@@ -76,7 +71,7 @@ function FilteredStats({ activeRange, preset, refreshKey }) {
   const label = getPeriodLabel(preset, activeRange);
 
   return (
-    <div style={rowStyle}>
+    <div className='responsive-stat-row'>
       <StatCard
         label={label}
         value={error ? 'Error' : stats ? formatAmount(stats.total) : '—'}
@@ -169,7 +164,7 @@ export default function StatsRow({ refreshKey, rangeInfo }) {
   ];
 
   return (
-    <div style={rowStyle}>
+    <div className='responsive-stat-row'>
       {stats.map((s) => (
         <StatCard key={s.label} {...s} />
       ))}

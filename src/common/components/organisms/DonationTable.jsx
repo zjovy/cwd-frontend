@@ -23,7 +23,6 @@ import {
   tdStyle,
   thStyle,
 } from '@/common/components/atoms/tableStyles';
-import ActionsMenu from '@/common/components/molecules/ActionsMenu';
 import { formatAmount, formatDate } from '@/utils/format';
 import PropTypes from 'prop-types';
 
@@ -57,9 +56,7 @@ export default function DonationTable({
   selected,
   onSelectChange,
   onSelectAll,
-  onRowClick,
-  onEdit,
-  onDelete,
+  onRowClick
 }) {
   const showCheckboxes = Boolean(onSelectChange && onSelectAll);
   const allChecked =
@@ -68,7 +65,6 @@ export default function DonationTable({
     donations.every((d) => selected.has(d.id));
   const someChecked =
     showCheckboxes && donations.some((d) => selected.has(d.id));
-  const showActions = Boolean(onEdit || onDelete);
 
   const selectAllRef = useRef(null);
   useEffect(() => {
@@ -103,7 +99,6 @@ export default function DonationTable({
               {h}
             </th>
           ))}
-          {showActions && <th style={thStyle} />}
         </tr>
       </thead>
       <tbody>
@@ -148,26 +143,6 @@ export default function DonationTable({
               <td style={tdStyle}>
                 <Badge status={d.receipt_status} />
               </td>
-              {showActions && (
-                <td style={tdStyle} onClick={(e) => e.stopPropagation()}>
-                  <ActionsMenu
-                    actions={[
-                      ...(onEdit
-                        ? [{ label: 'Edit', onClick: () => onEdit(d) }]
-                        : []),
-                      ...(onDelete
-                        ? [
-                            {
-                              label: 'Delete',
-                              onClick: () => onDelete(d),
-                              danger: true,
-                            },
-                          ]
-                        : []),
-                    ]}
-                  />
-                </td>
-              )}
             </tr>
           ))
         )}
@@ -183,7 +158,5 @@ DonationTable.propTypes = {
   selected: PropTypes.instanceOf(Set),
   onSelectChange: PropTypes.func,
   onSelectAll: PropTypes.func,
-  onRowClick: PropTypes.func,
-  onEdit: PropTypes.func,
-  onDelete: PropTypes.func,
+  onRowClick: PropTypes.func
 };

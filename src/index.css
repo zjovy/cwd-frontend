@@ -20,3 +20,39 @@ code {
     transform: rotate(360deg);
   }
 }
+
+/* Responsive layout utilities */
+.responsive-stat-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.responsive-stat-row > * {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.responsive-chart-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.responsive-chart-row > * {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+.responsive-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px 32px;
+}
+
+@media (max-width: 767px) {
+  .responsive-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}

@@ -16,11 +16,6 @@ import {
   YAxis,
 } from 'recharts';
 
-const rowStyle = {
-  display: 'flex',
-  gap: '20px',
-};
-
 const tooltipStyle = {
   background: '#fff',
   border: '1px solid #e5e7eb',
@@ -99,7 +94,7 @@ export default function DefaultCharts({ refreshKey }) {
   }
 
   return (
-    <div style={rowStyle}>
+    <div className='responsive-chart-row'>
       <Card style={{ flex: 1, padding: '22px 22px 16px' }}>
         <SectionTitle>Donation Trend</SectionTitle>
         <ResponsiveContainer width='100%' height={200}>

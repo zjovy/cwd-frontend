@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import Card from '@/common/components/atoms/Card';
 import SectionTitle from '@/common/components/atoms/SectionTitle';
+import TableScroll from '@/common/components/atoms/TableScroll';
 import DonationTable from '@/common/components/organisms/DonationTable';
 import DonationViewModal from '@/common/components/organisms/DonationViewModal';
 import donationService from '@/services/donationService';
@@ -133,12 +134,14 @@ export default function RecentDonations({ onMutate }) {
           )}
         </div>
 
-        <DonationTable
-          donations={donations}
-          loading={loading}
-          error={error}
-          onRowClick={(d) => setViewing(d)}
-        />
+        <TableScroll>
+          <DonationTable
+            donations={donations}
+            loading={loading}
+            error={error}
+            onRowClick={(d) => setViewing(d)}
+          />
+        </TableScroll>
       </Card>
 
       <DonationViewModal
