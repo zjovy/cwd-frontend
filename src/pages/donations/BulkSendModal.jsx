@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { Send } from 'lucide-react';
-import PropTypes from 'prop-types';
-
 import {
   editTextToTemplate,
   templateToEditText,
 } from '@/utils/receiptTemplate';
+import { Send } from 'lucide-react';
+import PropTypes from 'prop-types';
 
 import {
   cancelBtn,
@@ -81,6 +80,7 @@ const failedListStyle = {
 export default function BulkSendModal({
   open,
   recipients,
+  recipientsCap,
   allUnsent,
   subject,
   defaultBody,
@@ -95,13 +95,15 @@ export default function BulkSendModal({
   const editBodyRef = useRef(defaultEditBody);
   const [editorKey, setEditorKey] = useState(0);
 
-  if (!open) return null;
-
+  // Hooks must run unconditionally — early-return below would break the
+  // hook-order contract if placed above this effect.
   useEffect(() => {
     editBodyRef.current = defaultEditBody;
     setEditorKey((k) => k + 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultBody]);
+
+  if (!open) return null;
 
   const handleConfirm = () => {
     const technicalBody = editTextToTemplate(editBodyRef.current);
@@ -119,6 +121,10 @@ export default function BulkSendModal({
     : `Send to ${recipients.length} selected donor${recipients.length === 1 ? '' : 's'}`;
 
   const isBusy = sending || templateLoading || recipientsLoading;
+  // Server resolves scope for allUnsent — don't gate the send on the preview
+  // fetch having succeeded. For explicit selection, gate normally.
+  const sendDisabled = allUnsent ? isBusy : isBusy || recipients.length === 0;
+  const requestError = result?.requestError || null;
 
   return (
     <div style={overlay} onClick={onClose}>
@@ -139,8 +145,18 @@ export default function BulkSendModal({
           <div style={labelStyle}>Recipients</div>
           {allUnsent && (
             <div style={summaryStyle}>
-              We’ll send to the <strong>20 most recent</strong> unsent donations
-              matching your current filters.
+              {recipientsCap ? (
+                <>
+                  We’ll send to up to the{' '}
+                  <strong>{recipientsCap} most recent</strong> unsent donations
+                  matching your current filters.
+                </>
+              ) : (
+                <>
+                  We’ll send to all unsent donations matching your current
+                  filters.
+                </>
+              )}
             </div>
           )}
           {recipientsLoading ? (
@@ -152,7 +168,8 @@ export default function BulkSendModal({
               ) : (
                 recipients.map((r) => (
                   <div key={r.id}>
-                    {r.donorFullName} &lt;{r.donorEmail || 'no email'}&gt;
+                    {r.donorFullName}{' '}
+                    {r.donorEmail ? `<${r.donorEmail}>` : '(no email)'}
                   </div>
                 ))
               )}
@@ -173,6 +190,7 @@ export default function BulkSendModal({
           </p>
           <ReceiptMessageEditor
             key={editorKey}
+            id='bulk-send-message'
             initialValue={defaultEditBody}
             onChange={(value) => {
               editBodyRef.current = value;
@@ -183,7 +201,11 @@ export default function BulkSendModal({
           </button>
         </div>
 
-        {result && (
+        {requestError && (
+          <div style={resultStyle(true)}>Send failed: {requestError}</div>
+        )}
+
+        {result && !requestError && (
           <div style={resultStyle(result.failed.length > 0)}>
             Sent {result.sent.length} of {result.total}.
             {result.failed.length > 0 && (
@@ -212,7 +234,7 @@ export default function BulkSendModal({
               type='button'
               style={sendBtn}
               onClick={handleConfirm}
-              disabled={isBusy || recipients.length === 0}
+              disabled={sendDisabled}
             >
               <Send size={13} /> {sending ? 'Sending...' : headerLabel}
             </button>
@@ -226,6 +248,7 @@ export default function BulkSendModal({
 BulkSendModal.propTypes = {
   open: PropTypes.bool.isRequired,
   recipients: PropTypes.array,
+  recipientsCap: PropTypes.number,
   allUnsent: PropTypes.bool,
   subject: PropTypes.string.isRequired,
   defaultBody: PropTypes.string.isRequired,
@@ -233,9 +256,10 @@ BulkSendModal.propTypes = {
   recipientsLoading: PropTypes.bool,
   sending: PropTypes.bool,
   result: PropTypes.shape({
-    sent: PropTypes.array.isRequired,
-    failed: PropTypes.array.isRequired,
-    total: PropTypes.number.isRequired,
+    sent: PropTypes.array,
+    failed: PropTypes.array,
+    total: PropTypes.number,
+    requestError: PropTypes.string,
   }),
   onClose: PropTypes.func.isRequired,
   onConfirm: PropTypes.func.isRequired,
@@ -243,6 +267,7 @@ BulkSendModal.propTypes = {
 
 BulkSendModal.defaultProps = {
   recipients: [],
+  recipientsCap: null,
   allUnsent: false,
   templateLoading: false,
   recipientsLoading: false,

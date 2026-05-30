@@ -1,11 +1,10 @@
 import { useLayoutEffect, useRef } from 'react';
 
-import PropTypes from 'prop-types';
-
 import {
   getReceiptPlaceholderMeta,
   splitMessageParts,
 } from '@/utils/receiptTemplate';
+import PropTypes from 'prop-types';
 
 function pillInlineStyle(pill) {
   return {
@@ -104,7 +103,9 @@ function readLineFromNode(node) {
       return;
     }
     if (isPillNode(current)) {
-      const meta = getReceiptPlaceholderMeta(current.dataset.receiptPlaceholder);
+      const meta = getReceiptPlaceholderMeta(
+        current.dataset.receiptPlaceholder
+      );
       if (meta) line += meta.editToken;
       return;
     }
@@ -190,12 +191,12 @@ function getSelectedPills(range) {
     root.nodeType === Node.ELEMENT_NODE ? root : root.parentElement;
   if (!element) return [];
 
-  return Array.from(element.querySelectorAll('[data-receipt-placeholder]')).filter(
-    (pill) => range.intersectsNode(pill)
-  );
+  return Array.from(
+    element.querySelectorAll('[data-receipt-placeholder]')
+  ).filter((pill) => range.intersectsNode(pill));
 }
 
-export default function ReceiptMessageEditor({ initialValue, onChange }) {
+export default function ReceiptMessageEditor({ id, initialValue, onChange }) {
   const editorRef = useRef(null);
 
   const syncToParent = () => {
@@ -268,7 +269,7 @@ export default function ReceiptMessageEditor({ initialValue, onChange }) {
   return (
     <div
       ref={editorRef}
-      id='bulk-send-message'
+      id={id || undefined}
       role='textbox'
       aria-multiline='true'
       aria-label='Message'
@@ -283,6 +284,11 @@ export default function ReceiptMessageEditor({ initialValue, onChange }) {
 }
 
 ReceiptMessageEditor.propTypes = {
+  id: PropTypes.string,
   initialValue: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
+};
+
+ReceiptMessageEditor.defaultProps = {
+  id: undefined,
 };

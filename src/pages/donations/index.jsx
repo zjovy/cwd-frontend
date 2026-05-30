@@ -123,6 +123,7 @@ export default function DonationsPage() {
   const [bulkSending, setBulkSending] = useState(false);
   const [bulkResult, setBulkResult] = useState(null);
   const [bulkRecipients, setBulkRecipients] = useState([]);
+  const [bulkRecipientsCap, setBulkRecipientsCap] = useState(null);
   const [bulkRecipientsLoading, setBulkRecipientsLoading] = useState(false);
   const [bulkTemplate, setBulkTemplate] = useState(null);
   const [bulkTemplateLoading, setBulkTemplateLoading] = useState(false);
@@ -207,7 +208,10 @@ export default function DonationsPage() {
     setViewing(null);
   };
 
-  const selectedRecipients = useMemo(() => Object.values(selectedMap), [selectedMap]);
+  const selectedRecipients = useMemo(
+    () => Object.values(selectedMap),
+    [selectedMap]
+  );
 
   useEffect(() => {
     if (bulkTemplate || bulkTemplateLoading) return;
@@ -227,6 +231,7 @@ export default function DonationsPage() {
     setBulkResult(null);
     setBulkSending(false);
     setBulkRecipients([]);
+    setBulkRecipientsCap(null);
     setBulkRecipientsLoading(false);
   };
 
@@ -261,15 +266,9 @@ export default function DonationsPage() {
       console.error('[DonationsPage] bulk send failed:', err);
       setBulkResult({
         sent: [],
-        failed: [
-          {
-            id: 0,
-            name: 'Bulk send request',
-            email: null,
-            error: err.message || 'Request failed',
-          },
-        ],
+        failed: [],
         total: 0,
+        requestError: err.message || 'Request failed',
       });
     } finally {
       setBulkSending(false);
@@ -278,7 +277,9 @@ export default function DonationsPage() {
 
   const selectedCount = selected.size;
   const allUnsentMode = bulkMode === 'allUnsent';
-  const recipientsForModal = allUnsentMode ? bulkRecipients : selectedRecipients;
+  const recipientsForModal = allUnsentMode
+    ? bulkRecipients
+    : selectedRecipients;
 
   return (
     <main style={styles.main}>
@@ -296,10 +297,16 @@ export default function DonationsPage() {
               setBulkResult(null);
               setBulkMode('allUnsent');
               setBulkRecipients([]);
+              setBulkRecipientsCap(null);
               setBulkRecipientsLoading(true);
               donationService
                 .getUnsentRecipients(filters)
-                .then((r) => setBulkRecipients(r.recipients || []))
+                .then((r) => {
+                  setBulkRecipients(r.recipients || []);
+                  setBulkRecipientsCap(
+                    typeof r.cap === 'number' ? r.cap : null
+                  );
+                })
                 .catch((err) => {
                   console.error(
                     '[DonationsPage] load unsent recipients failed:',
@@ -393,9 +400,10 @@ export default function DonationsPage() {
       />
 
       <BulkSendModal
-        key={bulkMode || 'closed'}
+        key={bulkMode}
         open={Boolean(bulkMode)}
         recipients={recipientsForModal}
+        recipientsCap={allUnsentMode ? bulkRecipientsCap : null}
         allUnsent={bulkMode === 'allUnsent'}
         subject={RECEIPT_SUBJECT}
         defaultBody={bulkTemplate?.body || ''}
