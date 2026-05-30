@@ -16,6 +16,23 @@ import * as XLSX from 'xlsx';
 import BulkSendModal from './BulkSendModal';
 import DonationsFilterBar from './DonationsFilterBar';
 
+/* ── helpers ─────────────────────────────────────────── */
+
+function fmtExportDate(str) {
+  if (!str) return '';
+  const [y, m, d] = str.split('T')[0].split('-');
+  return `${m}-${d}-${y.slice(2)}`;
+}
+
+async function fetchInChunks(items, fn, chunkSize = 10) {
+  const results = [];
+  for (let i = 0; i < items.length; i += chunkSize) {
+    const chunk = items.slice(i, i + chunkSize);
+    results.push(...(await Promise.all(chunk.map(fn))));
+  }
+  return results;
+}
+
 /* ── styles ─────────────────────────────────────────── */
 
 const styles = {
@@ -160,12 +177,6 @@ export default function DonationsPage() {
     setSelectedMap({});
   };
 
-  const fmtExportDate = (str) => {
-    if (!str) return '';
-    const [y, m, d] = str.split('T')[0].split('-');
-    return `${m}-${d}-${y.slice(2)}`;
-  };
-
   const handleExport = async () => {
     setIsExporting(true);
     try {
@@ -174,7 +185,11 @@ export default function DonationsPage() {
         endDate: filters.endDate,
         limit: 10000,
       });
-      const detailed = await Promise.all(rows.map((d) => donationService.getById(d.id)));
+      if (rows.length === 0) {
+        toast.info('No donations found for the selected date range.');
+        return;
+      }
+      const detailed = await fetchInChunks(rows, (d) => donationService.getById(d.id));
       const data = detailed.map((d) => ({
         'Donor Name': d.donorFullName,
         Email: d.donorEmail,

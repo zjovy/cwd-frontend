@@ -132,6 +132,7 @@ export default function DonationsFilterBar({
           type='date'
           aria-label='Start date'
           value={startDate}
+          max={endDate || undefined}
           onChange={(e) => onChange('startDate', e.target.value)}
         />
         <input
@@ -139,6 +140,7 @@ export default function DonationsFilterBar({
           type='date'
           aria-label='End date'
           value={endDate}
+          min={startDate || undefined}
           onChange={(e) => onChange('endDate', e.target.value)}
         />
       </div>
