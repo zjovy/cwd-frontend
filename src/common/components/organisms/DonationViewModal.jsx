@@ -1,11 +1,6 @@
 import { useEffect, useState } from 'react';
 
 import { useUser } from '@/common/contexts/UserContext';
-import donationService from '@/services/donationService';
-import { RECEIPT_SUBJECT, buildReceiptMessage } from '@/utils/receiptTemplate';
-import { X } from 'lucide-react';
-import PropTypes from 'prop-types';
-
 import DonationDeleteSection from '@/pages/donations/DonationDeleteSection';
 import DonationDonorInfoSection from '@/pages/donations/DonationDonorInfoSection';
 import DonationModalFooter from '@/pages/donations/DonationModalFooter';
@@ -20,7 +15,15 @@ import {
   titleStyle,
 } from '@/pages/donations/DonationViewModal.styles';
 import EmailPreviewModal from '@/pages/donations/EmailPreviewModal';
-import { EMPTY_DONATION_VIEW_FORM, fromDonationRow } from '@/pages/donations/donationViewForm';
+import {
+  EMPTY_DONATION_VIEW_FORM,
+  fromDonationRow,
+} from '@/pages/donations/donationViewForm';
+import donationService from '@/services/donationService';
+import { RECEIPT_SUBJECT, buildReceiptMessage } from '@/utils/receiptTemplate';
+import { X } from 'lucide-react';
+import PropTypes from 'prop-types';
+import { toast } from 'sonner';
 
 export default function DonationViewModal({
   open,
@@ -120,11 +123,13 @@ export default function DonationViewModal({
       setForm((prev) => ({ ...prev, receipt_status: 'sent' }));
       await onReceiptSent?.();
       setEmailPreview(false);
-      setEmailMsg(`Receipt sent to ${form.email}`);
+      toast.success(`Receipt sent to ${form.email}`);
     } catch (err) {
       console.error('[DonationViewModal] send receipt failed:', err);
-      setIsEmailError(true);
-      setEmailMsg('Failed to send receipt. Please try again.');
+      setEmailPreview(false);
+      toast.error(
+        `Failed to send receipt to ${form.email || 'donor'}. Please try again.`
+      );
     } finally {
       setSending(false);
     }
