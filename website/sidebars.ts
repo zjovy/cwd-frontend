@@ -26,7 +26,6 @@ const sidebars: SidebarsConfig = {
         'frontend/project-structure',
         'frontend/website-layout',
         'frontend/features',
-        'frontend/deployment',
       ],
     },
     {
@@ -34,10 +33,19 @@ const sidebars: SidebarsConfig = {
       label: 'Backend',
       collapsible: true,
       collapsed: false,
+      items: ['backend/project-structure', 'backend/implementation'],
+    },
+    {
+      type: 'category',
+      label: 'Deployment',
+      collapsible: true,
+      collapsed: false,
       items: [
-        'backend/project-structure',
-        'backend/implementation',
-        'backend/deployment',
+        'deployment/overview',
+        'deployment/aws',
+        'deployment/aws-operations',
+        'deployment/firebase',
+        'deployment/resend',
       ],
     },
     {

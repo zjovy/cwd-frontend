@@ -47,7 +47,11 @@ Changing filters resets **page** to 1 (same pattern as donors).
 | `create(data)` | POST | `/donations` |
 | `update(id, data)` | PUT | `/donations/:id` |
 | `delete(id)` | DELETE | `/donations/:id` |
-| `sendReceipt(id, body)` | POST | Intended for receipt email — implementation should use `buildUrl` + `/donations` segment (align with backend) |
+| `sendReceipt(id, body)` | POST | `/donations/:id/send-receipt` |
+| `sendReceipts({ ids, allUnsent, filters, body })` | POST | `/donations/send-receipts` (bulk) |
+| `getUnsentRecipients(...)` | POST | `/donations/unsent-recipients` |
+| `getReceiptTemplate()` | GET | `/donations/receipt-template` |
+| `markSent(...)` | POST | `/donations/mark-sent` |
 
 Request/response shapes use **`buildDonationCreateBody`**, **`buildDonationUpdateBody`**, **`transformDonation`**, **`transformDonationList`**.
 

@@ -18,6 +18,11 @@ Method verbs below reflect **frontend service usage**. Your backend must impleme
 |----------|----------------|
 | `ENDPOINTS.DONATIONS` | `/donations` |
 | `ENDPOINTS.DONATION_BY_ID(id)` | `/donations/:id` |
+| `ENDPOINTS.DONATION_SEND_RECEIPT(id)` | `/donations/:id/send-receipt` |
+| `ENDPOINTS.DONATIONS_RECEIPT_TEMPLATE` | `/donations/receipt-template` |
+| `ENDPOINTS.DONATIONS_SEND_RECEIPTS` | `/donations/send-receipts` |
+| `ENDPOINTS.DONATIONS_MARK_SENT` | `/donations/mark-sent` |
+| `ENDPOINTS.DONATIONS_UNSENT_RECIPIENTS` | `/donations/unsent-recipients` |
 
 ## Donors
 
@@ -34,6 +39,8 @@ Method verbs below reflect **frontend service usage**. Your backend must impleme
 | `ENDPOINTS.DASHBOARD_SUMMARY` | `/dashboard/summary` |
 | `ENDPOINTS.DASHBOARD_TREND` | `/dashboard/trend` |
 | `ENDPOINTS.DASHBOARD_LAST6` | `/dashboard/last6months` |
+| `ENDPOINTS.DASHBOARD_RANGE_SUMMARY` | `/dashboard/range-summary` |
+| `ENDPOINTS.DASHBOARD_RANGE_TREND` | `/dashboard/range-trend` |
 
 ## Auth / users
 
@@ -44,6 +51,13 @@ Method verbs below reflect **frontend service usage**. Your backend must impleme
 | `ENDPOINTS.AUTH_ME` | `/auth/me` |
 | `ENDPOINTS.AUTH_USERS` | `/auth/users` |
 | `ENDPOINTS.AUTH_SET_ROLE(uid)` | `/auth/users/:uid/role` |
+
+## Stripe sync
+
+| Constant | Path pattern |
+|----------|----------------|
+| `ENDPOINTS.SYNC_STRIPE` | `/sync/stripe/trigger` |
+| `ENDPOINTS.SYNC_STRIPE_LAST` | `/sync/stripe/last` |
 
 ## Auth flows
 

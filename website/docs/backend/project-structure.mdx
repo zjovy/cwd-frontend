@@ -42,9 +42,10 @@ cwd-backend/
 
 ## Documentation Assets
 
-- `docs/aws-deployment-guide.md`: AWS operations runbook.
 - `docs/plans/2026-05-03-aws-ec2-deployment.md`: Implementation plan.
 - `docs/specs/aws-deployment-design.md`: Full architecture design spec.
+
+The AWS operations runbook now lives in the Docusaurus docs site under [Deployment → AWS operations](../deployment/aws-operations).
 
 ## Infrastructure as Code (`infra/`)
 
@@ -90,6 +91,7 @@ cwd-backend/
 - `src/routes/dashboardRoutes.js`: Dashboard metrics routes.
 - `src/routes/donationRoutes.js`: Donation CRUD and donation actions.
 - `src/routes/donorRoutes.js`: Donor CRUD and donor actions.
+- `src/routes/syncRoutes.js`: Stripe sync routes (webhook/trigger/last-sync).
 
 ### Middleware
 
@@ -103,6 +105,7 @@ cwd-backend/
 - `src/controllers/dashboardController.js`: Dashboard data handlers.
 - `src/controllers/donationController.js`: Donation handlers.
 - `src/controllers/donorController.js`: Donor handlers.
+- `src/controllers/syncController.js`: Stripe sync handlers.
 
 ### Repositories
 
@@ -110,6 +113,13 @@ cwd-backend/
 - `src/repositories/dashboardRepository.js`: Dashboard query abstraction.
 - `src/repositories/donationRepository.js`: Donation query abstraction.
 - `src/repositories/donorRepository.js`: Donor query abstraction.
+- `src/repositories/syncMetaRepository.js`: Stripe sync metadata (last-sync state) abstraction.
+
+### Services
+
+- `src/services/emailService.js`: Sends receipt/thank-you emails via Resend.
+- `src/services/receiptPdfService.js`: Generates donation receipt PDFs.
+- `src/services/stripeSyncService.js`: Stripe donation sync logic.
 
 ### Providers
 
@@ -118,7 +128,9 @@ cwd-backend/
 
 ### Utilities
 
+- `src/utils/dateValidation.js`: Date range parsing/validation helpers.
 - `src/utils/emailKey.js`: Email-related helper utility.
+- `src/utils/receiptTemplate.js`: Donation receipt content/template helper.
 
 ## Dependencies
 

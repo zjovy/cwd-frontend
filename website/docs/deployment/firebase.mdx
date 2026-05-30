@@ -1,0 +1,108 @@
+---
+sidebar_position: 4
+---
+
+# Firebase
+
+Firebase plays two distinct roles in the system. Don't conflate them — they use
+different SDKs, different credentials, and live in different repos.
+
+| Role | SDK | Where | Project |
+|------|-----|-------|---------|
+| **Hosting** — serves the frontend SPA | Firebase CLI / GitHub Action | `cwd-frontend` | `cwd-donor-management` |
+| **Auth** — identity provider | `firebase` (web) + `firebase-admin` (server) | both repos | `cwd-donor-management` |
+
+## 1. Hosting (frontend)
+
+The React/Vite SPA is built to `dist/` and served from Firebase Hosting at
+`app.cwmarketfoundation.org` (Firebase default domain
+`cwd-donor-management.web.app`).
+
+Config files in `cwd-frontend`:
+
+- `firebase.json` — serves `dist/`, with a SPA rewrite (`**` → `/index.html`).
+- `.firebaserc` — default project `cwd-donor-management`.
+
+### Deploy
+
+Automatic on push to `main` via `.github/workflows/firebase-hosting-merge.yml`:
+it injects the `VITE_*` build vars, runs `npm ci && npm run build`, and deploys
+to the `live` channel. Pull requests deploy to a temporary preview channel via
+`firebase-hosting-pull-request.yml`.
+
+Manual:
+
+```bash
+npm ci && npm run build
+npx firebase deploy --only hosting
+```
+
+### Required GitHub Actions config (in `zjovy/cwd-frontend`)
+
+The build is validated to fail fast if any of these are missing. Set them as
+repository **variables** (not secrets — they are public client config):
+
+- `VITE_BACKEND_URL` — `https://api.cwmarketfoundation.org`
+- `VITE_FIREBASE_API_KEY`
+- `VITE_FIREBASE_AUTH_DOMAIN`
+- `VITE_FIREBASE_PROJECT_ID`
+- `VITE_FIREBASE_STORAGE_BUCKET`
+- `VITE_FIREBASE_MESSAGING_SENDER_ID`
+- `VITE_FIREBASE_APP_ID`
+- `VITE_FIREBASE_MEASUREMENT_ID`
+
+And one **secret**:
+
+- `FIREBASE_SERVICE_ACCOUNT_CWD_DONOR_MANAGEMENT` — the service-account JSON the
+  `FirebaseExtended/action-hosting-deploy` action authenticates with. Generated
+  by the Firebase CLI when you run `firebase init hosting:github`, or from
+  Firebase Console → Project Settings → Service accounts.
+
+These same `VITE_*` values come from Firebase Console → Project Settings → Your
+apps → SDK config. For local dev, copy them into `cwd-frontend/.env` (see
+`.env.example`).
+
+## 2. Auth (identity)
+
+Firebase Authentication is the identity provider for the whole system.
+
+- **Frontend** (`cwd-frontend/src/firebase-config.js`) initializes the web SDK
+  and exposes `auth` and a `GoogleAuthProvider`. Users sign in with
+  email/password or Google. The frontend sends the resulting **ID token** as
+  `Authorization: Bearer <token>` on API calls.
+- **Backend** (`cwd-backend/src/config/firebase.js`) initializes the **Admin
+  SDK** from the `FIREBASE_SERVICE_ACCOUNT_KEY` env var (a service account JSON)
+  and verifies those ID tokens in `authMiddleware`.
+
+So the backend's `cwd/firebase-key` secret and the frontend's `VITE_FIREBASE_*`
+vars must point at the **same Firebase project** (`cwd-donor-management`).
+
+### Backend service-account key
+
+Stored in AWS Secrets Manager as `cwd/firebase-key` (the full service-account
+JSON). `fetch-secrets.sh` writes it into `.env` as `FIREBASE_SERVICE_ACCOUNT_KEY`
+on each deploy. To rotate:
+
+```bash
+aws secretsmanager update-secret --secret-id cwd/firebase-key \
+  --secret-string file://new-firebase-key.json --region us-east-1
+# then on EC2: ./scripts/fetch-secrets.sh && pm2 restart cwd-backend
+```
+
+See [AWS](./aws#secrets-manager) for how secrets flow into the backend.
+
+## First-time setup
+
+1. Create the Firebase project (`cwd-donor-management`) in the Firebase Console.
+2. **Auth** → enable the **Email/Password** and **Google** sign-in providers.
+3. Register a **Web app** → copy the SDK config into the frontend's `VITE_*`
+   variables (GitHub Actions repo variables + local `.env`).
+4. Generate a **service account** key (Project Settings → Service accounts) and
+   store it in Secrets Manager as `cwd/firebase-key` (used by the backend Admin
+   SDK).
+5. **Hosting** → from `cwd-frontend`, run `firebase init hosting:github` to wire
+   up the GitHub deploy workflows and create the
+   `FIREBASE_SERVICE_ACCOUNT_CWD_DONOR_MANAGEMENT` secret.
+6. **Custom domain** → Firebase Console → Hosting → Custom domains, add
+   `app.cwmarketfoundation.org`, then add the CNAME in DNS (see
+   [AWS Operations → Domain & SSL](./aws-operations#7-domain--ssl-setup)).

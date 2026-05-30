@@ -15,8 +15,9 @@ const config: Config = {
   },
 
   // Set the production url of your site here (update before deploying)
-  url: 'https://example.com',
-  baseUrl: '/',
+  // Served as a subpath of the frontend Firebase Hosting site.
+  url: 'https://app.cwmarketfoundation.org',
+  baseUrl: '/docs/',
 
   organizationName: 'cwd',
   projectName: 'cw-market-foundation-donor-management-system-docs',
@@ -34,18 +35,9 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
+          routeBasePath: '/',
         },
-        blog: {
-          showReadingTime: true,
-          feedOptions: {
-            type: ['rss', 'atom'],
-            xslt: true,
-          },
-          // Useful options to enforce blogging best practices
-          onInlineTags: 'warn',
-          onInlineAuthors: 'warn',
-          onUntruncatedBlogPosts: 'warn',
-        },
+        blog: false,
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -78,7 +70,7 @@ const config: Config = {
           items: [
             {
               label: 'Introduction',
-              to: '/docs/intro',
+              to: '/',
             },
           ],
         },

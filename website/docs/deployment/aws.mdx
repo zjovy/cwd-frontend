@@ -1,0 +1,129 @@
+---
+sidebar_position: 2
+---
+
+# AWS
+
+AWS hosts the backend API. This page covers which AWS services we depend on, how
+they fit together, and how to provision them. For day-to-day operations (SSH,
+logs, DB access, secret rotation), see [AWS Operations](./aws-operations).
+
+All file paths below are in the `cwd-backend` repo.
+
+## What we use
+
+| Service | What it does for us |
+|---------|--------------------|
+| **EC2** (t3.micro, Amazon Linux 2023) | Runs the Node/Express app under PM2, behind Nginx. Sits in a public subnet with an Elastic IP. |
+| **RDS** (MySQL 8.0, db.t3.micro) | Managed database in a private (isolated) subnet — not publicly reachable. |
+| **Secrets Manager** | Stores all backend secrets (DB credentials, Firebase key, Resend key, Stripe key, sync key). Pulled into `.env` on every deploy. |
+| **IAM + OIDC** | The EC2 instance role grants read access to secrets; a GitHub OIDC role exists for CI auth. |
+| **VPC** | 2 AZs, public + private-isolated subnets, **no NAT gateway** (cost saving). |
+
+Infrastructure is defined as code with **AWS CDK** (TypeScript) in `infra/`.
+Resources are split across four stacks.
+
+## Stacks
+
+Deployed in this order (cross-stack dependencies):
+
+1. **`CwdNetworkStack`** (`infra/lib/network-stack.ts`) — the VPC: 2 AZs, one
+   public subnet group and one private-isolated group, `natGateways: 0`.
+2. **`CwdDatabaseStack`** (`infra/lib/database-stack.ts`) — the RDS MySQL
+   instance in the private subnet, plus an auto-generated credentials secret
+   (`cwd/db-credentials`). Has `deletionProtection: true` and
+   `removalPolicy: RETAIN` — **the DB survives a stack delete**.
+3. **`CwdComputeStack`** (`infra/lib/compute-stack.ts`) — the EC2 instance, its
+   security group (80/443 open, 22 restricted), Elastic IP, SSH key pair
+   (`cwd-backend-key`, private key stored in SSM), and the instance IAM role.
+   Boots from `infra/scripts/user-data.sh`.
+4. **`CwdCicdStack`** (`infra/lib/cicd-stack.ts`) — a GitHub Actions OIDC
+   provider plus a `github-actions-cwd-deploy` role scoped to
+   `repo:zjovy/cwd-backend:ref:refs/heads/main`.
+
+Configuration (region, GitHub org/repo, SSH-allowed IPs, domain) lives in
+`infra/cdk.json` under `context`.
+
+### Deploy / preview infra changes
+
+```bash
+cd infra
+npm ci
+npx cdk diff   <StackName>   # preview
+npx cdk deploy <StackName>   # apply
+```
+
+:::warning
+Never delete `CwdDatabaseStack` without backing up first. Deletion protection is
+on, but treat it as load-bearing.
+:::
+
+## How the EC2 instance comes up
+
+On first boot, `infra/scripts/user-data.sh` installs Node 22, Nginx, PM2,
+git/jq/mariadb client, and Certbot; clones the repo; runs `fetch-secrets.sh`;
+starts the app under PM2; and writes an Nginx reverse-proxy config (`:80` →
+`localhost:5050`). TLS is added afterward with Certbot (see
+[AWS Operations → Domain & SSL](./aws-operations#7-domain--ssl-setup)).
+
+## Secrets Manager
+
+The instance role grants `secretsmanager:GetSecretValue` on these secret IDs.
+`scripts/fetch-secrets.sh` reads them and writes `.env` on every deploy (so
+**edits to `.env` on the box are overwritten** — change the secret instead).
+
+| Secret ID | Contents | Created by |
+|-----------|----------|-----------|
+| `cwd/db-credentials` | host, port, dbname, username, password | CDK (auto-generated) |
+| `cwd/firebase-key` | Firebase service account JSON → `FIREBASE_SERVICE_ACCOUNT_KEY` | manual (see [Firebase](./firebase)) |
+| `cwd/resend-key` | Resend API key → `RESEND_API_KEY` | manual (see [Resend](./resend)) |
+| `cwd/stripe-key` | Stripe secret key → `STRIPE_API_KEY` | manual |
+| `cwd/sync-key` | Shared secret for the Stripe-sync workflow → `SYNC_API_KEY` | manual (`openssl rand -hex 32`) |
+
+Non-secret values (`FRONTEND_URL`, `API_URL`, `RESEND_FROM_EMAIL`,
+`RECEIPT_CC_EMAIL`, `NODE_ENV`, `PORT`, `DATABASE_CLIENT`) are hardcoded in
+`fetch-secrets.sh`.
+
+## CI/CD deploy flow
+
+Push to `main` → `.github/workflows/deploy.yml` SSHes to EC2 (via
+`appleboy/ssh-action`) and runs `git pull`, `npm ci --omit=dev`,
+`fetch-secrets.sh`, `pm2 restart`, and a `/health` check.
+
+GitHub Actions secrets required (in `zjovy/cwd-backend`):
+
+- `EC2_HOST` — the Elastic IP
+- `EC2_USERNAME` — `ec2-user`
+- `EC2_SSH_KEY` — the private key contents (retrievable from SSM:
+  `aws ssm get-parameter --name /ec2/keypair/<key-pair-id> --with-decryption`)
+
+A separate scheduled workflow, `.github/workflows/stripe-sync.yml`, POSTs to
+`/sync/stripe` daily using `BACKEND_URL` and `SYNC_API_KEY` (matching the
+`cwd/sync-key` secret).
+
+:::note
+The `CwdCicdStack` provisions an OIDC deploy *role*, but the current
+`deploy.yml` authenticates over SSH, not OIDC. The role is available for
+workflows that need direct AWS API access.
+:::
+
+## First-time setup
+
+See [AWS Operations](./aws-operations) for the full from-scratch runbook. In
+short:
+
+```bash
+cd infra && npm ci
+npx cdk deploy CwdNetworkStack
+npx cdk deploy CwdDatabaseStack
+npx cdk deploy CwdComputeStack
+npx cdk deploy CwdCicdStack
+# then populate cwd/firebase-key, cwd/resend-key, cwd/stripe-key, cwd/sync-key
+# then set GitHub Actions secrets, configure DNS, run Certbot, push to main
+```
+
+## Cost
+
+~$27/mo at standard rates (~$4/mo on the AWS free tier): EC2 ~$8, RDS ~$15,
+data transfer ~$2, Secrets Manager ~$1. Elastic IP is free while attached to a
+running instance.
