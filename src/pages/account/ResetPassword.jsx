@@ -1,27 +1,47 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Form, FormTitle } from '@/common/components/form/Form';
-import { Input } from '@/common/components/form/Input';
-import SubmitButton from '@/common/components/form/SubmitButton';
-import { RedSpan } from '@/common/components/form/styles';
 import { auth } from '@/firebase-config';
+import {
+  ErrorMsg,
+  EyeBtn,
+  Field,
+  FieldGroup,
+  FontImport,
+  FormCard,
+  FormHeader,
+  FormSubtitle,
+  FormTitle,
+  HeroSubtitle,
+  HeroText,
+  HeroTitle,
+  Label,
+  LeftPanel,
+  PageWrapper,
+  PanelAccentBar,
+  PanelRing,
+  PasswordInput,
+  PasswordWrapper,
+  RightPanel,
+  SubmitBtn,
+} from '@/pages/account/AuthLayout';
 import { confirmPasswordReset } from 'firebase/auth';
+import { Eye, EyeOff } from 'lucide-react';
 import styled from 'styled-components';
 
 const PasswordStrength = styled.div`
-  height: 5px;
-  border-radius: 3px;
+  height: 4px;
+  border-radius: 2px;
   background-color: ${({ $strength }) => {
     switch ($strength) {
       case 'weak':
-        return '#ff4d4d';
+        return '#ef4444';
       case 'medium':
-        return '#ffd700';
+        return '#f59e0b';
       case 'strong':
-        return '#32cd32';
+        return '#10b981';
       default:
-        return '#ccc';
+        return '#e5e7eb';
     }
   }};
   width: ${({ $strength }) => {
@@ -36,15 +56,35 @@ const PasswordStrength = styled.div`
         return '0%';
     }
   }};
+  margin-top: 6px;
   transition: all 0.3s ease;
 `;
 
-const PasswordRequirements = styled.ul`
-  font-size: 0.8rem;
-  color: #666;
-  margin: 0;
-  padding-left: 20px;
-  text-align: left;
+const RequirementsList = styled.ul`
+  font-size: 12px;
+  color: #6b7280;
+  margin: 8px 0 0 0;
+  padding-left: 18px;
+  list-style: none;
+
+  li {
+    position: relative;
+    padding-left: 20px;
+    line-height: 1.5;
+
+    &::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: #10b981;
+      font-weight: bold;
+    }
+
+    &.unmet::before {
+      content: '○';
+      color: #d1d5db;
+    }
+  }
 `;
 
 const checkPasswordStrength = (password) => {
@@ -77,6 +117,8 @@ export default function ResetPassword() {
   const [oobCode, setOobCode] = useState(null);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -137,7 +179,7 @@ export default function ResetPassword() {
           'Reset link is invalid or already used. Please request a new one.'
         );
       } else {
-        setError(err.message || 'Failed to reset password. Please try again.');
+        setError('Failed to reset password. Please try again.');
       }
     } finally {
       setIsLoading(false);
@@ -145,38 +187,152 @@ export default function ResetPassword() {
   };
 
   const unmet = getUnmetRequirements(password);
+  const strength = checkPasswordStrength(password);
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <FormTitle>Set New Password</FormTitle>
-      {error && <RedSpan>{error}</RedSpan>}
-      <Input.Password
-        title='New Password'
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      />
-      {password && (
-        <>
-          <PasswordStrength $strength={checkPasswordStrength(password)} />
-          {unmet.length > 0 && (
-            <PasswordRequirements>
-              {unmet.map((req) => (
-                <li key={req}>{req}</li>
-              ))}
-            </PasswordRequirements>
-          )}
-        </>
-      )}
-      <Input.Password
-        title='Confirm Password'
-        value={confirmPassword}
-        onChange={(e) => setConfirmPassword(e.target.value)}
-        required
-      />
-      <SubmitButton onClick={() => {}} disabled={isLoading || !oobCode}>
-        {isLoading ? 'Updating...' : 'Update Password'}
-      </SubmitButton>
-    </Form>
+    <>
+      <FontImport />
+      <PageWrapper>
+        <LeftPanel>
+          <PanelRing />
+          <HeroText>
+            <PanelAccentBar />
+            <HeroTitle>C&amp;W Market Donation Dashboard</HeroTitle>
+            <HeroSubtitle>Create a new password for your account</HeroSubtitle>
+          </HeroText>
+        </LeftPanel>
+
+        <RightPanel>
+          <FormCard>
+            <FormHeader>
+              <FormTitle>Set new password</FormTitle>
+              <FormSubtitle>
+                Choose a strong password to secure your account
+              </FormSubtitle>
+            </FormHeader>
+
+            {error && <ErrorMsg>{error}</ErrorMsg>}
+
+            {oobCode && (
+              <form onSubmit={handleSubmit}>
+                <FieldGroup>
+                  <Field>
+                    <Label htmlFor='password'>New Password</Label>
+                    <PasswordWrapper>
+                      <PasswordInput
+                        id='password'
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder='••••••••'
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                      />
+                      <EyeBtn
+                        type='button'
+                        aria-label={
+                          showPassword ? 'Hide password' : 'Show password'
+                        }
+                        onClick={() => setShowPassword((p) => !p)}
+                        tabIndex={-1}
+                      >
+                        {showPassword ? (
+                          <EyeOff size={15} />
+                        ) : (
+                          <Eye size={15} />
+                        )}
+                      </EyeBtn>
+                    </PasswordWrapper>
+                    {password && (
+                      <>
+                        <PasswordStrength $strength={strength} />
+                        <RequirementsList>
+                          <li
+                            className={
+                              unmet.includes('At least 8 characters')
+                                ? 'unmet'
+                                : ''
+                            }
+                          >
+                            At least 8 characters
+                          </li>
+                          <li
+                            className={
+                              unmet.includes('One uppercase letter')
+                                ? 'unmet'
+                                : ''
+                            }
+                          >
+                            One uppercase letter
+                          </li>
+                          <li
+                            className={
+                              unmet.includes('One lowercase letter')
+                                ? 'unmet'
+                                : ''
+                            }
+                          >
+                            One lowercase letter
+                          </li>
+                          <li
+                            className={
+                              unmet.includes('One number') ? 'unmet' : ''
+                            }
+                          >
+                            One number
+                          </li>
+                          <li
+                            className={
+                              unmet.includes('One special character')
+                                ? 'unmet'
+                                : ''
+                            }
+                          >
+                            One special character (!@#$%^&*)
+                          </li>
+                        </RequirementsList>
+                      </>
+                    )}
+                  </Field>
+
+                  <Field>
+                    <Label htmlFor='confirmPassword'>Confirm Password</Label>
+                    <PasswordWrapper>
+                      <PasswordInput
+                        id='confirmPassword'
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        placeholder='••••••••'
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                      />
+                      <EyeBtn
+                        type='button'
+                        aria-label={
+                          showConfirmPassword
+                            ? 'Hide confirm password'
+                            : 'Show confirm password'
+                        }
+                        onClick={() => setShowConfirmPassword((p) => !p)}
+                        tabIndex={-1}
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff size={15} />
+                        ) : (
+                          <Eye size={15} />
+                        )}
+                      </EyeBtn>
+                    </PasswordWrapper>
+                  </Field>
+                </FieldGroup>
+
+                <SubmitBtn type='submit' disabled={isLoading || !oobCode}>
+                  {isLoading ? 'Updating...' : 'Update Password'}
+                </SubmitBtn>
+              </form>
+            )}
+          </FormCard>
+        </RightPanel>
+      </PageWrapper>
+    </>
   );
 }
