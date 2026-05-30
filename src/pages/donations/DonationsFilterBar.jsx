@@ -3,7 +3,7 @@
   Controlled filter row + result count for the Donations page.
 
   Props:
-    filters  – { search, status, minAmount, maxAmount }
+    filters  – { search, status, minAmount, maxAmount, startDate, endDate }
     onChange – (field, value) => void
     page     – current page (1-indexed)
     pageSize – rows per page
@@ -63,6 +63,15 @@ const styles = {
     outline: 'none',
     background: '#f9fafb',
   },
+  dateInput: {
+    width: '140px',
+    padding: '8px 12px',
+    border: '1px solid #e5e7eb',
+    borderRadius: '8px',
+    fontSize: '13px',
+    outline: 'none',
+    background: '#f9fafb',
+  },
   count: {
     fontSize: '13px',
     color: '#6b7280',
@@ -76,7 +85,7 @@ export default function DonationsFilterBar({
   pageSize,
   total,
 }) {
-  const { search, status, minAmount, maxAmount } = filters;
+  const { search, status, minAmount, maxAmount, startDate, endDate } = filters;
 
   const firstItem = total === null ? null : (page - 1) * pageSize + 1;
   const lastItem = total === null ? null : Math.min(page * pageSize, total);
@@ -118,6 +127,20 @@ export default function DonationsFilterBar({
           value={maxAmount}
           onChange={(e) => onChange('maxAmount', e.target.value)}
         />
+        <input
+          style={styles.dateInput}
+          type='date'
+          aria-label='Start date'
+          value={startDate}
+          onChange={(e) => onChange('startDate', e.target.value)}
+        />
+        <input
+          style={styles.dateInput}
+          type='date'
+          aria-label='End date'
+          value={endDate}
+          onChange={(e) => onChange('endDate', e.target.value)}
+        />
       </div>
 
       {total !== null && total > 0 && (
@@ -137,6 +160,8 @@ DonationsFilterBar.propTypes = {
     status: PropTypes.string.isRequired,
     minAmount: PropTypes.string.isRequired,
     maxAmount: PropTypes.string.isRequired,
+    startDate: PropTypes.string.isRequired,
+    endDate: PropTypes.string.isRequired,
   }).isRequired,
   onChange: PropTypes.func.isRequired,
   page: PropTypes.number.isRequired,

@@ -109,6 +109,8 @@ const INITIAL_FILTERS = {
   status: '',
   minAmount: '',
   maxAmount: '',
+  startDate: '',
+  endDate: '',
 };
 
 /* ── component ───────────────────────────────────────── */
