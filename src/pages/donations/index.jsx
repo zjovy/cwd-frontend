@@ -9,8 +9,9 @@ import useDonations from '@/hooks/useDonations';
 import donationService from '@/services/donationService';
 import { PAGE_SIZE } from '@/utils/pagination';
 import { RECEIPT_SUBJECT } from '@/utils/receiptTemplate';
-import { Check, Plus, Send, X } from 'lucide-react';
+import { Check, Download, Plus, Send, X } from 'lucide-react';
 import { toast } from 'sonner';
+import * as XLSX from 'xlsx';
 
 import BulkSendModal from './BulkSendModal';
 import DonationsFilterBar from './DonationsFilterBar';
@@ -129,6 +130,7 @@ export default function DonationsPage() {
   const [bulkRecipientsLoading, setBulkRecipientsLoading] = useState(false);
   const [bulkTemplate, setBulkTemplate] = useState(null);
   const [bulkTemplateLoading, setBulkTemplateLoading] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   const {
     donations,
@@ -156,6 +158,52 @@ export default function DonationsPage() {
     setPage(1);
     setFilters((prev) => ({ ...prev, [field]: value }));
     setSelectedMap({});
+  };
+
+  const fmtExportDate = (str) => {
+    if (!str) return '';
+    const [y, m, d] = str.split('T')[0].split('-');
+    return `${m}-${d}-${y.slice(2)}`;
+  };
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      const { donations: rows } = await donationService.getAll({
+        startDate: filters.startDate,
+        endDate: filters.endDate,
+        limit: 10000,
+      });
+      const detailed = await Promise.all(rows.map((d) => donationService.getById(d.id)));
+      const data = detailed.map((d) => ({
+        'Donor Name': d.donorFullName,
+        Email: d.donorEmail,
+        Amount: d.amount,
+        Date: fmtExportDate(d.donation_date),
+        'Receipt Status': d.receipt_status,
+        Phone: d.phone ?? '',
+        Address: d.address ?? '',
+      }));
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      const { startDate, endDate } = filters;
+      const fmtStart = fmtExportDate(startDate);
+      const fmtEnd = fmtExportDate(endDate);
+      const exportLabel =
+        fmtStart && fmtEnd
+          ? `${fmtStart}-${fmtEnd}Donations`
+          : fmtStart
+            ? `${fmtStart}-Donations`
+            : fmtEnd
+              ? `Donations-${fmtEnd}`
+              : 'Donations';
+      XLSX.utils.book_append_sheet(wb, ws, exportLabel.slice(0, 31));
+      XLSX.writeFile(wb, `${exportLabel}.xlsx`);
+    } catch (err) {
+      toast.error('Export failed. Please try again.');
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const selected = useMemo(
@@ -293,6 +341,14 @@ export default function DonationsPage() {
           </div>
         </div>
         <div style={styles.topActions}>
+          <button
+            style={styles.ghostBtn}
+            onClick={handleExport}
+            disabled={isExporting}
+            title='Only the date range filter is applied when exporting. Other filters (search, status, amount) are not used.'
+          >
+            <Download size={13} /> {isExporting ? 'Exporting...' : 'Export'}
+          </button>
           <button
             style={styles.ghostBtn}
             onClick={() => {
