@@ -8,7 +8,10 @@
     - email (string): The email to display.
     - onLogout (function): The function to call when the logout button is clicked.
 */
+import { useState } from 'react';
+
 import Avatar from '@/common/components/atoms/Avatar';
+import LogoutModal from '@/common/components/navigation/LogoutModal';
 import { LogOut } from 'lucide-react';
 import PropTypes from 'prop-types';
 
@@ -56,17 +59,36 @@ const styles = {
 };
 
 export default function UserProfile({ initials, name, email, onLogout }) {
+  const [open, setOpen] = useState(false);
+
+  const handleConfirmLogout = () => {
+    setOpen(false);
+    onLogout?.();
+  };
+
   return (
-    <div style={styles.footer}>
-      <Avatar size={30} initials={initials} />
-      <div style={styles.userInfo}>
-        <div style={styles.userName}>{name}</div>
-        <div style={styles.userEmail}>{email}</div>
+    <>
+      <div style={styles.footer}>
+        <Avatar size={30} initials={initials} />
+        <div style={styles.userInfo}>
+          <div style={styles.userName}>{name}</div>
+          <div style={styles.userEmail}>{email}</div>
+        </div>
+        <button
+          style={styles.logoutBtn}
+          title='Sign out'
+          onClick={() => setOpen(true)}
+        >
+          <LogOut size={16} />
+        </button>
       </div>
-      <button style={styles.logoutBtn} title='Sign out' onClick={onLogout}>
-        <LogOut size={16} />
-      </button>
-    </div>
+
+      <LogoutModal
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        onLogout={handleConfirmLogout}
+      />
+    </>
   );
 }
 

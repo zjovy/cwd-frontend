@@ -3,6 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import Button from '@/common/components/atoms/CommonButton';
 import useDonorDetails from '@/hooks/useDonorDetails';
+import { usePageStyles } from '@/common/styles/pageStyles';
+import { useBreakpoint } from '@/hooks/useMediaQuery';
 import donationService from '@/services/donationService';
 import { ArrowLeft } from 'lucide-react';
 
@@ -13,19 +15,14 @@ import DonorEditModal from './DonorEditModal';
 import DonorStatsRow from './DonorStatsRow';
 
 const styles = {
-  main: {
-    flex: 1,
-    padding: '36px 40px',
-    overflowY: 'auto',
-    minHeight: '100vh',
-  },
   header: {
     display: 'flex',
     alignItems: 'flex-start',
     gap: '20px',
     marginBottom: '20px',
+    flexWrap: 'wrap',
   },
-  titleBlock: { flex: 1 },
+  titleBlock: { flex: 1, minWidth: 0 },
   name: {
     fontSize: '32px',
     fontWeight: '700',
@@ -77,6 +74,8 @@ function earliestDonationDate(history) {
 }
 
 export default function DonorDetailsPage() {
+  const pageStyles = usePageStyles();
+  const { isMobile } = useBreakpoint();
   const { id } = useParams();
   const navigate = useNavigate();
   const { donor, history, loading, error, updateDonor, refetch } = useDonorDetails(id);
@@ -92,7 +91,7 @@ export default function DonorDetailsPage() {
 
   if (loading && !donor) {
     return (
-      <main style={styles.main}>
+      <main style={pageStyles.main}>
         <div style={styles.status}>Loading donor…</div>
       </main>
     );
@@ -100,7 +99,7 @@ export default function DonorDetailsPage() {
 
   if (error) {
     return (
-      <main style={styles.main}>
+      <main style={pageStyles.main}>
         <div style={{ ...styles.status, color: '#dc2626' }}>Error: {error}</div>
       </main>
     );
@@ -108,7 +107,7 @@ export default function DonorDetailsPage() {
 
   if (!donor) {
     return (
-      <main style={styles.main}>
+      <main style={pageStyles.main}>
         <div style={styles.status}>Donor not found.</div>
       </main>
     );
@@ -126,14 +125,16 @@ export default function DonorDetailsPage() {
   };
 
   return (
-    <main style={styles.main}>
+    <main style={pageStyles.main}>
       <div style={styles.header}>
         <Button variant='outline' onClick={() => navigate(-1)}>
           <ArrowLeft size={14} strokeWidth={2} />
           Back
         </Button>
         <div style={styles.titleBlock}>
-          <div style={styles.name}>{donor.fullName}</div>
+          <div style={{ ...styles.name, fontSize: isMobile ? '24px' : '32px' }}>
+            {donor.fullName}
+          </div>
           <div style={styles.subtitle}>Donor Profile</div>
           <div style={styles.tagRow}>
             {tags.map((t) => (
