@@ -15,7 +15,19 @@ import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';
 const sidebars: SidebarsConfig = {
   tutorialSidebar: [
     'intro',
-    'getting-started',
+    {
+      type: 'category',
+      label: 'Getting Started',
+      collapsible: true,
+      collapsed: false,
+      link: {type: 'doc', id: 'getting-started'},
+      items: [
+        'getting-started/prerequisites',
+        'getting-started/installation',
+        'getting-started/environment-variables',
+        'getting-started/running-locally',
+      ],
+    },
     'authentication',
     {
       type: 'category',
