@@ -55,6 +55,31 @@ const donationService = {
       body: JSON.stringify({ body }),
     });
   },
+
+  sendReceipts({ ids, allUnsent, filters, body } = {}) {
+    return request(buildUrl(ENDPOINTS.DONATIONS_SEND_RECEIPTS), {
+      method: 'POST',
+      body: JSON.stringify({ ids, allUnsent, filters, body }),
+    });
+  },
+
+  getUnsentRecipients(filters) {
+    return request(buildUrl(ENDPOINTS.DONATIONS_UNSENT_RECIPIENTS), {
+      method: 'POST',
+      body: JSON.stringify({ filters }),
+    });
+  },
+
+  getReceiptTemplate() {
+    return request(buildUrl(ENDPOINTS.DONATIONS_RECEIPT_TEMPLATE));
+  },
+
+  markSent(ids) {
+    return request(buildUrl(ENDPOINTS.DONATIONS_MARK_SENT), {
+      method: 'POST',
+      body: JSON.stringify({ ids }),
+    });
+  },
 };
 
 export default donationService;

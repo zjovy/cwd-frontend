@@ -15,7 +15,19 @@ import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';
 const sidebars: SidebarsConfig = {
   tutorialSidebar: [
     'intro',
-    'getting-started',
+    {
+      type: 'category',
+      label: 'Getting Started',
+      collapsible: true,
+      collapsed: false,
+      link: {type: 'doc', id: 'getting-started'},
+      items: [
+        'getting-started/prerequisites',
+        'getting-started/installation',
+        'getting-started/environment-variables',
+        'getting-started/running-locally',
+      ],
+    },
     'authentication',
     {
       type: 'category',
@@ -26,7 +38,6 @@ const sidebars: SidebarsConfig = {
         'frontend/project-structure',
         'frontend/website-layout',
         'frontend/features',
-        'frontend/deployment',
       ],
     },
     {
@@ -34,10 +45,19 @@ const sidebars: SidebarsConfig = {
       label: 'Backend',
       collapsible: true,
       collapsed: false,
+      items: ['backend/project-structure', 'backend/implementation'],
+    },
+    {
+      type: 'category',
+      label: 'Deployment',
+      collapsible: true,
+      collapsed: false,
       items: [
-        'backend/project-structure',
-        'backend/implementation',
-        'backend/deployment',
+        'deployment/overview',
+        'deployment/aws',
+        'deployment/aws-operations',
+        'deployment/firebase',
+        'deployment/resend',
       ],
     },
     {
