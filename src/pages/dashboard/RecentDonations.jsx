@@ -4,6 +4,7 @@ import Card from '@/common/components/atoms/Card';
 import SectionTitle from '@/common/components/atoms/SectionTitle';
 import DonationTable from '@/common/components/organisms/DonationTable';
 import DonationViewModal from '@/common/components/organisms/DonationViewModal';
+import useDonationTags from '@/hooks/useDonationTags';
 import donationService from '@/services/donationService';
 import PropTypes from 'prop-types';
 
@@ -39,6 +40,7 @@ const clearDateBtn = {
 };
 
 export default function RecentDonations({ onMutate }) {
+  const { getTags, addTag, removeTag } = useDonationTags();
   const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -138,6 +140,9 @@ export default function RecentDonations({ onMutate }) {
           loading={loading}
           error={error}
           onRowClick={(d) => setViewing(d)}
+          getTags={getTags}
+          addTag={addTag}
+          removeTag={removeTag}
         />
       </Card>
 

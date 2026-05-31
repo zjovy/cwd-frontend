@@ -24,6 +24,7 @@ import {
   thStyle,
 } from '@/common/components/atoms/tableStyles';
 import ActionsMenu from '@/common/components/molecules/ActionsMenu';
+import TagCell from '@/common/components/molecules/TagCell';
 import { formatAmount, formatDate } from '@/utils/format';
 import PropTypes from 'prop-types';
 
@@ -48,7 +49,7 @@ const donorLinkStyle = {
 
 /* ── DonationTable ───────────────────────────────────── */
 
-const COLUMNS = ['Donor Name', 'Email', 'Amount', 'Date', 'Receipt Status'];
+const COLUMNS = ['Donor Name', 'Email', 'Amount', 'Date', 'Receipt Status', 'Tags'];
 
 export default function DonationTable({
   donations,
@@ -60,6 +61,9 @@ export default function DonationTable({
   onRowClick,
   onEdit,
   onDelete,
+  getTags,
+  addTag,
+  removeTag,
 }) {
   const showCheckboxes = Boolean(onSelectChange && onSelectAll);
   const allChecked =
@@ -148,6 +152,13 @@ export default function DonationTable({
               <td style={tdStyle}>
                 <Badge status={d.receipt_status} />
               </td>
+              <td style={tdStyle} onClick={(e) => e.stopPropagation()}>
+                <TagCell
+                  tags={getTags(d.id)}
+                  onAdd={(tag) => addTag(d.id, tag)}
+                  onRemove={(tag) => removeTag(d.id, tag)}
+                />
+              </td>
               {showActions && (
                 <td style={tdStyle} onClick={(e) => e.stopPropagation()}>
                   <ActionsMenu
@@ -186,4 +197,7 @@ DonationTable.propTypes = {
   onRowClick: PropTypes.func,
   onEdit: PropTypes.func,
   onDelete: PropTypes.func,
+  getTags: PropTypes.func.isRequired,
+  addTag: PropTypes.func.isRequired,
+  removeTag: PropTypes.func.isRequired,
 };
