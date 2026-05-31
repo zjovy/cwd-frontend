@@ -78,7 +78,7 @@ export default function DonationTable({
     return <div style={{ ...statusMsg, color: '#dc2626' }}>Error: {error}</div>;
 
   const colSpan =
-    COLUMNS.length + (showCheckboxes ? 1 : 0) + (showActions ? 1 : 0);
+    COLUMNS.length + (showCheckboxes ? 1 : 0);
 
   return (
     <table style={tableStyle}>

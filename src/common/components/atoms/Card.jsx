@@ -15,15 +15,21 @@ const baseStyle = {
   padding: '22px',
 };
 
-export default function Card({ children, style }) {
-  return <div style={{ ...baseStyle, ...style }}>{children}</div>;
+export default function Card({ children, style, className }) {
+  return (
+    <div className={className} style={{ ...baseStyle, ...style }}>
+      {children}
+    </div>
+  );
 }
 
 Card.propTypes = {
   children: PropTypes.node.isRequired,
   style: PropTypes.object,
+  className: PropTypes.string,
 };
 
 Card.defaultProps = {
   style: {},
+  className: undefined,
 };
