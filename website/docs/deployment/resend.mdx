@@ -1,0 +1,69 @@
+---
+sidebar_position: 5
+---
+
+# Resend
+
+[Resend](https://resend.com) is our transactional email provider. The backend
+uses it to send **donation receipt emails** with a generated PDF attachment.
+
+## What uses it
+
+- `cwd-backend/src/services/emailService.js` — wraps the `resend` npm package.
+  `sendDonationReceipt({ to, subject, html, text, pdf })` sends the receipt with
+  the PDF attached.
+- The receipt HTML/text comes from `src/utils/receiptTemplate.js` and the PDF
+  from `src/services/receiptPdfService.js`.
+
+The client is created lazily and throws if `RESEND_API_KEY` is unset, so a
+missing key fails the send rather than silently dropping mail.
+
+## Configuration
+
+| Env var | Purpose | Default in code |
+|---------|---------|----------------|
+| `RESEND_API_KEY` | API key (`re_...`) | none — required |
+| `RESEND_FROM_EMAIL` | `From` header | `C&W Market Foundation <donations@noreply.cwmarketfoundation.org>` |
+| `RECEIPT_CC_EMAIL` | CC on every receipt | `info@cwmarketfoundation.org` |
+
+In production these are set by `scripts/fetch-secrets.sh`: `RESEND_API_KEY`
+comes from the `cwd/resend-key` secret in AWS Secrets Manager; the `FROM` and
+`CC` addresses are hardcoded there as non-secret config.
+
+The `from` and `cc` addresses must be on a **domain you have verified in
+Resend** (`cwmarketfoundation.org` / its `noreply.` subdomain). Unverified
+senders are rejected.
+
+## Rotate the API key
+
+```bash
+aws secretsmanager update-secret --secret-id cwd/resend-key \
+  --secret-string "re_new_key_here" --region us-east-1
+# then on EC2:
+./scripts/fetch-secrets.sh && pm2 restart cwd-backend --update-env
+```
+
+## First-time setup
+
+1. Create a Resend account and add the sending domain
+   (`cwmarketfoundation.org`). Add the DKIM/SPF DNS records Resend gives you and
+   wait for verification.
+2. Create an API key (`re_...`).
+3. Store it in Secrets Manager:
+   ```bash
+   aws secretsmanager create-secret --name cwd/resend-key \
+     --secret-string "re_your_key_here" --region us-east-1
+   ```
+4. Confirm `RESEND_FROM_EMAIL` / `RECEIPT_CC_EMAIL` in `fetch-secrets.sh` use the
+   verified domain.
+
+See [AWS](./aws#secrets-manager) for how the secret reaches the running backend.
+
+## Troubleshooting
+
+- **`RESEND_API_KEY is not configured`** — the secret is empty or
+  `fetch-secrets.sh` hasn't run. Re-run it and restart PM2.
+- **Send rejected / domain error** — the `from`/`cc` domain isn't verified in
+  Resend, or DNS records are missing.
+- **Receipts not arriving** — check `pm2 logs cwd-backend` for the thrown error,
+  and the Resend dashboard's email logs for delivery status.

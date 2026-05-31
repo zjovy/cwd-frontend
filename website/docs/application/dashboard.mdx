@@ -9,7 +9,7 @@ sidebar_position: 1
 
 ## Purpose
 
-Landing area after login: greeting, summary statistics, charts, and recent donation activity for **C&W Foundation** donor activity (copy is defined in the page).
+Landing area after login: greeting, summary statistics, charts, and recent donation activity for **C&W Market Foundation** donor activity (copy is defined in the page).
 
 ## UI sections
 
@@ -29,6 +29,10 @@ Landing area after login: greeting, summary statistics, charts, and recent donat
 | `getSummary` | GET | `ENDPOINTS.DASHBOARD_SUMMARY` → `/dashboard/summary` |
 | `getTrend` | GET | `ENDPOINTS.DASHBOARD_TREND` → `/dashboard/trend` |
 | `getLast6Months` | GET | `ENDPOINTS.DASHBOARD_LAST6` → `/dashboard/last6months` |
+| `getRangeSummary` | GET | `ENDPOINTS.DASHBOARD_RANGE_SUMMARY` → `/dashboard/range-summary` |
+| `getRangeTrend` | GET | `ENDPOINTS.DASHBOARD_RANGE_TREND` → `/dashboard/range-trend` |
+| `refreshStripe` (Refresh Stripe button) | POST | `ENDPOINTS.SYNC_STRIPE` → `/sync/stripe/trigger` |
+| `getLastSync` | GET | `ENDPOINTS.SYNC_STRIPE_LAST` → `/sync/stripe/last` |
 
 All use `request(buildUrl(...))` from the shared API client with optional **`AbortSignal`** for cancellation.
 

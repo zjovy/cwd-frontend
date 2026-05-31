@@ -1,0 +1,117 @@
+---
+sidebar_position: 1
+---
+
+# Deployment Overview
+
+This is the entry point for deploying the C&W Market Foundation donor-management
+system. The product is split across two repositories that deploy independently
+to two different platforms, and relies on three external dependencies.
+
+| Component | Repo | Deploys to | Trigger |
+|-----------|------|------------|---------|
+| Backend (Express API) | `cwd-backend` | AWS EC2 | push to `main` → SSH deploy |
+| Frontend (React SPA) | `cwd-frontend` | Firebase Hosting | push to `main` → GitHub Actions |
+
+## Dependencies
+
+Each external dependency has its own page:
+
+- **[AWS](./aws)** — hosts the backend: EC2 (app), RDS (MySQL), Secrets Manager
+  (credentials), and the GitHub Actions deploy role. Infrastructure is defined as
+  code with AWS CDK in the `cwd-backend/infra` directory. Day-2 operations live in
+  **[AWS Operations](./aws-operations)**.
+- **[Firebase](./firebase)** — two roles: Firebase **Hosting** serves the
+  frontend SPA, and Firebase **Auth** is the identity provider (the frontend signs
+  users in, the backend verifies their tokens with the Admin SDK).
+- **[Resend](./resend)** — transactional email provider used by the backend to
+  send donation receipt emails (with PDF attachments).
+
+## Architecture at a glance
+
+```text
+                          ┌────────────────────────────┐
+   Browser ──────────────►│ Firebase Hosting           │
+                          │ app.cwmarketfoundation.org  │  (cwd-frontend SPA)
+                          └─────────────┬──────────────┘
+                                        │ Firebase Auth (sign-in)
+                                        │ + REST calls w/ Bearer ID token
+                                        ▼
+                          ┌────────────────────────────┐
+                          │ Nginx (TLS, :443)          │
+                          │ EC2 t3.micro, public subnet │
+                          │ api.cwmarketfoundation.org  │
+                          │   └─ PM2 → Node :5050      │  (cwd-backend)
+                          └──┬──────────┬──────────┬────┘
+                             │          │          │
+              Secrets Manager│   RDS    │  Resend  │  Firebase Admin
+              (db/firebase/  │ MySQL    │ (receipt │  (verify ID tokens)
+               resend/stripe/│ private  │  email)  │
+               sync keys)    │ subnet   │          │
+```
+
+## How to deploy
+
+### Backend (`cwd-backend`)
+
+Deployment is automatic: **push to `main`** triggers
+`.github/workflows/deploy.yml`, which SSHes into the EC2 instance and runs:
+
+```bash
+git pull origin main
+npm ci --omit=dev
+./scripts/fetch-secrets.sh      # rewrites .env from Secrets Manager
+pm2 restart cwd-backend
+curl -f http://localhost:5050/health
+```
+
+Requires these GitHub Actions secrets in `zjovy/cwd-backend`: `EC2_HOST`,
+`EC2_USERNAME` (`ec2-user`), `EC2_SSH_KEY`. See [AWS](./aws) for how the
+instance, secrets, and IAM are provisioned, and [AWS Operations](./aws-operations)
+for the manual deploy steps.
+
+### Frontend (`cwd-frontend`)
+
+Deployment is automatic: **push to `main`** triggers
+`.github/workflows/firebase-hosting-merge.yml`, which builds the Vite app and
+deploys to the Firebase Hosting `live` channel. Pull requests get a preview
+channel via `firebase-hosting-pull-request.yml`.
+
+Build-time config comes from GitHub Actions **repository variables** (`VITE_*`)
+and the deploy uses the `FIREBASE_SERVICE_ACCOUNT_CWD_DONOR_MANAGEMENT` secret.
+See [Firebase](./firebase) for the full variable list and setup.
+
+To deploy manually:
+
+```bash
+npm ci && npm run build
+npx firebase deploy --only hosting
+```
+
+## Full first-time setup
+
+If you are standing the system up from scratch (new AWS account, new Firebase
+project), follow these in order:
+
+1. **AWS infrastructure** — deploy the CDK stacks and populate Secrets Manager.
+   See [AWS → First-time setup](./aws#first-time-setup) and
+   [AWS Operations](./aws-operations).
+2. **Firebase** — create the project, enable Auth providers, register the web
+   app, and set up Hosting + the GitHub deploy integration. See
+   [Firebase → First-time setup](./firebase#first-time-setup).
+3. **Resend** — create the API key, verify the sending domain, and store the key
+   in Secrets Manager. See [Resend → First-time setup](./resend#first-time-setup).
+4. **DNS** — point `api` (A record → Elastic IP) and `app` (CNAME → Firebase) at
+   the right targets, and set up TLS. See
+   [AWS Operations → Domain & SSL](./aws-operations#7-domain--ssl-setup).
+5. **Deploy** — push both repos to `main` and verify the health check and the
+   frontend load.
+
+## Environment variables reference
+
+| Where | Source | Notes |
+|-------|--------|-------|
+| Backend `.env` (prod) | `scripts/fetch-secrets.sh` ← Secrets Manager | Rewritten on every deploy; never edit by hand |
+| Backend `.env` (local) | copy of `.env.example` | See `cwd-backend/.env.example` |
+| Frontend `VITE_*` (prod) | GitHub Actions repo variables | Injected at build time |
+| Frontend `VITE_*` (local) | copy of `.env.example` | From Firebase Console → Project Settings |

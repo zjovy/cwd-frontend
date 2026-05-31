@@ -32,6 +32,12 @@ jobs:
           test -n "$VITE_FIREBASE_APP_ID"
           test -n "$VITE_FIREBASE_MEASUREMENT_ID"
       - run: npm ci && npm run build
+      - name: Build documentation site into dist/docs
+        run: |
+          npm --prefix website ci
+          npm --prefix website run build
+          mkdir -p dist/docs
+          cp -r website/build/. dist/docs/
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'

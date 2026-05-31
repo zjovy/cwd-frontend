@@ -39,7 +39,7 @@ Domain modules wrap `request` + `buildUrl`:
 |--------|------|
 | `src/services/donorService.js` | CRUD + `upsertByEmail` |
 | `src/services/donationService.js` | CRUD + receipt helper |
-| `src/services/dashboardService.js` | Summary / trend / last-6-months |
+| `src/services/dashboardService.js` | Summary / trend / last-6-months / date-range + Stripe sync trigger & last-sync |
 | `src/services/adminService.js` | Users list, role patch, admin signup |
 
 They use **`src/api/transformers.js`** to normalize backend shapes for the UI.
