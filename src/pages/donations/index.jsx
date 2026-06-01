@@ -6,7 +6,6 @@ import DonationModal from '@/common/components/organisms/DonationModal';
 import DonationTable from '@/common/components/organisms/DonationTable';
 import DonationViewModal from '@/common/components/organisms/DonationViewModal';
 import useDonations from '@/hooks/useDonations';
-import useDonationTags from '@/hooks/useDonationTags';
 import donationService from '@/services/donationService';
 import { PAGE_SIZE } from '@/utils/pagination';
 import { RECEIPT_SUBJECT } from '@/utils/receiptTemplate';
@@ -150,8 +149,6 @@ export default function DonationsPage() {
   const [bulkTemplate, setBulkTemplate] = useState(null);
   const [bulkTemplateLoading, setBulkTemplateLoading] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
-
-  const { getTags, addTag, removeTag } = useDonationTags();
 
   const {
     donations,
@@ -348,9 +345,9 @@ export default function DonationsPage() {
     const q = filters.tagSearch.trim().toLowerCase();
     if (!q) return donations;
     return donations.filter((d) =>
-      getTags(d.id).some((t) => t.toLowerCase().includes(q))
+      (d.description ?? '').toLowerCase().includes(q)
     );
-  }, [donations, filters.tagSearch, getTags]);
+  }, [donations, filters.tagSearch]);
 
   const selectedCount = selected.size;
   const allUnsentMode = bulkMode === 'allUnsent';
@@ -460,9 +457,6 @@ export default function DonationsPage() {
           onSelectChange={handleSelectChange}
           onSelectAll={handleSelectAll}
           onRowClick={(d) => setViewing(d)}
-          getTags={getTags}
-          addTag={addTag}
-          removeTag={removeTag}
         />
 
         <Pagination

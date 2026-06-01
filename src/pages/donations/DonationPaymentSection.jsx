@@ -42,6 +42,17 @@ export default function DonationPaymentSection({ form, onChange }) {
           required
         />
       </div>
+
+      {form.description && (
+        <div style={{ ...fieldGroup, marginBottom: 0 }}>
+          <label style={labelStyle}>Description</label>
+          <input
+            style={{ ...inputStyle, background: '#f3f4f6', color: '#6b7280' }}
+            value={form.description}
+            readOnly
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -50,6 +61,7 @@ DonationPaymentSection.propTypes = {
   form: PropTypes.shape({
     amount: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     donation_date: PropTypes.string,
+    description: PropTypes.string,
   }).isRequired,
   onChange: PropTypes.func.isRequired,
 };
