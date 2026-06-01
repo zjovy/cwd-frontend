@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>C&amp;W Market Donor Management</title>
+
+<!-- Fonts: Fraunces (distinctive editorial serif) + Work Sans (clean body) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400;1,9..144,600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+/* ===========================================
+   THEME — "Almanac": warm cream paper, charcoal ink,
+   terracotta + sage accents. Change these to retheme.
+   =========================================== */
+:root {
+  --cream:   #f3ede1;
+  --cream2:  #ece2d2;
+  --card:    #faf6ec;
+  --ink:     #20211d;
+  --muted:   #6f685b;
+  --terra:   #c05f3c;
+  --terra-soft: rgba(192,95,60,0.10);
+  --sage:    #5a6f52;
+  --sage-soft: rgba(90,111,82,0.12);
+  --gold:    #b88a2e;
+  --line:    rgba(32,33,29,0.14);
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Work Sans', system-ui, sans-serif;
+
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur: 0.7s;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* --- viewport-base.css (mandatory, included in full) --- */
+html, body { height: 100%; overflow-x: hidden; }
+html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+.slide {
+  width: 100vw; height: 100vh; height: 100dvh;
+  overflow: hidden; scroll-snap-align: start;
+  display: flex; flex-direction: column; position: relative;
+}
+.slide-content {
+  flex: 1; display: flex; flex-direction: column; justify-content: center;
+  max-height: 100%; overflow: hidden; padding: var(--slide-padding);
+}
+:root {
+  --title-size: clamp(1.5rem, 5vw, 4rem);
+  --h2-size: clamp(1.25rem, 3.5vw, 2.5rem);
+  --h3-size: clamp(1rem, 2.5vw, 1.75rem);
+  --body-size: clamp(0.75rem, 1.5vw, 1.125rem);
+  --small-size: clamp(0.65rem, 1vw, 0.875rem);
+  --slide-padding: clamp(1rem, 4vw, 4rem);
+  --content-gap: clamp(0.5rem, 2vw, 2rem);
+  --element-gap: clamp(0.25rem, 1vw, 1rem);
+}
+.card, .container, .content-box { max-width: min(90vw, 1000px); max-height: min(80vh, 700px); }
+.feature-list, .bullet-list { gap: clamp(0.4rem, 1vh, 1rem); }
+.feature-list li, .bullet-list li { font-size: var(--body-size); line-height: 1.4; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: clamp(0.5rem, 1.5vw, 1rem); }
+img, .image-container { max-width: 100%; max-height: min(50vh, 400px); object-fit: contain; }
+@media (max-height: 700px) {
+  :root { --slide-padding: clamp(0.75rem, 3vw, 2rem); --content-gap: clamp(0.4rem, 1.5vw, 1rem); --title-size: clamp(1.25rem, 4.5vw, 2.5rem); --h2-size: clamp(1rem, 3vw, 1.75rem); }
+}
+@media (max-height: 600px) {
+  :root { --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem); --content-gap: clamp(0.3rem, 1vw, 0.75rem); --title-size: clamp(1.1rem, 4vw, 2rem); --body-size: clamp(0.7rem, 1.2vw, 0.95rem); }
+  .nav-dots, .keyboard-hint, .decorative { display: none; }
+}
+@media (max-height: 500px) {
+  :root { --slide-padding: clamp(0.4rem, 2vw, 1rem); --title-size: clamp(1rem, 3.5vw, 1.5rem); --h2-size: clamp(0.9rem, 2.5vw, 1.25rem); --body-size: clamp(0.65rem, 1vw, 0.85rem); }
+}
+@media (max-width: 600px) {
+  :root { --title-size: clamp(1.25rem, 7vw, 2.5rem); }
+  .grid { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; }
+  html { scroll-behavior: auto; }
+}
+/* --- end viewport-base.css --- */
+
+/* ===========================================
+   GLOBAL LOOK
+   =========================================== */
+body {
+  font-family: var(--font-body);
+  color: var(--ink);
+  background:
+    radial-gradient(680px 420px at 88% 8%, var(--terra-soft), transparent 62%),
+    radial-gradient(620px 420px at 6% 96%, var(--sage-soft), transparent 60%),
+    linear-gradient(180deg, var(--cream), var(--cream2));
+  background-attachment: fixed;
+}
+.slide-content { gap: var(--content-gap); }
+
+/* Reusable reveal — staggered on slide enter */
+.reveal { opacity: 0; transform: translateY(26px); transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease); }
+.slide.visible .reveal { opacity: 1; transform: translateY(0); }
+.slide.visible .reveal:nth-child(1) { transition-delay: .05s; }
+.slide.visible .reveal:nth-child(2) { transition-delay: .15s; }
+.slide.visible .reveal:nth-child(3) { transition-delay: .25s; }
+.slide.visible .reveal:nth-child(4) { transition-delay: .35s; }
+.slide.visible .reveal:nth-child(5) { transition-delay: .45s; }
+.slide.visible .reveal:nth-child(6) { transition-delay: .55s; }
+.d1 { transition-delay: .1s; } .d2 { transition-delay: .2s; } .d3 { transition-delay: .3s; }
+.d4 { transition-delay: .4s; } .d5 { transition-delay: .5s; } .d6 { transition-delay: .6s; }
+.d7 { transition-delay: .7s; }
+
+/* Shared type */
+.kicker { font-size: clamp(.62rem,1vw,.8rem); letter-spacing: .26em; text-transform: uppercase; font-weight: 600; color: var(--terra); }
+.kicker.sage { color: var(--sage); }
+h1.display { font-family: var(--font-display); font-weight: 900; line-height: .96; letter-spacing: -0.02em; font-size: clamp(2.4rem, 7.5vw, 5.6rem); }
+h2.display { font-family: var(--font-display); font-weight: 900; line-height: 1.0; letter-spacing: -0.02em; font-size: clamp(1.9rem, 5vw, 3.5rem); }
+.it { font-style: italic; font-weight: 400; color: var(--terra); }
+.rule { width: clamp(56px,7vw,96px); height: 3px; background: var(--ink); }
+
+/* Decorative geometric accents (abstract only) */
+.deco-ring { position: absolute; border: 2px solid var(--terra); border-radius: 50%; opacity: .55; pointer-events: none; }
+.deco-dot  { position: absolute; background: var(--sage); border-radius: 50%; pointer-events: none; }
+.deco-line { position: absolute; height: 2px; background: var(--line); pointer-events: none; }
+
+/* ===========================================
+   SLIDE 1 — TITLE
+   =========================================== */
+.title-slide .slide-content { justify-content: center; }
+.title-meta { display: flex; gap: clamp(.6rem,2vw,1.4rem); flex-wrap: wrap; align-items: center; font-size: var(--small-size); color: var(--muted); }
+.title-chip { border: 1.5px solid var(--ink); border-radius: 99px; padding: .35rem 1rem; font-weight: 600; color: var(--ink); }
+
+/* ===========================================
+   GENERIC CONTENT SLIDE HEADER
+   =========================================== */
+.section-head { display: flex; flex-direction: column; gap: clamp(.5rem,1.4vh,1rem); margin-bottom: clamp(.6rem,2vh,1.4rem); }
+
+/* Two-column layouts */
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1.2rem,3.5vw,3rem); align-items: start; }
+.cols.lead { grid-template-columns: 1.05fr 0.95fr; }
+@media (max-width: 820px){ .cols, .cols.lead { grid-template-columns: 1fr; gap: clamp(.8rem,3vh,1.4rem); } }
+
+/* Bullet rows with marker */
+.points { display: flex; flex-direction: column; gap: clamp(.55rem,1.5vh,1.05rem); }
+.point { display: grid; grid-template-columns: auto 1fr; gap: clamp(.6rem,1.4vw,1rem); align-items: start; }
+.point .mk { width: 12px; height: 12px; border-radius: 3px; margin-top: .42em; flex: none; }
+.mk.terra { background: var(--terra); } .mk.sage { background: var(--sage); } .mk.gold { background: var(--gold); } .mk.ink { background: var(--ink); }
+.point .ptitle { font-weight: 700; font-size: clamp(.92rem,1.7vw,1.18rem); }
+.point .ptext { color: var(--muted); font-size: clamp(.78rem,1.4vw,1rem); line-height: 1.45; }
+
+/* Goal cards (core vs stretch) */
+.goalcard { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: clamp(1rem,2.4vw,1.7rem); box-shadow: 0 18px 40px -28px rgba(32,33,29,.55); height: 100%; }
+.goalcard h3 { font-family: var(--font-display); font-weight: 600; font-size: clamp(1.15rem,2.4vw,1.7rem); margin-bottom: .2rem; }
+.goalcard .sub { font-size: var(--small-size); color: var(--muted); margin-bottom: clamp(.7rem,1.6vh,1rem); }
+.goalcard ul { list-style: none; display: flex; flex-direction: column; gap: clamp(.45rem,1.2vh,.8rem); }
+.goalcard li { font-size: clamp(.8rem,1.45vw,1.02rem); line-height: 1.35; padding-left: 1.4rem; position: relative; }
+.goalcard li::before { content: '›'; position: absolute; left: 0; color: var(--terra); font-weight: 700; }
+.done { color: var(--sage); font-weight: 700; font-size: .72em; letter-spacing: .04em; vertical-align: middle; margin-left: .35rem; text-transform: uppercase; }
+
+/* Edge-case grid */
+.edge-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(.7rem,1.8vw,1.3rem); }
+@media (max-width: 760px){ .edge-grid { grid-template-columns: 1fr; } }
+.edge { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--terra); border-radius: 12px; padding: clamp(.75rem,1.8vw,1.15rem); }
+.edge:nth-child(2n){ border-left-color: var(--sage); }
+.edge h4 { font-size: clamp(.85rem,1.6vw,1.08rem); font-weight: 700; margin-bottom: .25rem; }
+.edge p { font-size: clamp(.74rem,1.3vw,.95rem); color: var(--muted); line-height: 1.4; }
+
+/* ===========================================
+   DEMO DIVIDER + DEMO WALKTHROUGH SLIDES
+   =========================================== */
+.demo-slide { background:
+    radial-gradient(680px 420px at 90% 6%, var(--terra-soft), transparent 60%),
+    linear-gradient(180deg, var(--cream), var(--cream2)); }
+.demo-divider .slide-content { justify-content: center; }
+.roadmap { display: flex; flex-direction: column; gap: clamp(.5rem,1.4vh,.95rem); margin-top: clamp(.8rem,2vh,1.4rem); }
+.roadmap .step { display: grid; grid-template-columns: auto 1fr; gap: clamp(.7rem,1.6vw,1.1rem); align-items: center; }
+.roadmap .rn { font-family: var(--font-display); font-weight: 900; font-size: clamp(1.1rem,2.4vw,1.7rem); color: var(--terra); width: 1.8em; }
+.roadmap .rt { font-size: clamp(.92rem,1.7vw,1.2rem); font-weight: 600; }
+.roadmap .rt span { color: var(--muted); font-weight: 400; font-size: .85em; }
+
+/* Demo step header pill */
+.demo-tag { display: inline-flex; align-items: center; gap: .55rem; background: var(--ink); color: var(--cream); border-radius: 99px; padding: .4rem 1rem; font-size: var(--small-size); font-weight: 600; letter-spacing: .04em; width: max-content; }
+.demo-tag .n { color: var(--terra); font-family: var(--font-display); font-weight: 900; }
+
+/* Demo step list (left) */
+.flow { display: flex; flex-direction: column; gap: clamp(.5rem,1.4vh,.95rem); counter-reset: fl; }
+.flow li { list-style: none; display: grid; grid-template-columns: auto 1fr; gap: clamp(.55rem,1.3vw,.9rem); align-items: start; }
+.flow li::before { counter-increment: fl; content: counter(fl); font-family: var(--font-display); font-weight: 900; font-size: .95em; color: var(--cream); background: var(--terra); width: 1.7em; height: 1.7em; border-radius: 50%; display: grid; place-items: center; flex: none; margin-top: .05em; }
+.flow .ft { font-size: clamp(.82rem,1.5vw,1.05rem); line-height: 1.4; }
+.flow .ft b { font-weight: 700; }
+
+/* "Audience sees / highlight" panel (right) */
+.spotlight { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: clamp(1rem,2.4vw,1.6rem); box-shadow: 0 18px 44px -26px rgba(32,33,29,.55); }
+.spotlight .slabel { font-size: .68rem; letter-spacing: .2em; text-transform: uppercase; color: var(--sage); font-weight: 700; margin-bottom: .7rem; }
+.chips { display: flex; flex-wrap: wrap; gap: .5rem; }
+.chip { background: var(--sage-soft); color: var(--sage); border-radius: 8px; padding: .32rem .7rem; font-size: clamp(.72rem,1.3vw,.92rem); font-weight: 600; }
+.chip.terra { background: var(--terra-soft); color: var(--terra); }
+.callout { margin-top: clamp(.8rem,2vh,1.2rem); padding-top: clamp(.7rem,1.6vh,1rem); border-top: 1px dashed var(--line); font-size: clamp(.76rem,1.35vw,.96rem); color: var(--muted); line-height: 1.45; }
+.callout b { color: var(--ink); }
+
+/* mini stat row for demo dashboard slide */
+.ministats { display: grid; grid-template-columns: repeat(2,1fr); gap: .6rem; margin-bottom: .9rem; }
+.ministat { background: var(--cream); border: 1px solid var(--line); border-radius: 10px; padding: .55rem .7rem; }
+.ministat .k { font-size: .66rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.ministat .v { font-family: var(--font-display); font-weight: 900; font-size: clamp(1rem,2vw,1.45rem); }
+.ministat .v.pos { color: var(--sage); }
+
+/* ===========================================
+   CLOSING
+   =========================================== */
+.closing .slide-content { justify-content: center; align-items: flex-start; }
+.recap { display: flex; flex-wrap: wrap; gap: .55rem; margin-top: clamp(.8rem,2vh,1.3rem); }
+.recap .chip { font-size: clamp(.74rem,1.4vw,.98rem); }
+
+/* ===========================================
+   CHROME — progress bar, nav dots, hint
+   =========================================== */
+.progress-bar { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: linear-gradient(90deg, var(--terra), var(--gold)); z-index: 9999; transition: width .2s ease; }
+.nav-dots { position: fixed; right: clamp(12px,2vw,26px); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; z-index: 9000; }
+.nav-dots button { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--ink); background: transparent; cursor: pointer; padding: 0; transition: all .25s ease; opacity: .5; }
+.nav-dots button.active { background: var(--terra); border-color: var(--terra); opacity: 1; transform: scale(1.3); }
+.keyboard-hint { position: fixed; bottom: clamp(10px,2vh,20px); left: 50%; transform: translateX(-50%); font-size: .7rem; color: var(--muted); letter-spacing: .08em; z-index: 9000; display: flex; gap: .5rem; align-items: center; }
+.keyboard-hint kbd { background: var(--card); border: 1px solid var(--line); border-radius: 5px; padding: .1rem .4rem; font-family: var(--font-body); font-size: .68rem; }
+.slide-num { position: fixed; left: clamp(12px,3vw,32px); bottom: clamp(10px,2vh,20px); font-family: var(--font-display); font-weight: 600; font-size: var(--small-size); color: var(--muted); z-index: 9000; }
+.slide-num b { color: var(--terra); }
+
+/* Inline editing chrome */
+.edit-hotzone { position: fixed; top: 0; left: 0; width: 80px; height: 80px; z-index: 10000; cursor: pointer; }
+.edit-toggle { position: fixed; top: 14px; left: 14px; width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--line); background: var(--card); font-size: 18px; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity .3s ease, transform .2s ease; z-index: 10001; box-shadow: 0 6px 18px -8px rgba(0,0,0,.4); }
+.edit-toggle.show, .edit-toggle.active { opacity: 1; pointer-events: auto; }
+.edit-toggle.active { background: var(--terra); color: var(--cream); border-color: var(--terra); }
+.edit-toggle:hover { transform: scale(1.08); }
+body.editing [contenteditable] { outline: 1.5px dashed var(--terra); outline-offset: 4px; border-radius: 4px; cursor: text; }
+body.editing [contenteditable]:focus { outline-style: solid; background: rgba(192,95,60,0.06); }
+.edit-banner { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--cream); font-size: .74rem; padding: .45rem 1rem; border-radius: 99px; z-index: 10001; display: none; gap: .8rem; align-items: center; }
+.edit-banner.show { display: flex; }
+.edit-banner kbd { background: rgba(255,255,255,.15); border-radius: 4px; padding: .08rem .35rem; }
+</style>
+</head>
+<body>
+
+<!-- progress + nav chrome -->
+<div class="progress-bar" id="progressBar"></div>
+<nav class="nav-dots" id="navDots" aria-label="Slide navigation"></nav>
+<div class="slide-num" id="slideNum"><b>01</b> / 09</div>
+<div class="keyboard-hint decorative"><kbd>←</kbd><kbd>→</kbd> navigate &nbsp;·&nbsp; <kbd>E</kbd> edit</div>
+
+<!-- inline editing chrome -->
+<div class="edit-hotzone" id="editHotzone"></div>
+<button class="edit-toggle" id="editToggle" title="Edit mode (E)">✏️</button>
+<div class="edit-banner" id="editBanner">Editing · click any text · <kbd>Ctrl</kbd>+<kbd>S</kbd> save · <kbd>E</kbd> exit</div>
+
+<!-- ============================================================
+     SLIDE 1 — TITLE
+     ============================================================ -->
+<section class="slide title-slide" id="s1">
+  <div class="deco-ring decorative" style="width:clamp(120px,15vw,230px); height:clamp(120px,15vw,230px); top:13%; right:9%;"></div>
+  <div class="deco-dot decorative" style="width:14px; height:14px; top:24%; right:24%;"></div>
+  <div class="deco-line decorative" style="width:clamp(80px,10vw,160px); top:78%; left:0;"></div>
+  <div class="slide-content">
+    <span class="kicker reveal" contenteditable="false">C&amp;W Market · Donor Management System</span>
+    <h1 class="display reveal" style="margin:.4rem 0 .2rem;">Turn gratitude<br><span class="it">into</span> records.</h1>
+    <p class="reveal" style="font-size:var(--body-size); color:var(--muted); max-width:46ch; margin-top:.3rem;">
+      A secure, admin-only platform that imports donations from Stripe and turns every gift into a receipt and a thank-you in a single click.
+    </p>
+    <div class="rule reveal" style="margin:clamp(1rem,2.5vh,1.6rem) 0;"></div>
+    <div class="title-meta reveal">
+      <span class="title-chip">Stripe sync</span>
+      <span class="title-chip">Receipts</span>
+      <span class="title-chip">Insights</span>
+      <span>· Project demo &amp; walkthrough</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 2 — PURPOSE / THE PROBLEM
+     ============================================================ -->
+<section class="slide" id="s2">
+  <div class="slide-content">
+    <div class="section-head">
+      <span class="kicker reveal">01 · Purpose</span>
+      <h2 class="display reveal">The problem we set out to solve.</h2>
+    </div>
+    <div class="cols lead">
+      <p class="reveal" style="font-size:clamp(.9rem,1.7vw,1.18rem); color:var(--muted); line-height:1.5;">
+        Small nonprofits collect donations through Stripe, but the <b style="color:var(--ink)">data lives in one place while the work of thanking donors lives in another</b>. Acknowledging donors becomes slow, manual, and error-prone.
+      </p>
+      <div class="points">
+        <div class="point reveal"><span class="mk terra"></span><div><div class="ptitle">Donor data is scattered</div><div class="ptext">Payments sit in Stripe with no clean, searchable view of who gave, how much, and when.</div></div></div>
+        <div class="point reveal"><span class="mk gold"></span><div><div class="ptitle">Thank-yous &amp; receipts are manual</div><div class="ptext">Letters and receipts are written by hand for every donor, which is tedious and easy to miss.</div></div></div>
+        <div class="point reveal"><span class="mk sage"></span><div><div class="ptitle">No visibility into impact</div><div class="ptext">No easy way to see trends, top donors, or whether giving is growing week over week.</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 3 — SPEC OVERVIEW (CORE FEATURES)
+     ============================================================ -->
+<section class="slide" id="s3">
+  <div class="slide-content">
+    <div class="section-head">
+      <span class="kicker reveal">02 · Spec Overview</span>
+      <h2 class="display reveal">What the platform does.</h2>
+    </div>
+    <div class="edge-grid">
+      <div class="edge reveal"><h4>🔐 Secure admin access</h4><p>Authentication with sign-up, login, password reset, and role-based routes that keep the platform restricted to admins.</p></div>
+      <div class="edge reveal"><h4>↻ Import from Stripe</h4><p>One-click sync pulls donations &amp; donor details from Stripe; refreshed daily so the dashboard is always current.</p></div>
+      <div class="edge reveal"><h4>🧾 Auto-generated documents</h4><p>Receipts and letter templates are generated automatically from each donation's data.</p></div>
+      <div class="edge reveal"><h4>✉️ Send directly from the platform</h4><p>Send personalized thank-yous &amp; receipts to one donor, or to many at once with bulk send.</p></div>
+      <div class="edge reveal"><h4>🔎 Search, filter &amp; sort</h4><p>Browse donations and donors with search, filters, and sorting by amount, date, and more.</p></div>
+      <div class="edge reveal"><h4>📈 Visualizations &amp; stats</h4><p>Charts of donations over time, plus growth rate, new donors, and totals to measure impact.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 4 — CORE GOALS vs STRETCH GOALS
+     ============================================================ -->
+<section class="slide" id="s4">
+  <div class="slide-content">
+    <div class="section-head">
+      <span class="kicker reveal">02 · Spec Overview</span>
+      <h2 class="display reveal">Core goals vs. stretch goals.</h2>
+    </div>
+    <div class="cols">
+      <div class="goalcard reveal">
+        <h3>Core goals</h3>
+        <div class="sub">The must-haves we committed to</div>
+        <ul>
+          <li>Admin-only platform with secure authentication</li>
+          <li>Auto-generate letter templates &amp; receipts after a monetary donation</li>
+          <li>View donor data with search, filters &amp; visualizations</li>
+        </ul>
+      </div>
+      <div class="goalcard reveal">
+        <h3>Stretch goals</h3>
+        <div class="sub">Reaches beyond the core scope</div>
+        <ul>
+          <li>Manually enter non-monetary donations from vendors &amp; partners (e.g. food) <span class="done">✓ done</span></li>
+          <li>Send document emails automatically or directly through the platform <span class="done">✓ done</span></li>
+          <li>Unified site for database <em>and</em> volunteer management <span style="color:var(--muted); font-size:.72em; text-transform:uppercase; margin-left:.35rem;">future</span></li>
+        </ul>
+      </div>
+    </div>
+    <p class="reveal" style="font-size:var(--small-size); color:var(--muted); margin-top:.4rem;">
+      <b style="color:var(--ink)">Non-goal:</b> the platform has no donor-facing view, so donors can't access it.
+    </p>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 5 — INTERESTING EDGE CASES
+     ============================================================ -->
+<section class="slide" id="s5">
+  <div class="slide-content">
+    <div class="section-head">
+      <span class="kicker reveal">02 · Spec Overview</span>
+      <h2 class="display reveal">Edge cases we designed for.</h2>
+    </div>
+    <div class="edge-grid">
+      <div class="edge reveal"><h4>Daily sync without duplicates</h4><p>Re-importing from Stripe reconciles against existing records so the same donation never lands twice.</p></div>
+      <div class="edge reveal"><h4>"Already sent?" flags</h4><p>Each donation tracks whether a thank-you / receipt has gone out, so donors never get double-emailed.</p></div>
+      <div class="edge reveal"><h4>Bulk send, partial failure</h4><p>Sending to many donors at once reports exactly which succeeded and which need a retry.</p></div>
+      <div class="edge reveal"><h4>Monetary vs. non-monetary</h4><p>Food &amp; in-kind gifts have no Stripe charge, so they're entered manually and handled separately from card donations.</p></div>
+      <div class="edge reveal"><h4>Access control</h4><p>Non-admins hitting a protected route are routed to a no-access page rather than seeing data.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 6 — DEMO DIVIDER + ROADMAP
+     ============================================================ -->
+<section class="slide demo-slide demo-divider" id="s6">
+  <div class="deco-ring decorative" style="width:clamp(110px,14vw,210px); height:clamp(110px,14vw,210px); bottom:10%; right:11%;"></div>
+  <div class="deco-dot decorative" style="width:13px; height:13px; bottom:26%; right:25%;"></div>
+  <div class="slide-content">
+    <span class="kicker reveal">03 · Live Demo</span>
+    <h2 class="display reveal" style="font-size:clamp(2.2rem,6.5vw,4.6rem);">End-to-end<br>walkthrough.</h2>
+    <div class="roadmap">
+      <div class="step reveal"><span class="rn">1</span><span class="rt">Sign in &amp; Dashboard <span>· stats, charts, Stripe sync</span></span></div>
+      <div class="step reveal"><span class="rn">2</span><span class="rt">Donations &amp; Receipts <span>· view, generate, send, bulk send</span></span></div>
+      <div class="step reveal"><span class="rn">3</span><span class="rt">Donors &amp; Admin <span>· search, donor profile, user management</span></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- Demo walkthrough slides removed — presenter steps live in DEMO_SCRIPT.md
+     so they're not shown to the audience. The live demo follows slide 6's roadmap. -->
+
+<!-- ============================================================
+     SLIDE 7 — CHALLENGES & WORKAROUNDS
+     ============================================================ -->
+<section class="slide" id="s7">
+  <div class="slide-content">
+    <div class="section-head">
+      <span class="kicker reveal">04 · Challenges</span>
+      <h2 class="display reveal">What was hard, and how we solved it.</h2>
+    </div>
+    <div class="edge-grid">
+      <div class="edge reveal"><h4>Messy Stripe data → clean records</h4><p><b>What we did:</b> normalize partial or missing donor fields (names, addresses) from Stripe into one consistent donor model the rest of the app can rely on.</p></div>
+      <div class="edge reveal"><h4>Learning AWS deployment &amp; CDK</h4><p><b>What we did:</b> got up to speed on AWS and defined our infrastructure as code with the AWS CDK, so the backend deploys the same way every time.</p></div>
+      <div class="edge reveal"><h4>Charts that adapt to any date range</h4><p><b>What we did:</b> auto-bucket donations by day, week, or month based on the selected range, so the trend line stays readable from one week to a full year.</p></div>
+      <div class="edge reveal"><h4>Deploying across three services</h4><p><b>What we did:</b> wired Firebase hosting, the AWS backend, and Resend email into one documented pipeline so deploys are repeatable.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 8 — THINGS WE LEARNED  (personalize via edit mode — press E)
+     ============================================================ -->
+<section class="slide" id="s8">
+  <div class="slide-content">
+    <div class="section-head">
+      <span class="kicker reveal">05 · What we learned</span>
+      <h2 class="display reveal">What DISC taught us.</h2>
+    </div>
+    <div class="cols lead">
+      <p class="reveal" style="font-size:clamp(.9rem,1.7vw,1.18rem); color:var(--muted); line-height:1.5;">
+        Beyond shipping features, the program pushed us to <b style="color:var(--ink)">build like a real team</b>: integrating third-party services, deploying to the cloud, and reviewing each other's work.
+      </p>
+      <div class="points">
+        <div class="point reveal"><span class="mk terra"></span><div><div class="ptitle">Integrating third-party APIs</div><div class="ptext">Working with Stripe, Firebase auth, and Resend taught us to design around external services we don't control.</div></div></div>
+        <div class="point reveal"><span class="mk gold"></span><div><div class="ptitle">Shipping to the cloud</div><div class="ptext">Getting a real frontend and backend deployed live on AWS and Firebase.</div></div></div>
+        <div class="point reveal"><span class="mk sage"></span><div><div class="ptitle">Collaborating as a team</div><div class="ptext">Branches, pull requests, and code review kept us moving without stepping on each other.</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 9 — NEXT STEPS  (personalize via edit mode — press E)
+     ============================================================ -->
+<section class="slide" id="s9">
+  <div class="slide-content">
+    <div class="section-head">
+      <span class="kicker sage reveal">06 · Next steps</span>
+      <h2 class="display reveal">Finishing by the end of the program.</h2>
+    </div>
+    <div class="roadmap">
+      <div class="step reveal"><span class="rn">1</span><span class="rt">UX improvements <span>· polish flows, loading and empty states, mobile spacing</span></span></div>
+      <div class="step reveal"><span class="rn">2</span><span class="rt">Handoff docs <span>· document the app so the team can pick it up and run it</span></span></div>
+      <div class="step reveal"><span class="rn">3</span><span class="rt">Transfer ownership <span>· hand off the project on Firebase, GitHub, and the rest</span></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 10 — CLOSING / RECAP
+     ============================================================ -->
+<section class="slide closing" id="s10">
+  <div class="deco-ring decorative" style="width:clamp(120px,15vw,230px); height:clamp(120px,15vw,230px); top:12%; right:10%;"></div>
+  <div class="deco-line decorative" style="width:clamp(80px,10vw,160px); top:80%; left:0;"></div>
+  <div class="slide-content">
+    <span class="kicker sage reveal">Recap</span>
+    <h2 class="display reveal" style="font-size:clamp(2rem,5.5vw,3.8rem);">From Stripe charge<br>to <span class="it">thank-you</span>, end to end.</h2>
+    <p class="reveal" style="font-size:var(--body-size); color:var(--muted); max-width:50ch; margin-top:.3rem;">
+      Secure admin access, daily Stripe sync, auto-generated receipts, one-click and bulk sending, searchable donors, and impact at a glance.
+    </p>
+    <div class="recap reveal">
+      <span class="chip terra">Secure auth</span>
+      <span class="chip">Stripe sync</span>
+      <span class="chip terra">Auto receipts</span>
+      <span class="chip">Bulk email</span>
+      <span class="chip terra">Donor profiles</span>
+      <span class="chip">Charts &amp; stats</span>
+    </div>
+    <p class="reveal" style="font-family:var(--font-display); font-style:italic; font-size:clamp(1rem,2vw,1.4rem); margin-top:clamp(1rem,2.5vh,1.6rem);">Thank you. Questions?</p>
+  </div>
+</section>
+
+<script>
+/* ===========================================
+   SLIDE PRESENTATION CONTROLLER
+   Keyboard / wheel / touch nav, progress bar,
+   nav dots, scroll-triggered reveals.
+   =========================================== */
+class SlidePresentation {
+  constructor() {
+    this.slides = Array.from(document.querySelectorAll('.slide'));
+    this.current = 0;
+    this.locked = false;
+    this.progressBar = document.getElementById('progressBar');
+    this.navDots = document.getElementById('navDots');
+    this.slideNum = document.getElementById('slideNum');
+    this.total = this.slides.length;
+    this.buildDots();
+    this.observe();
+    this.bindKeys();
+    this.bindWheel();
+    this.bindTouch();
+    this.update(0);
+  }
+  buildDots() {
+    this.slides.forEach((_, i) => {
+      const b = document.createElement('button');
+      b.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+      b.addEventListener('click', () => this.go(i));
+      this.navDots.appendChild(b);
+    });
+    this.dots = Array.from(this.navDots.children);
+  }
+  observe() {
+    // Reveal animations + track current slide
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          const idx = this.slides.indexOf(e.target);
+          if (idx !== -1) this.update(idx);
+        }
+      });
+    }, { threshold: 0.55 });
+    this.slides.forEach((s) => io.observe(s));
+  }
+  update(idx) {
+    this.current = idx;
+    const pct = this.total > 1 ? (idx / (this.total - 1)) * 100 : 100;
+    this.progressBar.style.width = pct + '%';
+    if (this.dots) this.dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+    const n = String(idx + 1).padStart(2, '0');
+    const t = String(this.total).padStart(2, '0');
+    this.slideNum.innerHTML = '<b>' + n + '</b> / ' + t;
+  }
+  go(idx) {
+    idx = Math.max(0, Math.min(this.total - 1, idx));
+    this.slides[idx].scrollIntoView({ behavior: 'smooth' });
+  }
+  next() { this.go(this.current + 1); }
+  prev() { this.go(this.current - 1); }
+  bindKeys() {
+    document.addEventListener('keydown', (e) => {
+      if (e.target.getAttribute && e.target.getAttribute('contenteditable') === 'true') return;
+      if (['ArrowRight', 'ArrowDown', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); this.next(); }
+      else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); this.prev(); }
+      else if (e.key === 'Home') { e.preventDefault(); this.go(0); }
+      else if (e.key === 'End') { e.preventDefault(); this.go(this.total - 1); }
+    });
+  }
+  bindWheel() {
+    // Debounced wheel nav so one scroll = one slide
+    window.addEventListener('wheel', (e) => {
+      if (this.locked) return;
+      if (Math.abs(e.deltaY) < 18) return;
+      this.locked = true;
+      if (e.deltaY > 0) this.next(); else this.prev();
+      setTimeout(() => { this.locked = false; }, 750);
+    }, { passive: true });
+  }
+  bindTouch() {
+    let startY = null;
+    window.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; }, { passive: true });
+    window.addEventListener('touchend', (e) => {
+      if (startY === null) return;
+      const dy = startY - e.changedTouches[0].clientY;
+      if (Math.abs(dy) > 50) { if (dy > 0) this.next(); else this.prev(); }
+      startY = null;
+    }, { passive: true });
+  }
+}
+
+/* ===========================================
+   INLINE EDITOR
+   Toggle with E key / corner hotzone.
+   Click any text to edit; Ctrl+S saves to
+   localStorage; auto-restores on reload.
+   =========================================== */
+class InlineEditor {
+  constructor() {
+    this.isActive = false;
+    this.STORAGE_KEY = 'cwd-deck-edits';
+    this.toggleBtn = document.getElementById('editToggle');
+    this.banner = document.getElementById('editBanner');
+    this.editable = Array.from(document.querySelectorAll(
+      'h1, h2, h3, h4, p, span.ft, li .ft, .kicker, .ptitle, .ptext, .rt, .chip, .edge h4, .edge p, .goalcard h3, .goalcard li, .callout, .demo-tag, .slabel'
+    )).filter((el) => !el.closest('.nav-dots, .progress-bar, .slide-num, .keyboard-hint, .edit-banner, .edit-toggle'));
+    this.editable.forEach((el, i) => { el.dataset.eid = 'e' + i; });
+    this.restore();
+  }
+  toggleEditMode() {
+    this.isActive = !this.isActive;
+    document.body.classList.toggle('editing', this.isActive);
+    this.toggleBtn.classList.toggle('active', this.isActive);
+    this.banner.classList.toggle('show', this.isActive);
+    this.editable.forEach((el) => el.setAttribute('contenteditable', this.isActive ? 'true' : 'false'));
+    if (!this.isActive) { this.toggleBtn.classList.remove('show'); this.save(); }
+  }
+  save() {
+    const data = {};
+    this.editable.forEach((el) => { data[el.dataset.eid] = el.innerHTML; });
+    try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
+    this.flash('Saved ✓');
+  }
+  restore() {
+    let data; try { data = JSON.parse(localStorage.getItem(this.STORAGE_KEY) || '{}'); } catch (e) { data = {}; }
+    this.editable.forEach((el) => { if (data[el.dataset.eid] != null) el.innerHTML = data[el.dataset.eid]; });
+  }
+  flash(msg) {
+    const old = this.banner.textContent;
+    this.banner.textContent = msg; this.banner.classList.add('show');
+    setTimeout(() => { if (!this.isActive) this.banner.classList.remove('show'); else this.banner.innerHTML = 'Editing · click any text · <kbd>Ctrl</kbd>+<kbd>S</kbd> save · <kbd>E</kbd> exit'; }, 1100);
+  }
+}
+
+const deck = new SlidePresentation();
+const editor = new InlineEditor();
+
+/* --- editing toggle interactions --- */
+const hotzone = document.getElementById('editHotzone');
+const editToggle = document.getElementById('editToggle');
+let hideTimeout = null;
+editToggle.addEventListener('click', () => editor.toggleEditMode());
+hotzone.addEventListener('mouseenter', () => { clearTimeout(hideTimeout); editToggle.classList.add('show'); });
+hotzone.addEventListener('mouseleave', () => { hideTimeout = setTimeout(() => { if (!editor.isActive) editToggle.classList.remove('show'); }, 400); });
+editToggle.addEventListener('mouseenter', () => clearTimeout(hideTimeout));
+editToggle.addEventListener('mouseleave', () => { hideTimeout = setTimeout(() => { if (!editor.isActive) editToggle.classList.remove('show'); }, 400); });
+document.addEventListener('keydown', (e) => {
+  if ((e.key === 'e' || e.key === 'E') && e.target.getAttribute && e.target.getAttribute('contenteditable') !== 'true') {
+    editor.toggleEditMode();
+  }
+  if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) { e.preventDefault(); if (editor.isActive) editor.save(); }
+});
+</script>
+</body>
+</html>
