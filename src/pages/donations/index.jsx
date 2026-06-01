@@ -129,6 +129,7 @@ const INITIAL_FILTERS = {
   maxAmount: '',
   startDate: '',
   endDate: '',
+  tagSearch: '',
 };
 
 /* ── component ───────────────────────────────────────── */
@@ -340,6 +341,14 @@ export default function DonationsPage() {
     }
   };
 
+  const visibleDonations = useMemo(() => {
+    const q = filters.tagSearch.trim().toLowerCase();
+    if (!q) return donations;
+    return donations.filter((d) =>
+      (d.description ?? '').toLowerCase().includes(q)
+    );
+  }, [donations, filters.tagSearch]);
+
   const selectedCount = selected.size;
   const allUnsentMode = bulkMode === 'allUnsent';
   const recipientsForModal = allUnsentMode
@@ -441,7 +450,7 @@ export default function DonationsPage() {
 
       <Card style={{ padding: '24px', marginTop: '16px' }}>
         <DonationTable
-          donations={donations}
+          donations={visibleDonations}
           loading={loading}
           error={error}
           selected={selected}
