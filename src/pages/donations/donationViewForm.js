@@ -7,6 +7,7 @@ export const EMPTY_DONATION_VIEW_FORM = {
   receipt_status: 'pending',
   phone: '',
   address: '',
+  description: '',
 };
 
 export function fromDonationRow(donation) {
@@ -20,5 +21,6 @@ export function fromDonationRow(donation) {
     receipt_status: donation.receipt_status ?? 'pending',
     phone: '',
     address: '',
+    description: donation.description ?? '',
   };
 }
