@@ -38,12 +38,30 @@ export default function useDonations(filters = {}) {
   }, []);
 
   // Debounced, cancellable fetch whenever filters change
-  const { search, status, minAmount, maxAmount, startDate, endDate, page } = filters;
+  const {
+    search,
+    status,
+    minAmount,
+    maxAmount,
+    startDate,
+    endDate,
+    descriptionSearch,
+    page,
+  } = filters;
   useEffect(() => {
     const controller = new AbortController();
     const timer = setTimeout(() => {
       fetchDonations(
-        { search, status, minAmount, maxAmount, startDate, endDate, page },
+        {
+          search,
+          status,
+          minAmount,
+          maxAmount,
+          startDate,
+          endDate,
+          descriptionSearch,
+          page,
+        },
         controller.signal
       );
     }, 300);
@@ -51,7 +69,17 @@ export default function useDonations(filters = {}) {
       clearTimeout(timer);
       controller.abort();
     };
-  }, [search, status, minAmount, maxAmount, startDate, endDate, page, fetchDonations]);
+  }, [
+    search,
+    status,
+    minAmount,
+    maxAmount,
+    startDate,
+    endDate,
+    descriptionSearch,
+    page,
+    fetchDonations,
+  ]);
 
   const refetchAtPage1 = async () => {
     onPageResetRef.current?.();

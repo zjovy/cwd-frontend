@@ -10,7 +10,7 @@
     total    – total matching records (null while loading)
 */
 import Card from '@/common/components/atoms/Card';
-import { Search, Tag } from 'lucide-react';
+import { FileText, Search } from 'lucide-react';
 import PropTypes from 'prop-types';
 
 const styles = {
@@ -96,7 +96,15 @@ export default function DonationsFilterBar({
   pageSize,
   total,
 }) {
-  const { search, status, minAmount, maxAmount, startDate, endDate, tagSearch } = filters;
+  const {
+    search,
+    status,
+    minAmount,
+    maxAmount,
+    startDate,
+    endDate,
+    descriptionSearch,
+  } = filters;
 
   const firstItem = total === null ? null : (page - 1) * pageSize + 1;
   const lastItem = total === null ? null : Math.min(page * pageSize, total);
@@ -114,12 +122,13 @@ export default function DonationsFilterBar({
           />
         </div>
         <div style={styles.searchWrap}>
-          <Tag size={14} style={styles.searchIcon} />
+          <FileText size={14} style={styles.searchIcon} />
           <input
             style={styles.searchInput}
-            placeholder='Filter by tag...'
-            value={tagSearch}
-            onChange={(e) => onChange('tagSearch', e.target.value)}
+            placeholder='Filter by description...'
+            aria-label='Filter by description'
+            value={descriptionSearch}
+            onChange={(e) => onChange('descriptionSearch', e.target.value)}
           />
         </div>
         <select
@@ -188,7 +197,7 @@ DonationsFilterBar.propTypes = {
     maxAmount: PropTypes.string.isRequired,
     startDate: PropTypes.string.isRequired,
     endDate: PropTypes.string.isRequired,
-    tagSearch: PropTypes.string.isRequired,
+    descriptionSearch: PropTypes.string.isRequired,
   }).isRequired,
   onChange: PropTypes.func.isRequired,
   page: PropTypes.number.isRequired,

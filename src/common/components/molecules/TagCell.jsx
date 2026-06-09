@@ -17,7 +17,11 @@ const chip = {
 
 export default function TagCell({ description }) {
   if (!description) return null;
-  return <span style={chip}>{description}</span>;
+  return (
+    <span style={chip} title={description}>
+      {description}
+    </span>
+  );
 }
 
 TagCell.propTypes = {
