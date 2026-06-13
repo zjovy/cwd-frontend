@@ -3,12 +3,6 @@ import { formatAmount } from '@/utils/format';
 import { Calendar, DollarSign, TrendingUp } from 'lucide-react';
 import PropTypes from 'prop-types';
 
-const rowStyle = {
-  display: 'flex',
-  gap: '16px',
-  marginBottom: '20px',
-};
-
 function formatMemberSince(date) {
   if (!date) return '—';
   return new Date(date).toLocaleDateString('en-US', {
@@ -37,7 +31,7 @@ export default function DonorStatsRow({
   totalDonations,
 }) {
   return (
-    <div style={rowStyle}>
+    <div className='responsive-stat-row' style={{ marginBottom: '20px' }}>
       <StatCard
         label='Total Donated'
         value={formatAmount(totalDonated || 0)}

@@ -29,11 +29,10 @@ const styles = {
     alignItems: 'center',
   }),
   value: (color) => ({
-    fontSize: '28px',
     fontWeight: '700',
     letterSpacing: '-0.03em',
     color: color || '#1a1a1a',
-    lineHeight: 1,
+    lineHeight: 1.15,
     marginBottom: '6px',
   }),
   sub: {
@@ -51,7 +50,7 @@ export default function StatCard({
   valueColor,
 }) {
   return (
-    <Card style={{ flex: 1, minWidth: 0 }}>
+    <Card className='stat-card'>
       <div style={styles.header}>
         <span style={styles.label}>{label}</span>
         {Icon && (
@@ -60,7 +59,9 @@ export default function StatCard({
           </span>
         )}
       </div>
-      <div style={styles.value(valueColor)}>{value}</div>
+      <div className='stat-card-value' style={styles.value(valueColor)}>
+        {value}
+      </div>
       <div style={styles.sub}>{sub}</div>
     </Card>
   );

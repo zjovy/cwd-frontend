@@ -11,11 +11,8 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: '20px',
-  },
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: '24px 32px',
+    flexWrap: 'wrap',
+    gap: '12px',
   },
   field: {
     display: 'flex',
@@ -62,7 +59,7 @@ export default function ContactInfoCard({ email, phone, address, onEdit }) {
           Edit
         </Button>
       </div>
-      <div style={styles.grid}>
+      <div className='responsive-grid-2'>
         <Field icon={<Mail size={18} strokeWidth={1.8} />} label='Email'>
           {email}
         </Field>

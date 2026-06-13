@@ -20,3 +20,65 @@ code {
     transform: rotate(360deg);
   }
 }
+
+/* Responsive layout utilities */
+.responsive-stat-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 1199px) {
+  .responsive-stat-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 599px) {
+  .responsive-stat-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stat-card {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.stat-card-value {
+  font-size: clamp(20px, 5vw, 28px);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.responsive-chart-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.responsive-chart-row > * {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+@media (max-width: 767px) {
+  .responsive-chart-row > * {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+}
+
+.responsive-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px 32px;
+}
+
+@media (max-width: 767px) {
+  .responsive-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}

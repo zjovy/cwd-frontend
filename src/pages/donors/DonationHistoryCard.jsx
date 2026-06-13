@@ -1,6 +1,7 @@
 import Badge from '@/common/components/atoms/Badge';
 import Card from '@/common/components/atoms/Card';
 import SectionTitle from '@/common/components/atoms/SectionTitle';
+import TableScroll from '@/common/components/atoms/TableScroll';
 import { formatAmount, formatDate } from '@/utils/format';
 import PropTypes from 'prop-types';
 
@@ -14,7 +15,7 @@ const styles = {
     paddingBottom: '16px',
     borderBottom: '1px solid #f0f0ee',
   },
-  table: { width: '100%', borderCollapse: 'collapse' },
+  table: { width: '100%', borderCollapse: 'collapse', minWidth: '480px' },
   th: {
     textAlign: 'left',
     fontSize: '12px',
@@ -72,7 +73,8 @@ export default function DonationHistoryCard({ donations, loading, error, onRowCl
 
     return (
       <>
-        <table style={styles.table}>
+        <TableScroll>
+          <table style={styles.table}>
           <thead>
             <tr>
               <th style={styles.th}>Date</th>
@@ -100,6 +102,7 @@ export default function DonationHistoryCard({ donations, loading, error, onRowCl
             ))}
           </tbody>
         </table>
+        </TableScroll>
 
         <div style={styles.totalsRow}>
           <div style={styles.totalsWrap}>
