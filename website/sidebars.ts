@@ -14,6 +14,13 @@ import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';
  */
 const sidebars: SidebarsConfig = {
   tutorialSidebar: [
+    {
+      type: 'category',
+      label: 'Handoff Documentation',
+      collapsible: true,
+      collapsed: false,
+      items: ['handoff/overview', 'handoff/progress', 'handoff/next-steps'],
+    },
     'intro',
     {
       type: 'category',
@@ -59,13 +66,6 @@ const sidebars: SidebarsConfig = {
         'deployment/firebase',
         'deployment/resend',
       ],
-    },
-    {
-      type: 'category',
-      label: 'Handoff Documentation',
-      collapsible: true,
-      collapsed: false,
-      items: ['handoff/overview', 'handoff/progress', 'handoff/next-steps'],
     },
   ],
 };

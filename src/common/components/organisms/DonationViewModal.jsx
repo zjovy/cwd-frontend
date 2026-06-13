@@ -64,6 +64,7 @@ export default function DonationViewModal({
           ...prev,
           address: detail.address ?? '',
           phone: detail.phone ?? '',
+          description: detail.description ?? prev.description,
         }));
       })
       .catch((err) => {

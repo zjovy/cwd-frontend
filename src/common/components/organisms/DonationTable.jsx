@@ -23,6 +23,8 @@ import {
   tdStyle,
   thStyle,
 } from '@/common/components/atoms/tableStyles';
+import ActionsMenu from '@/common/components/molecules/ActionsMenu';
+import TagCell from '@/common/components/molecules/TagCell';
 import { formatAmount, formatDate } from '@/utils/format';
 import PropTypes from 'prop-types';
 
@@ -47,7 +49,7 @@ const donorLinkStyle = {
 
 /* ── DonationTable ───────────────────────────────────── */
 
-const COLUMNS = ['Donor Name', 'Email', 'Amount', 'Date', 'Receipt Status'];
+const COLUMNS = ['Donor Name', 'Email', 'Amount', 'Date', 'Receipt Status', 'Description'];
 
 export default function DonationTable({
   donations,
@@ -143,6 +145,29 @@ export default function DonationTable({
               <td style={tdStyle}>
                 <Badge status={d.receipt_status} />
               </td>
+              <td style={tdStyle}>
+                <TagCell description={d.description} />
+              </td>
+              {showActions && (
+                <td style={tdStyle} onClick={(e) => e.stopPropagation()}>
+                  <ActionsMenu
+                    actions={[
+                      ...(onEdit
+                        ? [{ label: 'Edit', onClick: () => onEdit(d) }]
+                        : []),
+                      ...(onDelete
+                        ? [
+                            {
+                              label: 'Delete',
+                              onClick: () => onDelete(d),
+                              danger: true,
+                            },
+                          ]
+                        : []),
+                    ]}
+                  />
+                </td>
+              )}
             </tr>
           ))
         )}

@@ -10,7 +10,7 @@
     total    – total matching records (null while loading)
 */
 import Card from '@/common/components/atoms/Card';
-import { Search } from 'lucide-react';
+import { FileText, Search } from 'lucide-react';
 import PropTypes from 'prop-types';
 
 const styles = {
@@ -19,7 +19,18 @@ const styles = {
     gap: '10px',
     flexWrap: 'wrap',
     alignItems: 'center',
+    marginBottom: '10px',
+  },
+  dateRow: {
+    display: 'flex',
+    gap: '10px',
+    alignItems: 'center',
     marginBottom: '12px',
+  },
+  dateLabel: {
+    fontSize: '13px',
+    color: '#6b7280',
+    whiteSpace: 'nowrap',
   },
   searchWrap: {
     flex: '1 1 220px',
@@ -85,7 +96,15 @@ export default function DonationsFilterBar({
   pageSize,
   total,
 }) {
-  const { search, status, minAmount, maxAmount, startDate, endDate } = filters;
+  const {
+    search,
+    status,
+    minAmount,
+    maxAmount,
+    startDate,
+    endDate,
+    descriptionSearch,
+  } = filters;
 
   const firstItem = total === null ? null : (page - 1) * pageSize + 1;
   const lastItem = total === null ? null : Math.min(page * pageSize, total);
@@ -100,6 +119,16 @@ export default function DonationsFilterBar({
             placeholder='Search by name or email...'
             value={search}
             onChange={(e) => onChange('search', e.target.value)}
+          />
+        </div>
+        <div style={styles.searchWrap}>
+          <FileText size={14} style={styles.searchIcon} />
+          <input
+            style={styles.searchInput}
+            placeholder='Filter by description...'
+            aria-label='Filter by description'
+            value={descriptionSearch}
+            onChange={(e) => onChange('descriptionSearch', e.target.value)}
           />
         </div>
         <select
@@ -127,6 +156,9 @@ export default function DonationsFilterBar({
           value={maxAmount}
           onChange={(e) => onChange('maxAmount', e.target.value)}
         />
+      </div>
+      <div style={styles.dateRow}>
+        <span style={styles.dateLabel}>From</span>
         <input
           style={styles.dateInput}
           type='date'
@@ -135,6 +167,7 @@ export default function DonationsFilterBar({
           max={endDate || undefined}
           onChange={(e) => onChange('startDate', e.target.value)}
         />
+        <span style={styles.dateLabel}>To</span>
         <input
           style={styles.dateInput}
           type='date'
@@ -164,6 +197,7 @@ DonationsFilterBar.propTypes = {
     maxAmount: PropTypes.string.isRequired,
     startDate: PropTypes.string.isRequired,
     endDate: PropTypes.string.isRequired,
+    descriptionSearch: PropTypes.string.isRequired,
   }).isRequired,
   onChange: PropTypes.func.isRequired,
   page: PropTypes.number.isRequired,

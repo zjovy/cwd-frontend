@@ -131,6 +131,7 @@ const INITIAL_FILTERS = {
   maxAmount: '',
   startDate: '',
   endDate: '',
+  descriptionSearch: '',
 };
 
 /* ── component ───────────────────────────────────────── */
@@ -199,6 +200,7 @@ export default function DonationsPage() {
         Amount: d.amount,
         Date: fmtExportDate(d.donation_date),
         'Receipt Status': d.receipt_status,
+        Description: d.description ?? '',
         Phone: d.phone ?? '',
         Address: d.address ?? '',
       }));
