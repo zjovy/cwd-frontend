@@ -148,26 +148,6 @@ export default function DonationTable({
               <td style={tdStyle}>
                 <TagCell description={d.description} />
               </td>
-              {showActions && (
-                <td style={tdStyle} onClick={(e) => e.stopPropagation()}>
-                  <ActionsMenu
-                    actions={[
-                      ...(onEdit
-                        ? [{ label: 'Edit', onClick: () => onEdit(d) }]
-                        : []),
-                      ...(onDelete
-                        ? [
-                            {
-                              label: 'Delete',
-                              onClick: () => onDelete(d),
-                              danger: true,
-                            },
-                          ]
-                        : []),
-                    ]}
-                  />
-                </td>
-              )}
             </tr>
           ))
         )}

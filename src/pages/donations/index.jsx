@@ -7,6 +7,7 @@ import DonationModal from '@/common/components/organisms/DonationModal';
 import DonationTable from '@/common/components/organisms/DonationTable';
 import DonationViewModal from '@/common/components/organisms/DonationViewModal';
 import useDonations from '@/hooks/useDonations';
+import { useBreakpoint } from '@/hooks/useMediaQuery';
 import { usePageStyles } from '@/common/styles/pageStyles';
 import donationService from '@/services/donationService';
 import { PAGE_SIZE } from '@/utils/pagination';
@@ -37,6 +38,21 @@ async function fetchInChunks(items, fn, chunkSize = 10) {
 
 /* ── styles ─────────────────────────────────────────── */
 
+const btnBase = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '6px',
+  padding: '9px 16px',
+  borderRadius: '8px',
+  fontSize: '13px',
+  fontWeight: '500',
+  cursor: 'pointer',
+  whiteSpace: 'nowrap',
+  minHeight: '38px',
+  boxSizing: 'border-box',
+};
+
 const styles = {
   main: {
     flex: 1,
@@ -61,37 +77,27 @@ const styles = {
     fontSize: '14px',
     color: '#6b7280',
   },
-  topActions: {
+  topActions: (isMobile) => ({
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'stretch',
     gap: '8px',
-  },
-  addBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '9px 16px',
+    flexWrap: isMobile ? 'wrap' : 'nowrap',
+    width: isMobile ? '100%' : 'auto',
+  }),
+  addBtn: (isMobile) => ({
+    ...btnBase,
     border: 'none',
-    borderRadius: '8px',
     background: '#2563eb',
     color: '#fff',
-    fontSize: '13px',
-    fontWeight: '500',
-    cursor: 'pointer',
-  },
-  ghostBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '9px 14px',
+    ...(isMobile ? { flex: '1 1 100%' } : {}),
+  }),
+  ghostBtn: (isMobile) => ({
+    ...btnBase,
     border: '1px solid #d1d5db',
-    borderRadius: '8px',
     background: '#fff',
     color: '#374151',
-    fontSize: '13px',
-    fontWeight: '500',
-    cursor: 'pointer',
-  },
+    ...(isMobile ? { flex: '1 1 calc(50% - 4px)', minWidth: '140px' } : {}),
+  }),
   bulkBar: {
     display: 'flex',
     alignItems: 'center',
@@ -138,6 +144,7 @@ const INITIAL_FILTERS = {
 
 export default function DonationsPage() {
   const pageStyles = usePageStyles();
+  const { isMobile } = useBreakpoint();
   const [filters, setFilters] = useState(INITIAL_FILTERS);
   const [page, setPage] = useState(1);
   const [selectedMap, setSelectedMap] = useState({});
@@ -360,9 +367,9 @@ export default function DonationsPage() {
             View and manage all donation records.
           </div>
         </div>
-        <div style={styles.topActions}>
+        <div style={styles.topActions(isMobile)}>
           <button
-            style={styles.ghostBtn}
+            style={styles.ghostBtn(isMobile)}
             onClick={handleExport}
             disabled={isExporting}
             title='Only the date range filter is applied when exporting. Other filters (search, status, amount) are not used.'
@@ -370,7 +377,7 @@ export default function DonationsPage() {
             <Download size={13} /> {isExporting ? 'Exporting...' : 'Export'}
           </button>
           <button
-            style={styles.ghostBtn}
+            style={styles.ghostBtn(isMobile)}
             onClick={() => {
               setBulkResult(null);
               setBulkMode('allUnsent');
@@ -399,7 +406,7 @@ export default function DonationsPage() {
           >
             <Send size={13} /> Send All Unsent
           </button>
-          <button style={styles.addBtn} onClick={openCreate}>
+          <button style={styles.addBtn(isMobile)} onClick={openCreate}>
             <Plus size={14} color='white' /> Add Donation
           </button>
         </div>
@@ -421,7 +428,7 @@ export default function DonationsPage() {
           </div>
           <div style={styles.bulkRight}>
             <button
-              style={styles.addBtn}
+              style={styles.addBtn(isMobile)}
               onClick={() => {
                 setBulkResult(null);
                 setBulkMode('selected');
@@ -429,7 +436,7 @@ export default function DonationsPage() {
             >
               <Send size={13} /> Send Receipts
             </button>
-            <button style={styles.ghostBtn} onClick={handleMarkSent}>
+            <button style={styles.ghostBtn(isMobile)} onClick={handleMarkSent}>
               <Check size={13} /> Mark as Sent
             </button>
             <button

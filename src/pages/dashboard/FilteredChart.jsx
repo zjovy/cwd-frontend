@@ -132,7 +132,7 @@ export default function FilteredChart({
         <div style={{ height: 200 }} />
       ) : (
         <div className='responsive-chart-row'>
-          <div style={{ flex: 1 }}>
+          <div>
             <div
               style={{
                 fontSize: '12px',
@@ -175,7 +175,7 @@ export default function FilteredChart({
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <div style={{ flex: 1 }}>
+          <div>
             <div
               style={{
                 fontSize: '12px',

@@ -20,6 +20,7 @@ import {
   LayoutDashboard,
   ShieldCheck,
   Users,
+  X
 } from 'lucide-react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';

@@ -63,6 +63,13 @@ code {
   min-width: 0;
 }
 
+@media (max-width: 767px) {
+  .responsive-chart-row > * {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+}
+
 .responsive-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;

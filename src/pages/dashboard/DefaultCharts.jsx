@@ -95,7 +95,7 @@ export default function DefaultCharts({ refreshKey }) {
 
   return (
     <div className='responsive-chart-row'>
-      <Card style={{ flex: 1, padding: '22px 22px 16px' }}>
+      <Card style={{ padding: '22px 22px 16px' }}>
         <SectionTitle>Donation Trend</SectionTitle>
         <ResponsiveContainer width='100%' height={200}>
           <LineChart
@@ -134,7 +134,7 @@ export default function DefaultCharts({ refreshKey }) {
         </ResponsiveContainer>
       </Card>
 
-      <Card style={{ flex: 1, padding: '22px 22px 16px' }}>
+      <Card style={{ padding: '22px 22px 16px' }}>
         <SectionTitle>Last 6 Months</SectionTitle>
         <ResponsiveContainer width='100%' height={200}>
           <BarChart
