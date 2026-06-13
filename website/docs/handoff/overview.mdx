@@ -2,25 +2,112 @@
 sidebar_position: 1
 ---
 
-# Overview
+# Handoff
 
-This handoff section is for future maintainers of the C&W Market Foundation donor management system.
+**Start here.** This is the entry point for any new maintainer of the C&W
+Market Foundation donor management system. It explains what you are inheriting,
+how to get the system running, and links out to every other section you need to
+work on the project.
 
-## Scope
+If you only read one page before touching the code, read this one — then follow
+the links below.
 
-- Frontend app (`cwd-frontend`)
-- Backend API (`cwd-backend`)
-- Documentation site (`cwd-frontend/website`)
+## What you're inheriting
+
+The product is split across two application repositories plus a documentation
+site that builds into the frontend:
+
+| Component | Location | Stack | Deploys to |
+|-----------|----------|-------|------------|
+| Frontend SPA | `cwd-frontend` | React 19, Vite, React Router v7, styled-components, Firebase Auth | Firebase Hosting |
+| Backend API | `cwd-backend` | Node.js, Express, Firebase Admin, MySQL/PostgreSQL | AWS EC2 |
+| Docs site | `cwd-frontend/website` | Docusaurus | Served at `/docs` on the frontend host |
+
+External dependencies the system relies on: **Firebase** (auth + hosting),
+**AWS** (EC2, RDS, Secrets Manager), and **Resend** (transactional email). See
+[Deployment Overview](../deployment/overview) for how they fit together.
+
+For the product goals and full capability list, see the
+[Introduction](/).
+
+## Get the system running
+
+Work through [Getting Started](../getting-started) in order — it covers the
+frontend, backend, and docs site running together locally:
+
+1. [Prerequisites](../getting-started/prerequisites) — Node.js 20+, npm, Git,
+   plus a Firebase project and a running backend.
+2. [Installation](../getting-started/installation) — clone and install
+   dependencies for each service.
+3. [Environment variables](../getting-started/environment-variables) — copy each
+   `.env.example` and fill in `VITE_BACKEND_URL` and the `VITE_FIREBASE_*` keys.
+4. [Running locally](../getting-started/running-locally) — start backend
+   (`:5050`), frontend (`:5173`), and docs (`:3000`).
+
+The single most common local failure is auth: make sure backend CORS allows your
+Vite origin and that both services point at the **same Firebase project**. The
+[Running locally troubleshooting table](../getting-started/running-locally#troubleshooting)
+covers the rest.
+
+## Learn the system
+
+Read these before making non-trivial changes:
+
+- **[Authentication](../authentication)** — the hybrid Firebase + backend auth
+  model, login lifecycle, and the `pending` / `member` / `admin` role behavior.
+  This underpins nearly every route and API call.
+- **Frontend** — [project structure](../frontend/project-structure),
+  [website layout](../frontend/website-layout), and
+  [features](../frontend/features). Follow the conventions in
+  `cwd-frontend/CLAUDE.md` (atomic component hierarchy, `@/` path alias,
+  200-line file limit, styled-components only).
+- **Backend** — [project structure](../backend/project-structure) and
+  [implementation](../backend/implementation). The API is layered
+  `routes → middleware → controllers → repositories → providers`.
+- **Reference** — [backend endpoints](../reference/backend-endpoints) (the
+  contract the frontend expects) and the
+  [source layout](../reference/source-layout) map.
+
+## Operate & deploy
+
+Both apps deploy automatically on push to `main`. Before you ship anything:
+
+- **[Deployment Overview](../deployment/overview)** — the two-repo / two-platform
+  topology and the architecture diagram.
+- **[AWS](../deployment/aws)** — backend infrastructure (EC2, RDS, Secrets
+  Manager, CDK in `cwd-backend/infra`).
+- **[AWS Operations](../deployment/aws-operations)** — day-2 runbook: manual
+  deploys, domain/SSL, restarts.
+- **[Firebase](../deployment/firebase)** — hosting + auth setup and the GitHub
+  deploy integration.
+- **[Resend](../deployment/resend)** — transactional email (donation receipts).
+
+:::warning Secrets are not edited by hand
+The backend production `.env` is rewritten on every deploy by
+`scripts/fetch-secrets.sh` pulling from AWS Secrets Manager. Edit the secret in
+Secrets Manager, not the file. Never commit any `.env`.
+:::
+
+## Project status
+
+- **[Progress](./progress)** — what is complete, in progress, and the known
+  gaps.
+- **[Next Steps](./next-steps)** — priority-ranked tasks for the incoming team.
 
 ## Goals of this handoff
 
-- Reduce onboarding time for the next team
-- Preserve architecture and deployment intent
-- Make current implementation status explicit
+- Reduce onboarding time for the next team.
+- Preserve architecture and deployment intent.
+- Make current implementation status explicit.
 
 ## Suggested handoff package
 
-- Latest working branch + deployment notes
-- Environment variable templates for both services
-- Known risks, bugs, and technical debt list
-- Priority-ranked next tasks (see [Next Steps](./next-steps))
+When transferring ownership, hand over:
+
+- Latest working branch + deployment notes.
+- Environment variable templates for both services (see
+  [Environment variables](../getting-started/environment-variables)).
+- Access to Firebase, AWS, and Resend accounts, plus the GitHub Actions secrets
+  listed in [Deployment Overview](../deployment/overview).
+- Known risks, bugs, and technical debt list (see [Progress](./progress)).
+- Priority-ranked next tasks (see [Next Steps](./next-steps)).

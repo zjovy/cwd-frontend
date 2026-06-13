@@ -11,14 +11,21 @@ import { useNavigate } from 'react-router-dom';
 import NavItem from '@/common/components/atoms/NavItem';
 import UserProfile from '@/common/components/molecules/UserProfile';
 import { useUser } from '@/common/contexts/UserContext';
-import { DollarSign, LayoutDashboard, ShieldCheck, Users } from 'lucide-react';
+import {
+  BookOpen,
+  DollarSign,
+  LayoutDashboard,
+  ShieldCheck,
+  Users,
+} from 'lucide-react';
 import PropTypes from 'prop-types';
 
 const NAV_ITEMS = [
   { label: 'Dashboard', icon: LayoutDashboard, id: 'dashboard' },
   { label: 'Donations', icon: DollarSign, id: 'donations' },
   { label: 'Donors', icon: Users, id: 'donors' },
-  { label: 'Admin', icon: ShieldCheck, id: 'admin' },
+  { label: 'Admin', icon: ShieldCheck, id: 'admin', adminOnly: true },
+  { label: 'Docs', icon: BookOpen, href: '/docs/', adminOnly: true },
 ];
 
 const styles = {
@@ -64,7 +71,7 @@ function getDisplayName(user) {
 export default function Sidebar({ activePage, onNavigate }) {
   const { user, logout } = useUser();
   const navItems = NAV_ITEMS.filter(
-    ({ id }) => id !== 'admin' || user?.role === 'admin'
+    ({ adminOnly }) => !adminOnly || user?.role === 'admin'
   );
   const navigate = useNavigate();
 
@@ -83,13 +90,14 @@ export default function Sidebar({ activePage, onNavigate }) {
         />
       </div>
       <nav style={styles.nav}>
-        {navItems.map(({ label, icon, id }) => (
+        {navItems.map(({ label, icon, id, href }) => (
           <NavItem
-            key={id}
+            key={id || href}
             label={label}
             icon={icon}
-            active={activePage === id}
-            onClick={() => onNavigate && onNavigate(id)}
+            href={href}
+            active={!href && activePage === id}
+            onClick={href ? undefined : () => onNavigate && onNavigate(id)}
           />
         ))}
       </nav>

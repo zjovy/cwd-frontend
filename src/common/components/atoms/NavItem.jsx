@@ -7,6 +7,8 @@
     - icon (elementType): The icon to display.
     - active (boolean): Whether the item is active.
     - onClick (function): The function to call when the item is clicked.
+    - href (string): When provided, renders an anchor link (e.g. for the docs
+      site served outside the SPA) instead of a button.
 */
 import PropTypes from 'prop-types';
 
@@ -28,7 +30,21 @@ const btnStyle = (active) => ({
   marginBottom: '2px',
 });
 
-export default function NavItem({ label, icon: Icon, active, onClick }) {
+export default function NavItem({ label, icon: Icon, active, onClick, href }) {
+  if (href) {
+    return (
+      <a
+        href={href}
+        target='_blank'
+        rel='noopener noreferrer'
+        style={{ ...btnStyle(active), textDecoration: 'none' }}
+      >
+        <Icon size={16} strokeWidth={active ? 2.2 : 1.8} />
+        {label}
+      </a>
+    );
+  }
+
   return (
     <button style={btnStyle(active)} onClick={onClick}>
       <Icon size={16} strokeWidth={active ? 2.2 : 1.8} />
@@ -42,9 +58,11 @@ NavItem.propTypes = {
   icon: PropTypes.elementType.isRequired,
   active: PropTypes.bool,
   onClick: PropTypes.func,
+  href: PropTypes.string,
 };
 
 NavItem.defaultProps = {
   active: false,
   onClick: undefined,
+  href: undefined,
 };
