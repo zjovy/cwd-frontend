@@ -2,6 +2,7 @@ export const ENDPOINTS = {
   DONATIONS: '/donations',
   DONATION_BY_ID: (id) => `/donations/${id}`,
   DONATION_SEND_RECEIPT: (id) => `/donations/${id}/send-receipt`,
+  DONATION_RECEIPT_PDF: (id) => `/donations/${id}/receipt-pdf`,
   DONATIONS_RECEIPT_TEMPLATE: '/donations/receipt-template',
   DONATIONS_SEND_RECEIPTS: '/donations/send-receipts',
   DONATIONS_MARK_SENT: '/donations/mark-sent',

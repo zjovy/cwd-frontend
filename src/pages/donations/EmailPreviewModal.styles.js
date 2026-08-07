@@ -21,6 +21,11 @@ export const modal = {
   overflowY: 'auto',
 };
 
+export const modalWide = {
+  ...modal,
+  maxWidth: '720px',
+};
+
 export const headerRow = {
   display: 'flex',
   alignItems: 'center',

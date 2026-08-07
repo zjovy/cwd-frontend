@@ -35,3 +35,23 @@ export async function request(url, options = {}) {
   if (!ct.includes('application/json')) return null;
   return res.json();
 }
+
+export async function requestBlob(url, options = {}) {
+  const { signal, ...rest } = options;
+  const headers = await authHeaders();
+  const res = await fetch(url, {
+    ...rest,
+    headers,
+    credentials: 'include',
+    signal,
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(
+      body.error || body.message || `Request failed (${res.status})`
+    );
+  }
+
+  return res.blob();
+}

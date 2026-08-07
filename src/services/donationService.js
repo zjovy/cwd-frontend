@@ -1,4 +1,4 @@
-import { buildUrl, request } from '@/api/client';
+import { buildUrl, request, requestBlob } from '@/api/client';
 import { ENDPOINTS } from '@/api/endpoints';
 import {
   buildDonationCreateBody,
@@ -53,6 +53,14 @@ const donationService = {
     return request(buildUrl(ENDPOINTS.DONATION_SEND_RECEIPT(id)), {
       method: 'POST',
       body: JSON.stringify({ body }),
+    });
+  },
+
+  getReceiptPdf(id, body, signal) {
+    return requestBlob(buildUrl(ENDPOINTS.DONATION_RECEIPT_PDF(id)), {
+      method: 'POST',
+      body: JSON.stringify(body != null ? { body } : {}),
+      signal,
     });
   },
 
