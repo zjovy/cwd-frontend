@@ -140,6 +140,7 @@ export default function DonationViewModal({
     <>
       <EmailPreviewModal
         open={emailPreview}
+        donationId={donation?.id}
         to={form.email}
         subject={RECEIPT_SUBJECT}
         body={buildReceiptMessage(form)}

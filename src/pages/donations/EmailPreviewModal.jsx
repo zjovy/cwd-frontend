@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Send } from 'lucide-react';
 import PropTypes from 'prop-types';
@@ -10,16 +10,18 @@ import {
   footerRow,
   headerRow,
   labelStyle,
-  modal,
+  modalWide,
   overlay,
   readonlyInput,
   sendBtn,
   textareaStyle,
   titleStyle,
 } from './EmailPreviewModal.styles';
+import ReceiptPdfPreview from './ReceiptPdfPreview';
 
 export default function EmailPreviewModal({
   open,
+  donationId,
   to,
   subject,
   body,
@@ -27,20 +29,20 @@ export default function EmailPreviewModal({
   onClose,
   onConfirm,
 }) {
-  const bodyRef = useRef(body);
+  const [message, setMessage] = useState(body);
+
+  useEffect(() => {
+    if (open) setMessage(body);
+  }, [open, body]);
 
   if (!open) return null;
-
-  const handleConfirm = () => {
-    onConfirm(bodyRef.current);
-  };
 
   return (
     <div style={overlay} onClick={onClose}>
       <div
         aria-modal='true'
         role='dialog'
-        style={modal}
+        style={modalWide}
         onClick={(e) => e.stopPropagation()}
       >
         <div style={headerRow}>
@@ -66,15 +68,15 @@ export default function EmailPreviewModal({
           </label>
           <textarea
             id='receipt-preview-message'
-            ref={(node) => {
-              if (node) bodyRef.current = node.value;
-            }}
             style={textareaStyle}
-            defaultValue={body}
-            onChange={(e) => {
-              bodyRef.current = e.target.value;
-            }}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
           />
+        </div>
+
+        <div style={fieldGroup}>
+          <div style={labelStyle}>Receipt PDF</div>
+          <ReceiptPdfPreview donationId={donationId} body={message} />
         </div>
 
         <div style={footerRow}>
@@ -84,7 +86,7 @@ export default function EmailPreviewModal({
           <button
             type='button'
             style={sendBtn}
-            onClick={handleConfirm}
+            onClick={() => onConfirm(message)}
             disabled={sending}
           >
             <Send size={13} /> {sending ? 'Sending...' : 'Send Email'}
@@ -97,6 +99,7 @@ export default function EmailPreviewModal({
 
 EmailPreviewModal.propTypes = {
   open: PropTypes.bool.isRequired,
+  donationId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   to: PropTypes.string.isRequired,
   subject: PropTypes.string.isRequired,
   body: PropTypes.string.isRequired,
@@ -106,5 +109,6 @@ EmailPreviewModal.propTypes = {
 };
 
 EmailPreviewModal.defaultProps = {
+  donationId: null,
   sending: false,
 };

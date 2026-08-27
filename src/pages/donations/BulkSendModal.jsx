@@ -7,6 +7,7 @@ import {
 import { Send } from 'lucide-react';
 import PropTypes from 'prop-types';
 
+import BulkSamplePreview from './BulkSamplePreview';
 import {
   cancelBtn,
   closeBtn,
@@ -14,7 +15,7 @@ import {
   footerRow,
   headerRow,
   labelStyle,
-  modal,
+  modalWide,
   overlay,
   readonlyInput,
   sendBtn,
@@ -24,7 +25,7 @@ import ReceiptMessageEditor from './ReceiptMessageEditor';
 
 const recipientListStyle = {
   fontSize: '13px',
-  padding: '8px 12px',
+  padding: '4px',
   border: '1px solid #e5e7eb',
   borderRadius: '8px',
   background: '#f9fafb',
@@ -32,6 +33,14 @@ const recipientListStyle = {
   maxHeight: '140px',
   overflowY: 'auto',
 };
+
+const recipientRowStyle = (selected) => ({
+  padding: '6px 10px',
+  borderRadius: '6px',
+  cursor: 'pointer',
+  background: selected ? '#dbeafe' : 'transparent',
+  color: selected ? '#1e40af' : '#374151',
+});
 
 const summaryStyle = {
   fontSize: '13px',
@@ -94,14 +103,19 @@ export default function BulkSendModal({
   const defaultEditBody = templateToEditText(defaultBody);
   const editBodyRef = useRef(defaultEditBody);
   const [editorKey, setEditorKey] = useState(0);
+  const [templateBody, setTemplateBody] = useState(defaultBody);
+  const [sampleId, setSampleId] = useState(null);
 
-  // Hooks must run unconditionally — early-return below would break the
-  // hook-order contract if placed above this effect.
   useEffect(() => {
     editBodyRef.current = defaultEditBody;
+    setTemplateBody(defaultBody);
     setEditorKey((k) => k + 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultBody]);
+
+  useEffect(() => {
+    if (!open) setSampleId(null);
+  }, [open]);
 
   if (!open) return null;
 
@@ -113,6 +127,8 @@ export default function BulkSendModal({
   };
 
   const handleResetMessage = () => {
+    editBodyRef.current = defaultEditBody;
+    setTemplateBody(defaultBody);
     setEditorKey((key) => key + 1);
   };
 
@@ -121,8 +137,6 @@ export default function BulkSendModal({
     : `Send to ${recipients.length} selected donor${recipients.length === 1 ? '' : 's'}`;
 
   const isBusy = sending || templateLoading || recipientsLoading;
-  // Server resolves scope for allUnsent — don't gate the send on the preview
-  // fetch having succeeded. For explicit selection, gate normally.
   const sendDisabled = allUnsent ? isBusy : isBusy || recipients.length === 0;
   const requestError = result?.requestError || null;
 
@@ -131,7 +145,7 @@ export default function BulkSendModal({
       <div
         aria-modal='true'
         role='dialog'
-        style={modal}
+        style={modalWide}
         onClick={(e) => e.stopPropagation()}
       >
         <div style={headerRow}>
@@ -164,10 +178,22 @@ export default function BulkSendModal({
           ) : (
             <div style={recipientListStyle}>
               {recipients.length === 0 ? (
-                <div>No recipients found.</div>
+                <div style={{ padding: '8px 12px' }}>No recipients found.</div>
               ) : (
                 recipients.map((r) => (
-                  <div key={r.id}>
+                  <div
+                    key={r.id}
+                    role='button'
+                    tabIndex={0}
+                    style={recipientRowStyle(r.id === sampleId)}
+                    onClick={() => setSampleId(r.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setSampleId(r.id);
+                      }
+                    }}
+                  >
                     {r.donorFullName}{' '}
                     {r.donorEmail ? `<${r.donorEmail}>` : '(no email)'}
                   </div>
@@ -194,12 +220,22 @@ export default function BulkSendModal({
             initialValue={defaultEditBody}
             onChange={(value) => {
               editBodyRef.current = value;
+              setTemplateBody(editTextToTemplate(value));
             }}
           />
           <button type='button' style={linkBtn} onClick={handleResetMessage}>
             Reset to default message
           </button>
         </div>
+
+        {!result && !recipientsLoading && (
+          <BulkSamplePreview
+            recipients={recipients}
+            sampleId={sampleId}
+            onSampleIdChange={setSampleId}
+            templateBody={templateBody}
+          />
+        )}
 
         {requestError && (
           <div style={resultStyle(true)}>Send failed: {requestError}</div>
