@@ -12,6 +12,8 @@ const colorMap = {
   sent: { background: '#F0FDF4', color: '#15803D' },
   pending: { background: '#FFF4E5', color: '#B25000' },
   expired: { background: '#F3F4F6', color: '#6B7280' },
+  stripe: { background: '#EFF6FF', color: '#1D4ED8' },
+  manual: { background: '#F3F4F6', color: '#4B5563' },
 };
 
 const badgeStyle = (status) => ({
@@ -30,9 +32,7 @@ const label = (status) =>
   status ? status.charAt(0).toUpperCase() + status.slice(1) : '—';
 
 export default function Badge({ status }) {
-  return (
-    <span style={badgeStyle(status)}>{label(status)}</span>
-  );
+  return <span style={badgeStyle(status)}>{label(status)}</span>;
 }
 
 Badge.propTypes = {

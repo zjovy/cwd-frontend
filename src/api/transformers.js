@@ -28,12 +28,22 @@ function normalizeDonorsListPayload(raw) {
   return { donors, total };
 }
 
+function donationSource(raw) {
+  if (raw.source === 'stripe' || raw.source === 'manual') return raw.source;
+  const stripeId = raw.stripe_payment_intent_id;
+  const hasStripeId = stripeId != null && String(stripeId).trim() !== '';
+  return hasStripeId ? 'stripe' : 'manual';
+}
+
 // Add computed fullName to a raw donor row.
 export function transformDonor(raw) {
   if (!raw) return raw;
   return {
     ...raw,
     fullName: `${raw.first_name ?? ''} ${raw.last_name ?? ''}`.trim(),
+    donations: Array.isArray(raw.donations)
+      ? raw.donations.map(transformDonation)
+      : raw.donations,
   };
 }
 
@@ -45,6 +55,7 @@ export function transformDonation(raw) {
     ...raw,
     donorFullName: name || 'Anonymous',
     donorEmail: raw.email ?? '',
+    source: donationSource(raw),
   };
 }
 

@@ -6,9 +6,9 @@ import TableScroll from '@/common/components/atoms/TableScroll';
 import DonationModal from '@/common/components/organisms/DonationModal';
 import DonationTable from '@/common/components/organisms/DonationTable';
 import DonationViewModal from '@/common/components/organisms/DonationViewModal';
+import { usePageStyles } from '@/common/styles/pageStyles';
 import useDonations from '@/hooks/useDonations';
 import { useBreakpoint } from '@/hooks/useMediaQuery';
-import { usePageStyles } from '@/common/styles/pageStyles';
 import donationService from '@/services/donationService';
 import { PAGE_SIZE } from '@/utils/pagination';
 import { RECEIPT_SUBJECT } from '@/utils/receiptTemplate';
@@ -200,12 +200,15 @@ export default function DonationsPage() {
         toast.info('No donations found for the selected date range.');
         return;
       }
-      const detailed = await fetchInChunks(rows, (d) => donationService.getById(d.id));
+      const detailed = await fetchInChunks(rows, (d) =>
+        donationService.getById(d.id)
+      );
       const data = detailed.map((d) => ({
         'Donor Name': d.donorFullName,
         Email: d.donorEmail,
         Amount: d.amount,
         Date: fmtExportDate(d.donation_date),
+        Source: d.source === 'stripe' ? 'Stripe' : 'Manual',
         'Receipt Status': d.receipt_status,
         Description: d.description ?? '',
         Phone: d.phone ?? '',

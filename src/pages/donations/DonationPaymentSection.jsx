@@ -1,3 +1,4 @@
+import Badge from '@/common/components/atoms/Badge';
 import PropTypes from 'prop-types';
 
 import {
@@ -43,6 +44,17 @@ export default function DonationPaymentSection({ form, onChange }) {
         />
       </div>
 
+      {form.source && (
+        <div
+          style={
+            form.description ? fieldGroup : { ...fieldGroup, marginBottom: 0 }
+          }
+        >
+          <div style={labelStyle}>Source</div>
+          <Badge status={form.source} />
+        </div>
+      )}
+
       {form.description && (
         <div style={{ ...fieldGroup, marginBottom: 0 }}>
           <label style={labelStyle}>Description</label>
@@ -62,6 +74,7 @@ DonationPaymentSection.propTypes = {
     amount: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     donation_date: PropTypes.string,
     description: PropTypes.string,
+    source: PropTypes.string,
   }).isRequired,
   onChange: PropTypes.func.isRequired,
 };
