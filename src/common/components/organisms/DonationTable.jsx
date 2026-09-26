@@ -49,7 +49,15 @@ const donorLinkStyle = {
 
 /* ── DonationTable ───────────────────────────────────── */
 
-const COLUMNS = ['Donor Name', 'Email', 'Amount', 'Date', 'Receipt Status', 'Description'];
+const COLUMNS = [
+  'Donor Name',
+  'Email',
+  'Amount',
+  'Date',
+  'Source',
+  'Receipt Status',
+  'Description',
+];
 
 export default function DonationTable({
   donations,
@@ -58,7 +66,7 @@ export default function DonationTable({
   selected,
   onSelectChange,
   onSelectAll,
-  onRowClick
+  onRowClick,
 }) {
   const showCheckboxes = Boolean(onSelectChange && onSelectAll);
   const allChecked =
@@ -79,8 +87,7 @@ export default function DonationTable({
   if (error)
     return <div style={{ ...statusMsg, color: '#dc2626' }}>Error: {error}</div>;
 
-  const colSpan =
-    COLUMNS.length + (showCheckboxes ? 1 : 0);
+  const colSpan = COLUMNS.length + (showCheckboxes ? 1 : 0);
 
   return (
     <table style={tableStyle}>
@@ -143,6 +150,9 @@ export default function DonationTable({
               <td style={tdStyle}>{formatAmount(d.amount)}</td>
               <td style={tdStyle}>{formatDate(d.donation_date)}</td>
               <td style={tdStyle}>
+                <Badge status={d.source} />
+              </td>
+              <td style={tdStyle}>
                 <Badge status={d.receipt_status} />
               </td>
               <td style={tdStyle}>
@@ -163,5 +173,5 @@ DonationTable.propTypes = {
   selected: PropTypes.instanceOf(Set),
   onSelectChange: PropTypes.func,
   onSelectAll: PropTypes.func,
-  onRowClick: PropTypes.func
+  onRowClick: PropTypes.func,
 };

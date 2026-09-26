@@ -8,6 +8,7 @@ export const EMPTY_DONATION_VIEW_FORM = {
   phone: '',
   address: '',
   description: '',
+  source: '',
 };
 
 export function fromDonationRow(donation) {
@@ -22,5 +23,6 @@ export function fromDonationRow(donation) {
     phone: '',
     address: '',
     description: donation.description ?? '',
+    source: donation.source ?? '',
   };
 }

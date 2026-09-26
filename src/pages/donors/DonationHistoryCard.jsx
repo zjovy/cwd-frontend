@@ -55,7 +55,12 @@ const styles = {
   },
 };
 
-export default function DonationHistoryCard({ donations, loading, error, onRowClick }) {
+export default function DonationHistoryCard({
+  donations,
+  loading,
+  error,
+  onRowClick,
+}) {
   const total = donations.reduce(
     (sum, d) => sum + (parseFloat(d.amount) || 0),
     0
@@ -75,33 +80,43 @@ export default function DonationHistoryCard({ donations, loading, error, onRowCl
       <>
         <TableScroll>
           <table style={styles.table}>
-          <thead>
-            <tr>
-              <th style={styles.th}>Date</th>
-              <th style={{ ...styles.th, textAlign: 'center' }}>Receipt Status</th>
-              <th style={{ ...styles.th, textAlign: 'right' }}>Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            {donations.map((d) => (
-              <tr
-                key={d.id}
-                style={onRowClick ? { cursor: 'pointer' } : undefined}
-                onClick={onRowClick ? () => onRowClick(d) : undefined}
-              >
-                <td style={styles.td}>{formatDate(d.donation_date)}</td>
-                <td style={{ ...styles.td, textAlign: 'center' }}>
-                  <Badge status={d.receipt_status} />
-                </td>
-                <td
-                  style={{ ...styles.td, textAlign: 'right', fontWeight: 500 }}
-                >
-                  {formatAmount(d.amount)}
-                </td>
+            <thead>
+              <tr>
+                <th style={styles.th}>Date</th>
+                <th style={styles.th}>Source</th>
+                <th style={{ ...styles.th, textAlign: 'center' }}>
+                  Receipt Status
+                </th>
+                <th style={{ ...styles.th, textAlign: 'right' }}>Amount</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {donations.map((d) => (
+                <tr
+                  key={d.id}
+                  style={onRowClick ? { cursor: 'pointer' } : undefined}
+                  onClick={onRowClick ? () => onRowClick(d) : undefined}
+                >
+                  <td style={styles.td}>{formatDate(d.donation_date)}</td>
+                  <td style={styles.td}>
+                    <Badge status={d.source} />
+                  </td>
+                  <td style={{ ...styles.td, textAlign: 'center' }}>
+                    <Badge status={d.receipt_status} />
+                  </td>
+                  <td
+                    style={{
+                      ...styles.td,
+                      textAlign: 'right',
+                      fontWeight: 500,
+                    }}
+                  >
+                    {formatAmount(d.amount)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </TableScroll>
 
         <div style={styles.totalsRow}>
